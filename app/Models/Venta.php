@@ -18,6 +18,7 @@ class Venta extends Model
         'estado_pago',
         'metodo_pago',
         'descuento_total',
+        'ticket_pdf',
         
     ];
 

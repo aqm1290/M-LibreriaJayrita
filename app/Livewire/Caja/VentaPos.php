@@ -50,6 +50,13 @@ class VentaPos extends Component
 
     public function mount()
     {
+        $hoy = today()->toDateString();
+        $cierre = \App\Models\CierreCaja::where('fecha', $hoy)->first();
+
+        if (!$cierre?->caja_abierta) {
+            return redirect()->route('caja.apertura')
+                ->with('error', '¡Primero debes abrir la caja del día!');
+        }
         $this->usuario_id = auth()->id() ?? 1;
         $this->resetearCliente();
     }

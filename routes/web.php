@@ -2,17 +2,20 @@
 
 use Illuminate\Support\Facades\Route;
 
-// Componentes Livewire correctos (namespace App\Livewire)
 use App\Livewire\Admin\Dashboard; 
 use App\Livewire\CategoriaManager;
 use App\Livewire\MarcasComponent;
 use App\Livewire\ModeloComponent;
 use App\Livewire\Admin\Productos;
-use App\Livewire\Caja\VentaPos;                    // ← Esta línea la agregas
+use App\Livewire\Caja\VentaPos;                   
 
 use App\Http\Controllers\VentaPdfController;
 
-Route::get('/venta/pdf/{id}', [VentaPdfController::class, 'ticket'])->name('venta.ticket');
+
+Route::get('/caja/apertura', \App\Livewire\Caja\AperturaCaja::class)->name('caja.apertura');
+Route::get('/caja/cierre', \App\Livewire\Caja\CierreDiario::class)->name('caja.cierre');
+Route::get('/venta/ticket/{id}', [VentaPdfController::class, 'ticket'])->name('venta.ticket');
+Route::get('/venta/descargar/{id}', [VentaPdfController::class, 'descargar'])->name('venta.descargar');
 
 Route::get('/caja/pos', VentaPos::class)->name('caja.pos');
 

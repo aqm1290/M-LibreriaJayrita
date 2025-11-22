@@ -392,6 +392,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         window.addEventListener('toast', e => Swal.fire({ toast:true, position:'top-end', timer:2500, icon:'success', title:e.detail, showConfirmButton:false }));
+       
         window.addEventListener('confirmar-venta', e => {
             const d = e.detail;
             let lista = '<div style="text-align:left; max-height:350px; overflow-y:auto;">';
@@ -407,10 +408,20 @@
 
         window.addEventListener('venta-creada', e => {
             Swal.fire({
-                title: '¡Venta completada!', text: 'Venta #' + e.detail, icon: 'success',
-                showCancelButton: true, confirmButtonText: 'Imprimir', cancelButtonText: 'Cerrar'
-            }).then(r => r.isConfirmed && window.open(`/venta/pdf/${e.detail}`, '_blank'));
+                title: '¡Venta completada!',
+                text: 'Venta #' + e.detail,
+                icon: 'success',
+                showCancelButton: true,
+                confirmButtonText: 'Imprimir Ticket',
+                cancelButtonText: 'Cerrar',
+                reverseButtons: true
+            }).then(r => {
+                if (r.isConfirmed) {
+                    window.open('/venta/ticket/' + e.detail, '_blank');
+                }
+            });
         });
+
         document.addEventListener('keydown', e => {
             if (['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName)) return;
             if (e.key === 'F4') { e.preventDefault(); @this.call('confirmarVenta') }
