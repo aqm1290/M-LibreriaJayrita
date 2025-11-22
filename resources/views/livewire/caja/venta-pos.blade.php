@@ -148,19 +148,100 @@
 
             <!-- TOTALES Y PAGO -->
             <div class="p-6 space-y-6 bg-gradient-to-b from-white to-gray-50">
+                {{-- cliente --}}
+                    <div>
+                                <label class="block text-sm font-bold text-gray-700 mb-3">Cliente</label>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-2">Cliente</label>
-                        <input type="text" wire:model.lazy="cliente_nombre" placeholder="Cliente Genérico"
-                               class="w-full px-5 py-4 rounded-xl border-2 border-gray-300 focus:border-[#3483FA] focus:ring-4 focus:ring-[#3483FA]/20 text-lg">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-2">CI / NIT (opcional)</label>
-                        <input type="text" wire:model.lazy="cliente_documento" placeholder="0000000"
-                               class="w-full px-5 py-4 rounded-xl border-2 border-gray-300 focus:border-[#3483FA] focus:ring-4 focus:ring-[#3483FA]/20 text-lg">
-                    </div>
-                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <!-- BUSCAR POR NOMBRE -->
+                                    <div class="relative">
+                                        <input type="text"
+                                            wire:model.live.debounce.300ms="buscarNombre"
+                                            placeholder="Buscar por nombre..."
+                                            class="w-full px-5 py-4 rounded-xl border-2 border-gray-300 focus:border-[#3483FA] focus:ring-4 focus:ring-[#3483FA]/20 text-lg transition"
+                                            autocomplete="off">
+                                        <div class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
+                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                                            </svg>
+                                        </div>
+                                    </div>
+
+                                    <!-- BUSCAR POR CI/NIT -->
+                                    <div class="relative">
+                                        <input type="text"
+                                            wire:model.live.debounce.300ms="buscarCi"
+                                            placeholder="Buscar por CI o NIT..."
+                                            class="w-full px-5 py-4 rounded-xl border-2 border-gray-300 focus:border-[#3483FA] focus:ring-4 focus:ring-[#3483FA]/20 text-lg transition"
+                                            autocomplete="off">
+                                        <div class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
+                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                    d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- RESULTADOS -->
+                                @if(count($clientesEncontrados) > 0)
+                                    <div class="mt-4 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden">
+                                        @foreach($clientesEncontrados as $cli)
+                                            <button type="button"
+                                                    wire:click="seleccionarCliente({{ $cli->id }})"
+                                                    class="w-full px-6 py-5 text-left hover:bg-blue-50 transition flex items-center justify-between border-b border-gray-100 last:border-0">
+                                                <div>
+                                                    <div class="font-bold text-gray-800 text-lg">{{ $cli->nombre }}</div>
+                                                    <div class="text-sm text-gray-600">
+                                                        @if($cli->ci) CI: {{ $cli->ci }} @endif
+                                                        @if($cli->telefono) • {{ $cli->telefono }} @endif
+                                                    </div>
+                                                </div>
+                                                <span class="bg-[#3483FA] text-white px-4 py-2 rounded-full text-sm font-bold shadow">
+                                                    Seleccionar
+                                                </span>
+                                            </button>
+                                        @endforeach
+                                    </div>
+                                @endif
+
+                                <!-- CLIENTE SELECCIONADO + BOTÓN CREAR -->
+                                <div class="mt-6 flex justify-between items-center bg-gradient-to-r from-blue-50 to-indigo-50 p-5 rounded-2xl border-2 border-blue-200">
+                                    <div>
+                                        <div class="text-xl font-black text-gray-800">
+                                            {{ $cliente_nombre }}
+                                            @if($cliente_documento)
+                                                <span class="text-blue-700 font-bold">({{ $cliente_documento }})</span>
+                                            @endif
+                                        </div>
+                                        @if($cliente_id)
+                                            <div class="text-sm text-gray-600 mt-1">Cliente registrado</div>
+                                        @else
+                                            <div class="text-sm text-gray-500">Venta rápida</div>
+                                        @endif
+                                    </div>
+
+                                    <button type="button" wire:click="abrirModalCliente"
+                                            class="px-6 py-4 bg-[#3483FA] hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg transform hover:scale-105 transition">
+                                        + Nuevo Cliente
+                                    </button>
+                                </div>
+                            </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
                 <div class="flex justify-between text-xl font-bold">
                     <span>Subtotal</span>
@@ -233,6 +314,77 @@
             </div>
         </div>
     </div>
+    <!-- ============================================= -->
+    <!-- MODAL: CREAR NUEVO CLIENTE                     -->
+    <!-- ============================================= -->
+    @if($mostrarModalCliente)
+        <div class="fixed inset-0 bg-black bg-opacity-60 z-[9999] flex items-center justify-center p-4 backdrop-blur-sm">
+            <div class="bg-white rounded-3xl shadow-3xl max-w-2xl w-full max-h-screen overflow-y-auto">
+                <div class="p-8 pb-4">
+                    <h2 class="text-4xl font-black text-center text-gray-800 mb-2">
+                        Nuevo Cliente
+                    </h2>
+                    <p class="text-center text-gray-600">Se creará y seleccionará automáticamente</p>
+                </div>
+
+                <div class="px-8 pb-8 space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Nombre completo *</label>
+                            <input type="text" 
+                                wire:model="nuevoCliente.nombre" 
+                                placeholder="Juan Pérez"
+                                class="w-full px-6 py-4 rounded-xl border-2 border-gray-300 focus:border-[#3483FA] focus:ring-4 focus:ring-[#3483FA]/20 text-lg transition">
+                            @error('nuevoCliente.nombre') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">CI / NIT</label>
+                            <input type="text" 
+                                wire:model="nuevoCliente.ci" 
+                                placeholder="1234567"
+                                class="w-full px-6 py-4 rounded-xl border-2 border-gray-300 focus:border-[#3483FA] focus:ring-4 focus:ring-[#3483FA]/20 text-lg transition">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Teléfono</label>
+                            <input type="text" 
+                                wire:model="nuevoCliente.telefono" 
+                                placeholder="77712345"
+                                class="w-full px-6 py-4 rounded-xl border-2 border-gray-300 focus:border-[#3483FA] focus:ring-4 focus:ring-[#3483FA]/20 text-lg transition">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Correo (opcional)</label>
+                            <input type="email" 
+                                wire:model="nuevoCliente.correo" 
+                                placeholder="juan@example.com"
+                                class="w-full px-6 py-4 rounded-xl border-2 border-gray-300 focus:border-[#3483FA] focus:ring-4 focus:ring-[#3483FA]/20 text-lg transition">
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Dirección (opcional)</label>
+                            <input type="text" 
+                                wire:model="nuevoCliente.direccion" 
+                                placeholder="Av. Siempre Viva #123"
+                                class="w-full px-6 py-4 rounded-xl border-2 border-gray-300 focus:border-[#3483FA] focus:ring-4 focus:ring-[#3483FA]/20 text-lg transition">
+                        </div>
+                    </div>
+
+                    <div class="flex gap-4 pt-6">
+                        <button wire:click="$set('mostrarModalCliente', false)"
+                                class="flex-1 py-5 rounded-xl bg-gray-200 hover:bg-gray-300 font-bold text-xl transition transform active:scale-95">
+                            Cancelar
+                        </button>
+                        <button wire:click="crearCliente"
+                                class="flex-1 py-5 rounded-xl bg-[#3483FA] hover:bg-blue-700 text-white font-black text-xl shadow-lg transition transform active:scale-95">
+                            Crear y Seleccionar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>
 
 <!-- SCRIPTS -->
@@ -264,6 +416,7 @@
             if (e.key === 'F4') { e.preventDefault(); @this.call('confirmarVenta') }
             if (e.key === 'F9') { e.preventDefault(); @this.call('limpiarCarrito') }
             if (e.key === 'F2') { e.preventDefault(); document.querySelector('input[wire\\:model\\.live]')?.focus() }
+            if (e.key === 'F6') {  e.preventDefault(); @this.call('abrirModalCliente') }
         });
     });
 </script>

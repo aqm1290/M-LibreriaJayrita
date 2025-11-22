@@ -6,6 +6,7 @@ use Livewire\Component;
 use Illuminate\Support\Facades\DB;
 use App\Models\Producto;
 use App\Models\Venta;
+use App\Models\Cliente;
 use App\Models\DetalleVenta;
 
 class VentaPos extends Component
@@ -21,8 +22,26 @@ class VentaPos extends Component
     public $total_impuesto = 0;
     public $total = 0;
     public $cambio = 0;
-    public $cliente_nombre = 'Cliente XXXXXX'; // valor por defecto
-    public $cliente_documento = ''; // opcional
+   
+    //cliente
+    public $cliente_id = null;
+    public $cliente_nombre = 'Cliente';
+    public $cliente_documento = '';
+
+    // Para el modal
+    public $mostrarModalCliente = false;
+    public $nuevoCliente = [
+        'nombre' => '',
+        'ci' => '',
+        'telefono' => '',
+        'direccion' => '',
+        'correo' => '',
+    ];
+
+    // Para búsqueda de clientes
+    public $buscarNombre = '';
+    public $buscarCi = '';
+    public $clientesEncontrados = [];
 
     protected $listeners = [
         'confirmar-venta' => 'finalizarVenta',
@@ -32,6 +51,15 @@ class VentaPos extends Component
     public function mount()
     {
         $this->usuario_id = auth()->id() ?? 1;
+        $this->resetearCliente();
+    }
+    public function resetearCliente()
+    {
+        $this->cliente_id = null;
+        $this->cliente_nombre = 'Cliente ';
+        $this->cliente_documento = '';
+        $this->buscarCliente = '';
+        $this->clientesEncontrados = [];
     }
 
     public function render()
@@ -169,26 +197,29 @@ class VentaPos extends Component
             return;
         }
 
+        $this->calcularTotales();
+
         DB::beginTransaction();
         try {
             $venta = Venta::create([
-                'usuario_id' => $this->usuario_id,
-                'total' => $this->total,
-                'estado_pago' => $this->metodo_pago === 'efectivo' ? 'completada' : 'pendiente',
-                'metodo_pago' => $this->metodo_pago,
-                'impuesto' => $this->total_impuesto,
-                'descuento_total' => $this->descuento,
-                'cliente_nombre' => $this->cliente_nombre ?: 'Cliente XXXXXXXX',
-                'cliente_documento' => $this->cliente_documento,
+                'usuario_id'        => $this->usuario_id,
+                'cliente_id'        => $this->cliente_id,
+                'cliente_nombre'    => $this->cliente_id ? null : ($this->cliente_nombre ?: 'Cliente Genérico'),
+                'cliente_documento' => $this->cliente_id ? null : $this->cliente_documento,
+                'total'             => $this->total,
+                'estado_pago'       => $this->metodo_pago === 'efectivo' ? 'completada' : 'pendiente',
+                'metodo_pago'       => $this->metodo_pago,
+                'impuesto'          => $this->total_impuesto,
+                'descuento_total'   => $this->descuento,
             ]);
 
             foreach ($this->cart as $item) {
                 DetalleVenta::create([
-                    'venta_id' => $venta->id,
+                    'venta_id'    => $venta->id,
                     'producto_id' => $item['producto_id'],
-                    'cantidad' => $item['cantidad'],
-                    'precio' => $item['precio_unitario'],
-                    'subtotal' => $item['subtotal'], 
+                    'cantidad'    => $item['cantidad'],
+                    'precio'      => $item['precio_unitario'],
+                    'subtotal'    => $item['subtotal'],
                 ]);
 
                 $producto = Producto::find($item['producto_id']);
@@ -200,38 +231,56 @@ class VentaPos extends Component
             DB::commit();
 
             $this->dispatch('toast', '¡Venta registrada con éxito!');
-            $this->reset(['cart',
-            'subtotal',
-            'descuento',
-            'total',
-            'efectivo_recibido',
-            'cambio',
-            'cliente_nombre',
-            'cliente_documento',
-            'metodo_pago',
-            'search']);
-            $this->calcularTotales();
             $this->dispatch('venta-creada', $venta->id);
+
+            // === RESETEO PERFECTO (todo actualizado) ===
+            $this->resetearTodo();
 
         } catch (\Throwable $e) {
             DB::rollBack();
-            $this->dispatch('toast', 'Error: ' . $e->getMessage());
+            $this->dispatch('toast', 'Error al procesar la venta');
+            \Log::error('Error en Venta POS: ' . $e->getMessage(), ['exception' => $e]);
         }
+    }
 
-            $this->reset([
+    // MÉTODO REUTILIZABLE (lo usamos también en limpiar carrito si querés)
+    public function resetearTodo()
+    {
+        $this->reset([
             'cart',
             'subtotal',
-            'descuento',
+            'total_impuesto',
             'total',
+            'descuento',
             'efectivo_recibido',
             'cambio',
+            'metodo_pago',
+            'search',
+            // Cliente
+            'cliente_id',
             'cliente_nombre',
             'cliente_documento',
-            'metodo_pago',
-            'search'
+            'buscarNombre',
+            'buscarCi',
+            'clientesEncontrados',
+            'mostrarModalCliente',
+            'nuevoCliente' // también reseteamos el formulario del modal
         ]);
 
+        // Valores por defecto
+        $this->cliente_nombre = 'Cliente Genérico';
+        $this->nuevoCliente = [
+            'nombre' => '',
+            'ci' => '',
+            'telefono' => '',
+            'direccion' => '',
+            'correo' => '',
+        ];
+
+        $this->calcularTotales();
     }
+
+
 
     public function incrementarCantidad($index)
     {
@@ -273,5 +322,88 @@ class VentaPos extends Component
         } else {
             $this->dispatch('toast', 'La cantidad mínima es 1');
         }
+    }
+
+
+
+
+    public function updated($property)
+    {
+        if ($property === 'buscarNombre' || $property === 'buscarCi') {
+            $this->buscarClientes();
+        }
+    }
+
+    public function buscarClientes()
+    {
+        $query = Cliente::query();
+
+        if ($this->buscarNombre !== '') {
+            $query->where('nombre', 'like', "%{$this->buscarNombre}%");
+        }
+
+        if ($this->buscarCi !== '') {
+            $query->where('ci', 'like', "%{$this->buscarCi}%");
+        }
+
+        // Si ambos están vacíos, no mostrar nada
+        if ($this->buscarNombre === '' && $this->buscarCi === '') {
+            $this->clientesEncontrados = [];
+            return;
+        }
+
+        $this->clientesEncontrados = $query->limit(15)->get();
+    }
+    public function seleccionarCliente($clienteId)
+    {
+        $cliente = Cliente::find($clienteId);
+        if ($cliente) {
+            $this->cliente_id = $cliente->id;
+            $this->cliente_nombre = $cliente->nombre;
+            $this->cliente_documento = $cliente->ci ?? '';
+            
+            // Limpiar campos de búsqueda
+            $this->buscarNombre = '';
+            $this->buscarCi = '';
+            $this->clientesEncontrados = [];
+        }
+    }
+    public function abrirModalCliente()
+    {
+        $this->nuevoCliente = [
+            'nombre' => $this->cliente_nombre !== 'Cliente' ? $this->cliente_nombre : '',
+            'ci' => $this->cliente_documento,
+            'telefono' => '',
+            'direccion' => '',
+            'correo' => '',
+        ];
+        $this->mostrarModalCliente = true;
+    }
+
+    public function crearCliente()
+    {
+        $this->validate([
+            'nuevoCliente.nombre' => 'required|string|max:255',
+            'nuevoCliente.ci' => 'nullable|string|max:20',
+            'nuevoCliente.telefono' => 'nullable|string|max:20',
+        ]);
+
+        $cliente = Cliente::create($this->nuevoCliente);
+
+        $this->cliente_id = $cliente->id;
+        $this->cliente_nombre = $cliente->nombre;
+        $this->cliente_documento = $cliente->ci ?? '';
+        $this->buscarCliente = $cliente->nombre_completo;
+
+        $this->mostrarModalCliente = false;
+        $this->dispatch('toast', '¡Cliente creado y seleccionado!');
+    }
+    public function getNombreClienteAttribute()
+    {
+        if ($this->cliente_id && $this->cliente) {
+            return $this->cliente->nombre . ($this->cliente->ci ? " (CI: {$this->cliente->ci})" : '');
+        }
+
+        return $this->cliente_nombre ?? 'Cliente ';
     }
 }
