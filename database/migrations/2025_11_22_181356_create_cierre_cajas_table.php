@@ -11,17 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cierre_cajas', function (Blueprint $table) {
+        Schema::create('cierre_caja', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('usuario_id')->constrained('users');
-            $table->date('fecha'); // fecha del cierre (hoy)
-            $table->decimal('total_efectivo', 10, 2);
-            $table->decimal('total_qr', 10, 2);
-            $table->decimal('total_ventas', 10, 2);
-            $table->integer('cantidad_ventas');
-            $table->decimal('inicio_caja', 10, 2)->default(0); // opcional: cuanto había al abrir
-            $table->string('reporte_pdf')->nullable(); // PDF del cierre
-            $table->text('observaciones')->nullable();
+            $table->foreignId('usuario_id')->constrained('users')->onDelete('cascade');
+            $table->date('fecha')->unique(); // Un cierre por día
+            $table->decimal('monto_apertura', 10, 2)->default(0.00); // ← YA INCLUIDO
+            $table->decimal('total_efectivo', 10, 2)->default(0.00);
+            $table->decimal('total_qr', 10, 2)->default(0.00);
+            $table->decimal('total_ventas', 10, 2)->default(0.00);
+            $table->integer('cantidad_ventas')->default(0);
+            $table->string('reporte_pdf')->nullable();
+            $table->boolean('caja_abierta')->default(true);
             $table->timestamps();
         });
     }

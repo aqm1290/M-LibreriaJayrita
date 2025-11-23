@@ -13,10 +13,7 @@ return new class extends Migration {
             $table->string('correo')->unique();
             $table->string('telefono')->nullable();
             $table->text('direccion')->nullable();
-            $table->boolean('activo')->default(true);
-            $table->string('nit', 50)->nullable();
             $table->string('empresa', 150)->nullable();
-            $table->string('estado')->default('activo'); // activo, inactivo
             $table->timestamp('creado_en')->useCurrent();
             $table->timestamp('actualizado_en')->useCurrent()->useCurrentOnUpdate();
         });
