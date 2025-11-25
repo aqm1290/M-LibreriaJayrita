@@ -6,9 +6,13 @@ use Livewire\Component;
 use App\Models\Venta;
 use App\Models\DetalleVenta;
 use App\Models\CierreCaja;
+use App\Models\Producto;
+use Carbon\Carbon;
+
 
 class Dashboard extends Component
 {
+    
     public $ventasHoy = 0;
     public $cantidadVentasHoy = 0;
     public $efectivoHoy = 0;
@@ -19,6 +23,9 @@ class Dashboard extends Component
     public $fechas = [];
     public $ventasSemanales = [];
 
+    public $stockBajo = [];
+    public $sinStock = [];
+    public $productosMuertos = [];
     public $topProductos = [];
 
     public function mount()
@@ -48,18 +55,39 @@ class Dashboard extends Component
             $this->ventasSemanales[] = Venta::whereDate('created_at', $fecha)->sum('total') ?: 0;
         }
 
-        // === TOP 10 PRODUCTOS DEL DÍA (CORREGIDO 100%) ===
-        $this->topProductos = DetalleVenta::with(['producto.marca', 'producto.modelo']) // ← modelo, no modelobier
+        // === TOP 10 PRODUCTOS DEL DÍA ===
+        $this->topProductos = DetalleVenta::with(['producto.marca', 'producto.modelo'])
             ->select('producto_id')
             ->selectRaw('SUM(cantidad) as total_vendido')
-            ->selectRaw('SUM(cantidad * precio) as total_ingresos') // ← usa el precio guardado en detalle_venta
+            ->selectRaw('SUM(cantidad * precio) as total_ingresos')
             ->whereHas('venta', fn($q) => $q->whereDate('created_at', $hoy))
             ->groupBy('producto_id')
             ->orderByDesc('total_vendido')
             ->limit(10)
             ->get();
-    }
 
+        // === STOCK BAJO (1 a 10 unidades) → COLUMNA "stock" !!!
+        $this->stockBajo = \App\Models\Producto::whereBetween('stock', [1, 10])
+            ->with('marca', 'modelo')
+            ->orderBy('stock')
+            ->limit(20)
+            ->get();
+
+        // === SIN STOCK (0 unidades) → COLUMNA "stock" !!!
+        $this->sinStock = \App\Models\Producto::where('stock', 0)
+            ->with('marca', 'modelo')
+            ->limit(20)
+            ->get();
+
+        // === PRODUCTOS QUE NO SE MUEVEN (30 días sin ventas y con stock > 0)
+        $this->productosMuertos = \App\Models\Producto::where('stock', '>', 0)
+            ->whereDoesntHave('detalleVentas', function ($q) {
+                $q->where('created_at', '>=', now()->subDays(30));
+            })
+            ->with('marca', 'modelo')
+            ->limit(15)
+            ->get();
+    }
     public function render()
     {
         return view('livewire.admin.dashboard');

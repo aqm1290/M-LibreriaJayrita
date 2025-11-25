@@ -18,6 +18,8 @@ class Producto extends Model
         'modelo_id', 'marca_id', 'promo_id', 'codigo',
     ];
 
+    
+    public function detallesEntradas(){return $this->hasMany(DetalleEntrada::class, 'producto_id');}
     public function categoria() { return $this->belongsTo(Categoria::class); }
     public function marca()     { return $this->belongsTo(Marca::class); }
     public function modelo()    { return $this->belongsTo(Modelo::class); }

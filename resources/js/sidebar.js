@@ -1,6 +1,4 @@
-// resources/js/sidebar.js
 document.addEventListener('DOMContentLoaded', function () {
-    // Cargar iconos al inicio
     if (typeof feather !== 'undefined') {
         feather.replace();
     }
@@ -8,34 +6,66 @@ document.addEventListener('DOMContentLoaded', function () {
     const sidebar = document.getElementById('sidebar');
     const mainContent = document.getElementById('main-content');
     const btnCollapse = document.getElementById('btn-collapse');
-    let collapseIcon = btnCollapse.querySelector('i'); // Inicial
+    const btnToggleSidebar = document.getElementById('btn-toggle-sidebar');
+    const btnCloseSidebar = document.getElementById('btn-close-sidebar');
+    const sidebarOverlay = document.getElementById('sidebar-overlay');
+    const darkModeToggle = document.getElementById('dark-mode-toggle');
 
-    // Botón colapsar/expandir
-    btnCollapse.addEventListener('click', function () {
-        const isCollapsed = sidebar.classList.toggle('sidebar-collapsed');
-        mainContent.classList.toggle('main-collapsed', isCollapsed);
+    function toggleMobileSidebar() {
+        sidebar.classList.toggle('-translate-x-full');
+        sidebarOverlay.classList.toggle('hidden');
+        document.body.classList.toggle('overflow-hidden');
+    }
 
-        // Cambiar flecha (CORREGIDO: Reemplazar todo el contenido del botón con nuevo <i> y refrescar Feather)
-        btnCollapse.innerHTML = `<i data-feather="${isCollapsed ? 'chevrons-right' : 'chevrons-left'}" class="w-6 h-6"></i>`;
-        feather.replace(); // Refrescar inmediatamente después de cambiar
+    if (btnToggleSidebar) {
+        btnToggleSidebar.addEventListener('click', toggleMobileSidebar);
+    }
 
-        // Actualizar referencia a collapseIcon después del cambio
-        collapseIcon = btnCollapse.querySelector('i');
+    if (btnCloseSidebar) {
+        btnCloseSidebar.addEventListener('click', toggleMobileSidebar);
+    }
 
-        // Ocultar/mostrar textos (con opacity para transición suave)
-        const texts = document.querySelectorAll('.nav-text, .header-text, .user-info, .gestion-title');
-        texts.forEach(text => {
-            text.classList.toggle('hidden', isCollapsed);
-            text.style.opacity = isCollapsed ? '0' : '1';
+    if (sidebarOverlay) {
+        sidebarOverlay.addEventListener('click', toggleMobileSidebar);
+    }
+
+    if (btnCollapse) {
+        btnCollapse.addEventListener('click', function () {
+            const isCollapsed = sidebar.classList.toggle('sidebar-collapsed');
+            mainContent.classList.toggle('main-collapsed', isCollapsed);
+
+            btnCollapse.innerHTML = `<i data-feather="${isCollapsed ? 'chevrons-right' : 'chevrons-left'}" class="w-6 h-6"></i>`;
+            feather.replace();
+
+            const texts = document.querySelectorAll('.nav-text, .header-text, .user-info, .gestion-title');
+            texts.forEach(text => {
+                text.classList.toggle('hidden', isCollapsed);
+                text.style.opacity = isCollapsed ? '0' : '1';
+                text.style.transform = isCollapsed ? 'translateX(-10px)' : 'translateX(0)'; // Animación slide out
+            });
+
+            setTimeout(() => feather.replace(), 100);
+        });
+    }
+
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener('click', function () {
+            document.documentElement.classList.toggle('dark');
+            if (document.documentElement.classList.contains('dark')) {
+                localStorage.theme = 'dark';
+            } else {
+                localStorage.theme = 'light';
+            }
+            feather.replace();
         });
 
-        // Refrescar iconos adicionales
-        setTimeout(() => feather.replace(), 50);
-        setTimeout(() => feather.replace(), 150);
-        setTimeout(() => feather.replace(), 300);
-    });
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    }
 
-    // CERRAR SESIÓN
     const logoutBtn = document.querySelector('button:has([data-feather="log-out"])');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', function () {
@@ -43,10 +73,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Refrescar iconos al inicio
-    setTimeout(() => feather.replace(), 100);
-
-    // Compatibilidad con Livewire
     if (typeof Livewire !== 'undefined') {
         Livewire.hook('morph.updated', () => {
             feather.replace();

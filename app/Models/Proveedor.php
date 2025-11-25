@@ -9,13 +9,22 @@ class Proveedor extends Model
 {
     use HasFactory;
 
-    public $timestamps = false;
-    const CREATED_AT = 'creado_en';
-    const UPDATED_AT = 'actualizado_en';
+    protected $table = 'proveedores';
 
     protected $fillable = [
-        'nombre', 'correo', 'telefono', 'direccion', 'activo',
-        'nit', 'empresa', 'estado',
+        'nombre',
+        'correo',
+        'telefono',
+        'direccion',
+        'nit',
+        'empresa',
+        'contacto_nombre',
+        'contacto_telefono',
+        'estado',
+    ];
+
+    protected $casts = [
+        'estado' => 'string',
     ];
 
     public function entradasInventario()

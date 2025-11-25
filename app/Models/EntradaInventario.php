@@ -2,17 +2,15 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class EntradaInventario extends Model
 {
-    protected $table = 'entradas_inventario';
-    use HasFactory;
-
     protected $fillable = [
-        'proveedor_id', 'producto_id', 'cantidad',
-        'precio_compra', 'fecha',
+        'proveedor_id',
+        'fecha',
+        'observacion',
+        'total',
     ];
 
     public function proveedor()
@@ -20,8 +18,8 @@ class EntradaInventario extends Model
         return $this->belongsTo(Proveedor::class);
     }
 
-    public function producto()
+    public function detalles()
     {
-        return $this->belongsTo(Producto::class);
+        return $this->hasMany(DetalleEntrada::class);
     }
 }

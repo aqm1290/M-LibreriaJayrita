@@ -1,0 +1,19 @@
+/* Logo animado sutil */
+.logo-container img {
+    transition: transform 0.3s ease;
+}
+
+.logo-container:hover img {
+    transform: scale(1.1) rotate(5deg);
+}
+
+/* Submenús más bonitos */
+.submenu-item {
+    @apply block px-5 py-2.5 text-gray-600 hover:text-gray-900 hover:bg-yellow-50 rounded-lg font-medium transition-all duration-200;
+}
+
+/* Scroll suave en sidebar */
+nav.overflow-y-auto {
+    scrollbar-width: thin;
+    scrollbar-color: #fbbf24 transparent;
+}

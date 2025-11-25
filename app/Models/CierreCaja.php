@@ -6,8 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class CierreCaja extends Model
 {
-    protected $table = 'cierre_caja'; // ← FORZAMOS EL NOMBRE CORRECTO (plural)
-
+    protected $table = 'cierre_caja';
     protected $fillable = [
         'usuario_id',
         'fecha',

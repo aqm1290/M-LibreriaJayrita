@@ -9,13 +9,25 @@ return new class extends Migration {
     {
         Schema::create('proveedores', function (Blueprint $table) {
             $table->id();
+
+            // Datos principales
             $table->string('nombre');
             $table->string('correo')->unique();
             $table->string('telefono')->nullable();
             $table->text('direccion')->nullable();
+            $table->string('nit', 50)->nullable();
             $table->string('empresa', 150)->nullable();
-            $table->timestamp('creado_en')->useCurrent();
-            $table->timestamp('actualizado_en')->useCurrent()->useCurrentOnUpdate();
+
+            // Nuevos campos solicitados
+            $table->string('contacto_nombre')->nullable();      // persona de contacto
+            $table->string('contacto_telefono')->nullable();    // teléfono contacto
+            $table->enum('estado', ['activo', 'inactivo'])->default('activo'); // estado
+
+            $table->timestamps();
+
+            // Índices
+            $table->index('nombre', 'proveedores_nombre_index');
+            $table->index('correo', 'proveedores_correo_index');
         });
     }
 

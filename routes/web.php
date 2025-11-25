@@ -7,7 +7,11 @@ use App\Livewire\Admin\Dashboard;
 use App\Livewire\CategoriaManager;
 use App\Livewire\MarcasComponent;
 use App\Livewire\ModeloComponent;
+use App\Livewire\Inventario\CreateEntradaInventario;
+
 use App\Livewire\Admin\Productos;
+use App\Livewire\Admin\Proveedores;
+
 
 use App\Livewire\Caja\AperturaCaja;
 use App\Livewire\Caja\CierreDiario;
@@ -52,6 +56,9 @@ Route::middleware(['auth', 'rol:admin,cajero'])->group(function () {
 
     Route::get('/caja/cierre', CierreDiario::class)
          ->name('caja.cierre');
+    Route::get('/entrada-inventario',CreateEntradaInventario::class)->name('entrada-inventario');
+    Route::get('/entradas', \App\Livewire\Inventario\IndexEntradaInventario::class)->name('entradas.index');
+    Route::get('/entradas/{id}/edit', \App\Livewire\Inventario\EditEntradaInventario::class)->name('entradas.edit');    
 });
 
 // ====================================================================
@@ -62,6 +69,10 @@ Route::middleware(['auth', 'rol:admin'])->group(function () {
     Route::get('/categorias', CategoriaManager::class)->name('categorias');
     Route::get('/marcas', MarcasComponent::class)->name('marcas');
     Route::get('/modelos', ModeloComponent::class)->name('modelos');
+
+    Route::get('/proveedores', Proveedores::class)->name('proveedores');
+
+
 });
 
 // ====================================================================
