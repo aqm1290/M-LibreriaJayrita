@@ -11,14 +11,16 @@ class AperturaCaja extends Component
     public $cajaAbierta = false;
     public $montoApertura = 0;
 
+        // app/Livewire/Caja/AperturaCaja.php
     public function mount()
     {
-        $hoy = today()->toDateString();
-        $cierre = CierreCaja::where('fecha', $hoy)->first();
+        $this->redirectIfAlreadyOpen();
+    }
 
-        if ($cierre && $cierre->caja_abierta) {
-            $this->cajaAbierta = true;
-            $this->montoApertura = $cierre->monto_apertura;
+    public function redirectIfAlreadyOpen()
+    {
+        if (CierreCaja::cajaAbiertaHoy()) {
+            return redirect()->route('caja.pos');
         }
     }
 
@@ -28,23 +30,18 @@ class AperturaCaja extends Component
             'monto' => 'required|numeric|min:0'
         ]);
 
-        $hoy = today()->toDateString();
-
         CierreCaja::updateOrCreate(
-            ['fecha' => $hoy],
+            ['fecha' => today()],
             [
-                'usuario_id' => auth()->check() ? auth()->id() : 1,
+                'usuario_id' => auth()->id(),
                 'monto_apertura' => $this->monto,
                 'caja_abierta' => true
             ]
         );
 
-        $this->cajaAbierta = true;
-        $this->montoApertura = $this->monto;
-
-        $this->dispatch('toast', '¡Caja abierta con éxito! Bs ' . number_format($this->monto, 2));
+        $this->dispatch('toast', '¡Caja abierta con éxito! Puedes empezar a vender.');
+        return redirect()->route('caja.pos');
     }
-
     public function render()
     {
         return view('livewire.caja.apertura-caja')

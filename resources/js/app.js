@@ -1,20 +1,65 @@
+
 import './bootstrap';
 import '../css/app.css';
 import Swal from 'sweetalert2';
+import { createIcons } from 'lucide';
 
+window.Swal = Swal;
 
-import { createIcons, Home, Box, Boxes, Layers, Wallet, Package, Store, Users, FolderTree } from 'lucide';
+import {
+    X,
+    ChevronDown,
+    ShoppingCart,
+    Home,
+    Wallet,
+    DoorOpen,
+    DoorClosed,
+    Search,
+    Boxes,
+    FilePlus,
+    History,
+    FolderTree,
+    Package,
+    Layers,
+    Tag,
+
+} from 'lucide';
 
 createIcons({
     icons: {
-        Home, Box, Boxes, Layers, Wallet, Package, Store, Users, FolderTree
+        X,
+        ChevronDown,
+        ShoppingCart,
+        Home,
+        Wallet,
+        DoorOpen,
+        DoorClosed,
+        Search,
+        Boxes,
+        FilePlus,
+        History,
+        FolderTree,
+        Package,
+        Layers,
+        Tag,
+
+        FileText,
+        Truck,
+        Menu,
+        CheckCircle,
+
     }
 });
+// ------------------------------------
 
-/* import Alpine from 'alpinejs';
- */
-window.Swal = Swal;
-/* 
-window.Alpine = Alpine;
 
-Alpine.start(); */
+window.toggleSidebar = function () {
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar.classList.contains('-translate-x-full')) {
+        sidebar.classList.remove('-translate-x-full');
+        sidebar.classList.add('translate-x-0');
+    } else {
+        sidebar.classList.add('-translate-x-full');
+        sidebar.classList.remove('translate-x-0');
+    }
+}

@@ -46,6 +46,7 @@ class VentaPos extends Component
     protected $listeners = [
         'confirmar-venta' => 'finalizarVenta',
         'venta-creada' => 'ventaCreada',
+        'add-to-pos-cart' => 'agregarProducto',
     ];
 
     public function mount()

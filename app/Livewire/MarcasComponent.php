@@ -4,91 +4,123 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\Marca;
+use Illuminate\Validation\Rule;
 
 class MarcasComponent extends Component
 {
-    public $marcas;
-    public $nombre, $descripcion, $marca_id;
+    public $search = '';
     public $modal = false;
+    public $confirmDelete = false;
 
-    protected $listeners = [
-        'deleteConfirmed' => 'delete'
-    ];
+    public $marca_id = null;
+    public $nombre = '';
+    public $descripcion = '';
+
+    protected function rules()
+    {
+        return [
+            'nombre' => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('marcas')->ignore($this->marca_id),
+            ],
+            'descripcion' => 'nullable|string|max:500',
+        ];
+    }
+
+    protected function messages()
+    {
+        return [
+            'nombre.required' => 'El nombre de la marca es obligatorio.',
+            'nombre.max'      => 'El nombre no puede tener más de 100 caracteres.',
+            'nombre.unique'   => 'Ya existe una marca con este nombre.',
+            'descripcion.max'=> 'La descripción no puede tener más de 500 caracteres.',
+        ];
+    }
 
     public function render()
     {
-        $this->marcas = Marca::orderBy('id', 'DESC')->get();
-        return view('livewire.marcas-component');
+        $marcas = Marca::where('nombre', 'like', "%{$this->search}%")
+            ->orWhere('descripcion', 'like', "%{$this->search}%")
+            ->orderBy('nombre')
+            ->paginate(12);
+
+        return view('livewire.marcas-component', compact('marcas'));
     }
 
-    public function openModal()
+    public function crear()
     {
-        $this->resetInput();
+        $this->resetForm();
         $this->modal = true;
     }
 
-    public function closeModal()
+    public function editar($id)
     {
-        $this->modal = false;
+        $marca = Marca::findOrFail($id);
+        $this->marca_id    = $marca->id;
+        $this->nombre      = $marca->nombre;
+        $this->descripcion = $marca->descripcion ?? '';
+        $this->modal = true;
     }
 
-    public function resetInput()
+    public function guardar()
     {
-        $this->nombre = '';
-        $this->descripcion = '';
-        $this->marca_id = null;
-    }
-
-    public function store()
-    {
-        $this->validate([
-            'nombre' => 'required',
-        ]);
+        $this->validate();
 
         Marca::updateOrCreate(
             ['id' => $this->marca_id],
             [
-                'nombre' => $this->nombre,
+                'nombre'      => $this->nombre,
                 'descripcion' => $this->descripcion,
             ]
         );
 
-        $this->dispatch('toast', [
-            'icon'  => 'success',
-            'title' => $this->marca_id ? 'Marca actualizada' : 'Marca creada'
-        ]);
+        $this->dispatch('toast', 
+            $this->marca_id 
+                ? 'Marca actualizada correctamente' 
+                : 'Marca creada exitosamente'
+        );
 
-        $this->closeModal();
-        $this->resetInput();
+        $this->cerrarModal();
     }
 
-    public function edit($id)
-    {
-        $marca = Marca::findOrFail($id);
-
-        $this->marca_id = $id;
-        $this->nombre = $marca->nombre;
-        $this->descripcion = $marca->descripcion;
-
-        $this->modal = true;
-    }
-
-    public function confirmDelete($id)
+    public function confirmarEliminar($id)
     {
         $this->marca_id = $id;
-
-        $this->dispatch('confirmDelete');
+        $this->confirmDelete = true;
     }
 
-    public function delete()
+    public function eliminar()
     {
-        Marca::destroy($this->marca_id);
+        $marca = Marca::find($this->marca_id);
 
-        $this->dispatch('toast', [
-            'icon'  => 'success',
-            'title' => 'Marca eliminada correctamente'
-        ]);
+        if ($marca && $marca->productos()->count() > 0) {
+            $this->dispatch('toast', 'No se puede eliminar: hay productos asociados a esta marca.');
+            $this->confirmDelete = false;
+            return;
+        }
 
-        $this->resetInput();
+        $marca?->delete();
+        $this->dispatch('toast', 'Marca eliminada correctamente');
+        $this->confirmDelete = false;
+    }
+
+    public function cerrarModal()
+    {
+        $this->modal = false;
+        $this->confirmDelete = false;
+        $this->resetForm();
+    }
+
+    private function resetForm()
+    {
+        $this->reset(['marca_id', 'nombre', 'descripcion']);
+        $this->resetErrorBag();
+    }
+
+    public function updatingSearch()
+    {
+        $this->resetPage();
     }
 }

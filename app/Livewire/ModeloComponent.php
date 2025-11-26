@@ -7,7 +7,6 @@ use Livewire\WithPagination;
 use App\Models\Modelo;
 use App\Models\Marca;
 use Illuminate\Validation\Rule;
-use Livewire\Attributes\On;
 
 class ModeloComponent extends Component
 {
@@ -15,33 +14,48 @@ class ModeloComponent extends Component
 
     public $search = '';
     public $modal = false;
+    public $confirmDelete = false;
+
     public $modeloId = null;
     public $nombre = '';
     public $descripcion = '';
-    public $marca_id = null;
+    public $marca_id = '';
 
-    protected $rules = [
-        'nombre' => 'required|string|max:255',
-        'marca_id' => 'required|exists:marcas,id',
-        'descripcion' => 'nullable|string',
-    ];
-
-    protected $queryString = ['search'];
-
-    public function updatingSearch()
+    protected function rules()
     {
-        $this->resetPage();
+        return [
+            'nombre' => [
+                'required',
+                'string',
+                'max:150',
+                Rule::unique('modelos')->where(fn($query) => $query->where('marca_id', $this->marca_id))->ignore($this->modeloId),
+            ],
+            'marca_id' => 'required|exists:marcas,id',
+            'descripcion' => 'nullable|string|max:500',
+        ];
+    }
+
+    protected function messages()
+    {
+        return [
+            'nombre.required' => 'El nombre del modelo es obligatorio.',
+            'nombre.max'      => 'El nombre no puede tener más de 150 caracteres.',
+            'nombre.unique'   => 'Ya existe un modelo con este nombre para la marca seleccionada.',
+            'marca_id.required' => 'Debes seleccionar una marca.',
+            'marca_id.exists'   => 'La marca seleccionada no es válida.',
+            'descripcion.max'   => 'La descripción no puede tener más de 500 caracteres.',
+        ];
     }
 
     public function render()
     {
         $modelos = Modelo::with('marca')
-            ->where(function ($q) {
-                $q->where('nombre', 'like', "%{$this->search}%")
-                  ->orWhereHas('marca', fn($m) => $m->where('nombre', 'like', "%{$this->search}%"));
+            ->when($this->search, function ($query) {
+                $query->where('nombre', 'like', "%{$this->search}%")
+                      ->orWhereHas('marca', fn($q) => $q->where('nombre', 'like', "%{$this->search}%"));
             })
             ->orderBy('nombre')
-            ->paginate(10);
+            ->paginate(12);
 
         $marcas = Marca::orderBy('nombre')->get();
 
@@ -56,11 +70,11 @@ class ModeloComponent extends Component
 
     public function editar($id)
     {
-        $m = Modelo::findOrFail($id);
-        $this->modeloId = $m->id;
-        $this->nombre = $m->nombre;
-        $this->descripcion = $m->descripcion;
-        $this->marca_id = $m->marca_id;
+        $modelo = Modelo::findOrFail($id);
+        $this->modeloId    = $modelo->id;
+        $this->nombre      = $modelo->nombre;
+        $this->descripcion = $modelo->descripcion ?? '';
+        $this->marca_id    = $modelo->marca_id;
         $this->modal = true;
     }
 
@@ -71,46 +85,57 @@ class ModeloComponent extends Component
         Modelo::updateOrCreate(
             ['id' => $this->modeloId],
             [
-                'nombre' => $this->nombre,
+                'nombre'      => $this->nombre,
                 'descripcion' => $this->descripcion,
-                'marca_id' => $this->marca_id,
+                'marca_id'    => $this->marca_id,
             ]
         );
 
-        $mensaje = $this->modeloId ? 'Modelo actualizado.' : 'Modelo creado.';
+        $this->dispatch('toast',
+            $this->modeloId
+                ? 'Modelo actualizado correctamente'
+                : 'Modelo creado exitosamente'
+        );
 
-        $this->dispatch('toast', $mensaje);
-
-        $this->resetForm();
-        $this->modal = false;
-        $this->resetPage();
+        $this->cerrarModal();
     }
 
     public function confirmarEliminar($id)
     {
         $this->modeloId = $id;
-        $this->dispatch('confirmar-eliminar');
+        $this->confirmDelete = true;
     }
 
-    #[On('eliminar')]
     public function eliminar()
     {
-        Modelo::find($this->modeloId)?->delete();
+        $modelo = Modelo::find($this->modeloId);
 
-        $this->dispatch('toast', 'Modelo eliminado.');
-        $this->resetPage();
+        if ($modelo && $modelo->productos()->count() > 0) {
+            $this->dispatch('toast', 'No se puede eliminar: hay productos con este modelo.');
+            $this->confirmDelete = false;
+            return;
+        }
+
+        $modelo?->delete();
+        $this->dispatch('toast', 'Modelo eliminado correctamente');
+        $this->confirmDelete = false;
     }
 
     public function cerrarModal()
     {
         $this->modal = false;
+        $this->confirmDelete = false;
+        $this->resetForm();
     }
 
     private function resetForm()
     {
-        $this->modeloId = null;
-        $this->nombre = '';
-        $this->descripcion = '';
-        $this->marca_id = null;
+        $this->reset(['modeloId', 'nombre', 'descripcion', 'marca_id']);
+        $this->resetErrorBag();
+    }
+
+    public function updatingSearch()
+    {
+        $this->resetPage();
     }
 }

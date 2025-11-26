@@ -3,129 +3,104 @@
 namespace App\Livewire\Caja;
 
 use Livewire\Component;
-use App\Models\Venta;
-use App\Models\CierreCaja as CierreCajaModel;
-use App\Models\DetalleVenta;
+use App\Models\{Venta, DetalleVenta, CierreCaja};
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon;
 
 class CierreDiario extends Component
 {
-    public $hoy;
-    public $totalDia = 0;
+    public $montoFisico = '';
+    public $observaciones = '';
+
     public $efectivo = 0;
     public $qr = 0;
-    public $totalVentas = 0;
-    public $ventasEfectivo = 0;
-    public $ventasQr = 0;
+    public $totalDia = 0;
+    public $apertura = 0;
     public $productosTop10 = [];
     public $yaCerrado = false;
-    public $cierre;
-    public $apertura = 0;
-    public $cajaAbierta = false;
+    public $reportePdf = null;
 
     public function mount()
     {
-        $this->hoy = today()->toDateString();
-        $this->calcularVentasDelDia();
+        $this->calcularTodo();
     }
 
-    public function calcularVentasDelDia()
+    public function calcularTodo()
     {
-        $ventas = Venta::whereDate('created_at', $this->hoy)->get();
+        $hoy = today()->toDateString();
 
+        $ventas = Venta::whereDate('created_at', $hoy)->get();
         $this->totalDia = $ventas->sum('total');
         $this->efectivo = $ventas->where('metodo_pago', 'efectivo')->sum('total');
-        $this->qr = $ventas->where('metodo_pago', 'qr')->sum('total');
-        $this->totalVentas = $ventas->count();
-        $this->ventasEfectivo = $ventas->where('metodo_pago', 'efectivo')->count();
-        $this->ventasQr = $ventas->where('metodo_pago', 'qr')->count();
+        $this->qr = $ventas->whereIn('metodo_pago', ['qr', 'transferencia'])->sum('total');
 
-        // TOP 10 PRODUCTOS
+        $cierre = CierreCaja::where('fecha', $hoy)->first();
+        $this->apertura = $cierre?->monto_apertura ?? 0;
+        $this->yaCerrado = $cierre?->caja_abierta == false;
+        $this->reportePdf = $cierre?->reporte_pdf;
+
         $this->productosTop10 = DetalleVenta::selectRaw('
-            productos.nombre,
-            SUM(detalle_ventas.cantidad) as cantidad_vendida,
-            SUM(detalle_ventas.subtotal) as monto_vendido
-        ')
-        ->join('productos', 'detalle_ventas.producto_id', '=', 'productos.id')
-        ->join('ventas', 'detalle_ventas.venta_id', '=', 'ventas.id')
-        ->whereDate('ventas.created_at', $this->hoy)
-        ->groupBy('productos.id', 'productos.nombre')
-        ->orderByDesc('cantidad_vendida')
-        ->limit(10)
-        ->get();
-
-        // === APERTURA DE CAJA (ESTO ES LO QUE FALTABA) ===
-        $cierreHoy = CierreCajaModel::where('fecha', $this->hoy)->first();
-        $this->apertura = $cierreHoy?->monto_apertura ?? 0;
-        $this->cajaAbierta = $cierreHoy?->caja_abierta ?? false;
-
-        // Para el cierre (si ya está cerrado)
-        $this->yaCerrado = CierreCajaModel::where('fecha', $this->hoy)
-            ->whereNotNull('total_ventas')
-            ->exists();
-
-        if ($this->yaCerrado) {
-            $this->cierre = CierreCajaModel::where('fecha', $this->hoy)->first();
-        }
+                productos.nombre,
+                SUM(detalle_ventas.cantidad) as cantidad,
+                SUM(detalle_ventas.subtotal) as monto
+            ')
+            ->join('productos', 'detalle_ventas.producto_id', '=', 'productos.id')
+            ->join('ventas', 'detalle_ventas.venta_id', '=', 'ventas.id')
+            ->whereDate('ventas.created_at', $hoy)
+            ->groupBy('productos.id', 'productos.nombre')
+            ->orderByDesc('cantidad')
+            ->limit(10)
+            ->get();
     }
 
     public function generarCierre()
     {
-        $usuarioId = auth()->check() ? auth()->id() : 1;
+        $this->validate(['montoFisico' => 'required|numeric|min:0']);
 
-        // Forzamos que exista el registro con monto_apertura
-        $cierreHoy = CierreCajaModel::firstOrCreate(
-            ['fecha' => $this->hoy],
-            ['usuario_id' => $usuarioId, 'monto_apertura' => 0, 'caja_abierta' => true]
-        );
+        $hoy = today()->toDateString();
+        $esperado = $this->efectivo + $this->apertura;
+        $diferencia = $this->montoFisico - $esperado;
 
         $pdf = Pdf::loadView('pdf.cierre-diario', [
-            'fecha' => $this->hoy,
-            'totalDia' => $this->totalDia,
+            'fecha' => $hoy,
+            'cajero' => auth()->user(),
+            'apertura' => $this->apertura,
             'efectivo' => $this->efectivo,
             'qr' => $this->qr,
-            'totalVentas' => $this->totalVentas,
-            'totalVentasEfectivo' => $this->ventasEfectivo,
-            'totalVentasQr' => $this->ventasQr,
+            'totalDia' => $this->totalDia,
+            'montoFisico' => $this->montoFisico,
+            'totalEsperado' => $esperado,
+            'diferencia' => $diferencia,
+            'observaciones' => $this->observaciones,
             'productosTop10' => $this->productosTop10,
-            'apertura' => $cierreHoy->monto_apertura ?? 0,
-            'totalEsperado' => $this->efectivo + ($cierreHoy->monto_apertura ?? 0),
-            'cajero' => auth()->user() ?? \App\Models\User::find(1)
-        ]);
+        ])->setPaper('a4');
 
-        // ← ESTO ES CLAVE: forzar que use fuentes que SÍ existen
-        $pdf->setOptions([
-            'defaultFont' => 'DejaVu Sans',
-            'isRemoteEnabled' => true,
-            'isHtml5ParserEnabled' => true
-        ]);
-
-        $pdf->setPaper('a4');
-
-        $fileName = 'cierre_caja_' . now()->format('Y_m_d_H_i_s') . '.pdf';
+        $fileName = 'cierre_' . now()->format('Y_m_d_His') . '.pdf';
         $ruta = 'cierres/' . $fileName;
         Storage::disk('public')->put($ruta, $pdf->output());
 
-        // Actualizamos el registro con los totales del cierre
-        $cierreHoy->update([
+        CierreCaja::updateOrCreate(['fecha' => $hoy], [
+            'usuario_id' => auth()->id(),
+            'monto_apertura' => $this->apertura,
             'total_efectivo' => $this->efectivo,
             'total_qr' => $this->qr,
             'total_ventas' => $this->totalDia,
-            'cantidad_ventas' => $this->totalVentas,
+            'cantidad_ventas' => Venta::whereDate('created_at', $hoy)->count(),
+            'monto_cierre_fisico' => $this->montoFisico,
+            'diferencia' => $diferencia,
+            'observaciones' => $this->observaciones,
             'reporte_pdf' => $ruta,
+            'caja_abierta' => false,
         ]);
 
-        $this->dispatch('toast', '¡Cierre de caja generado con éxito!');
-        $this->calcularVentasDelDia();
+        $this->dispatch('toast', '¡Cierre realizado con éxito! Redirigiendo...');
         $this->dispatch('open-pdf', url: asset('storage/' . $ruta));
+
+        $this->calcularTodo();
     }
 
     public function render()
     {
-        return view('livewire.caja.cierre-diario')
-            ->layout('layouts.pos'); // ← CREA ESTE LAYOUT
+        return view('livewire.caja.cierre-diario')->layout('layouts.pos');
     }
 }

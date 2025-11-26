@@ -54,20 +54,20 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             <div class="bg-gradient-to-br from-yellow-400 to-orange-500 p-8 rounded-3xl text-white shadow-2xl transform hover:scale-105 transition">
                 <p class="text-yellow-100 text-lg font-bold">Total Ventas Hoy</p>
-                <p class="text-6xl font-black mt-4">Bs {{ number_format($ventasHoy, 2, ',', '.') }}</p>
+                <p class="text-4xl font-black mt-4">Bs {{ number_format($ventasHoy, 2, ',', '.') }}</p>
             </div>
             <div class="bg-white p-8 rounded-3xl shadow-2xl border-4 border-gray-100 hover:shadow-3xl transition cursor-pointer">
                 <p class="text-gray-600 text-lg font-bold">Cantidad de Ventas</p>
-                <p class="text-6xl font-black text-gray-900 mt-4">{{ $cantidadVentasHoy }}</p>
+                <p class="text-4xl font-black text-gray-900 mt-4">{{ $cantidadVentasHoy }}</p>
                 <p class="text-gray-500 mt-2">transacciones hoy</p>
             </div>
             <div class="bg-gradient-to-br from-green-400 to-emerald-600 p-8 rounded-3xl text-white shadow-2xl transform hover:scale-105 transition">
                 <p class="text-green-100 text-lg font-bold">Efectivo</p>
-                <p class="text-6xl font-black mt-4">Bs {{ number_format($efectivoHoy, 2, ',', '.') }}</p>
+                <p class="text-4xl font-black mt-4">Bs {{ number_format($efectivoHoy, 2, ',', '.') }}</p>
             </div>
-            <div class="bg-gradient-to-br from-blue-500 to-indigo-600 p-8 rounded-3xl text-white shadow-2xl transform hover:scale-105 transition">
-                <p class="text-blue-100 text-lg font-bold">Pagos Electrónicos</p>
-                <p class="text-6xl font-black mt-4">Bs {{ number_format($qrHoy, 2, ',', '.') }}</p>
+            <div class="bg-gradient-to-br from-blue-500 to-indigo-800 p-8 rounded-3xl text-white shadow-2xl transform hover:scale-105 transition">
+                <p class="text-blue-100 text-lg font-bold">Pagos Electrónicos - QR</p>
+                <p class="text-4xl font-black mt-4">Bs {{ number_format($qrHoy, 2, ',', '.') }}</p>
             </div>
         </div>
     </div>
@@ -116,7 +116,7 @@
                             </div>
                         </div>
                     @empty
-                        <p class="text-center text-red-700 text-xl py-12">¡Genial! No hay productos agotados</p>
+                        <p class="text-center text-red-700 text-xl py-12"> No hay productos agotados</p>
                     @endforelse
                 </div>
             </div>

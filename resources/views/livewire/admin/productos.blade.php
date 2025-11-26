@@ -1,255 +1,312 @@
-<div class="p-6">
+<div class="min-h-screen bg-gray-50 py-12 px-6">
+    <div class="max-w-7xl mx-auto">
 
-    {{-- Título + botón crear --}}
-    <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold text-gray-800">Gestión de Productos</h1>
+        <!-- CABECERA -->
+        <div class="flex justify-between items-center mb-10">
+            <div>
+                <h1 class="text-5xl font-black text-gray-900">Gestión de Productos</h1>
+                <p class="text-gray-600 mt-2 text-lg">Administra el catálogo completo de Librería Jayrita</p>
+            </div>
+            <button wire:click="crear"
+                class="px-8 py-4 bg-gradient-to-r from-gray-800 to-black hover:from-black hover:to-gray-900 text-white font-bold text-lg rounded-xl shadow-xl flex items-center gap-3 transform hover:scale-105 transition duration-300">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4"></path>
+                </svg>
+                NUEVO PRODUCTO
+            </button>
+        </div>
 
-        <button wire:click="crear"
-            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow">
-            + Nuevo Producto
-        </button>
-    </div>
+        <!-- BUSCADOR -->
+        <div class="mb-8">
+            <input type="text" wire:model.live="search" placeholder="Buscar por nombre o código..."
+                class="w-full px-6 py-4 text-lg border border-gray-300 rounded-xl shadow focus:border-gray-800 focus:ring-4 focus:ring-gray-200 transition">
+        </div>
 
-    {{-- Buscador --}}
-    <div class="mb-4">
-        <input type="text" wire:model.live="search"
-            placeholder="Buscar productos..."
-            class="w-full px-4 py-2 border rounded-lg shadow-sm focus:ring focus:ring-blue-300">
-    </div>
-
-    {{-- Tabla --}}
-    <div class="overflow-x-auto bg-white shadow rounded-lg">
-        <table class="w-full table-auto">
-            <thead class="bg-gray-100">
-                <tr class="text-left">
-                    <th class="px-4 py-2">Imagen</th>
-                    <th class="px-4 py-2">Nombre</th>
-                    <th class="px-4 py-2">Código</th>
-                    <th class="px-4 py-2">Precio</th>
-                    <th class="px-4 py-2">Stock</th>
-                    <th class="px-4 py-2">Marca</th>
-                    <th class="px-4 py-2">Modelo</th>
-                    <th class="px-4 py-2">Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($productos as $p)
-                <tr class="border-b hover:bg-gray-50">
-                    <td class="px-4 py-2">
-                        @if($p->url_imagen)
-                            <img src="{{ asset('storage/'.$p->url_imagen) }}" class="w-14 h-14 rounded object-cover">
-                        @else
-                            <span class="text-gray-400">Sin imagen</span>
-                        @endif
-                    </td>
-
-                    <td class="px-4 py-2">{{ $p->nombre }}</td>
-                    <td class="px-4 py-2">{{ $p->codigo }}</td>
-                    <td class="px-4 py-2">{{ number_format($p->precio, 2) }}</td>
-                    <td class="px-4 py-2">{{ $p->stock }}</td>
-                    <td class="px-4 py-2">{{ $p->marca->nombre ?? '-' }}</td>
-                    <td class="px-4 py-2">{{ $p->modelo->nombre ?? '-' }}</td>
-
-                    <td class="px-4 py-2">
-                        <button wire:click="editar({{ $p->id }})"
-                            class="text-blue-600 hover:underline mr-3">Editar</button>
-
-                        <button wire:click="confirmarEliminar({{ $p->id }})"
-                            class="text-red-600 hover:underline">Eliminar</button>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="10" class="text-center py-4 text-gray-500">
-                        No hay productos registrados.
-                    </td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-
-    <div class="mt-4">
-        {{ $productos->links() }}
-    </div>
-
-    {{-- Modal --}}
-    @if ($modal)
-    <div class="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50 px-4">
-        <div class="bg-white w-full max-w-2xl rounded-lg shadow-lg p-6 
-                max-h-[90vh] overflow-y-auto flex flex-col">
-                
-            <h2 class="text-xl font-bold mb-4">
-                {{ $productoId ? 'Editar Producto' : 'Nuevo Producto' }}
-            </h2>
-
-            <div class="grid grid-cols-2 gap-4">
-
-                {{-- Nombre --}}
-                <div>
-                    <label class="block text-sm font-medium">Nombre</label>
-                    <input type="text" wire:model="nombre"
-                        class="w-full border px-3 py-2 rounded">
-                    @error('nombre')<span class="text-red-600 text-sm">{{ $message }}</span>@enderror
-                </div>
-
-                {{-- Código --}}
-                <div>
-                    <label class="block text-sm font-medium">Código</label>
-                    <input type="text" wire:model="codigo"
-                        class="w-full border px-3 py-2 rounded">
-                    @error('codigo')<span class="text-red-600 text-sm">{{ $message }}</span>@enderror
-                </div>
-
-                {{-- Precio --}}
-                <div>
-                    <label class="block text-sm font-medium">Precio</label>
-                    <input type="number" wire:model="precio" step="0.01" min="0"
-                        class="w-full border px-3 py-2 rounded">
-                    @error('precio')<span class="text-red-600 text-sm">{{ $message }}</span>@enderror
-                </div>
-
-                {{-- Costo Compra --}}
-                <div>
-                    <label class="block text-sm font-medium">Costo Compra</label>
-                    <input type="number" wire:model="costo_compra" step="0.01" min="0"
-                        class="w-full border px-3 py-2 rounded">
-                    @error('costo_compra')<span class="text-red-600 text-sm">{{ $message }}</span>@enderror
-                </div>
-
-                {{-- Stock --}}
-                <div>
-                    <label class="block text-sm font-medium">Stock</label>
-                    <input type="number" wire:model="stock" min="0"
-                        class="w-full border px-3 py-2 rounded">
-                    @error('stock')<span class="text-red-600 text-sm">{{ $message }}</span>@enderror
-                </div>
-
-                {{-- Color --}}
-                <div>
-                    <label class="block text-sm font-medium">Color</label>
-                    <input type="text" wire:model="color"
-                        class="w-full border px-3 py-2 rounded">
-                </div>
-
-                {{-- Tipo --}}
-                <div>
-                    <label class="block text-sm font-medium">Tipo</label>
-                    <input type="text" wire:model="tipo"
-                        class="w-full border px-3 py-2 rounded">
-                </div>
-
-                {{-- Categoría --}}
-                <div>
-                    <label class="block text-sm font-medium">Categoría</label>
-                    <select wire:model="categoria_id" class="w-full border px-3 py-2 rounded">
-                        <option value="">Seleccione</option>
-                        @foreach($categorias as $c)
-                            <option value="{{ $c->id }}">{{ $c->nombre }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-                {{-- Marca --}}
-                <div>
-                    <label class="block text-sm font-medium">Marca</label>
-                    <select wire:model.live="marca_id" class="w-full border px-3 py-2 rounded">
-                        <option value="">Seleccione</option>
-                        @foreach($marcas as $m)
-                            <option value="{{ $m->id }}">{{ $m->nombre }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-                {{-- Modelo --}}
-                <div>
-                    <label class="block text-sm font-medium">Modelo</label>
-                    <select wire:model="modelo_id" class="w-full border px-3 py-2 rounded">
-                        <option value="">Seleccione</option>
-                        @foreach($modelos as $mo)
-                            @if(!$marca_id || $mo->marca_id == $marca_id)
-                                <option value="{{ $mo->id }}">{{ $mo->nombre }}</option>
+        <!-- TABLA -->
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+            <table class="w-full">
+                <thead class="bg-gray-900 text-white">
+                    <tr>
+                        <th class="px-6 py-5 text-left font-semibold">Imagen</th>
+                        <th class="px-6 py-5 text-left font-semibold">Nombre</th>
+                        <th class="px-6 py-5 text-left font-semibold">Código</th>
+                        <th class="px-6 py-5 text-left font-semibold">Precio</th>
+                        <th class="px-6 py-5 text-left font-semibold">Stock</th>
+                        <th class="px-6 py-5 text-left font-semibold">Marca</th>
+                        <th class="px-6 py-5 text-left font-semibold">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    @forelse($productos as $p)
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="px-6 py-4">
+                            @if($p->url_imagen)
+                                <img src="{{ asset('storage/'.$p->url_imagen) }}" class="w-16 h-16 rounded-lg object-cover shadow">
+                            @else
+                                <div class="bg-gray-200 border-2 border-dashed rounded-lg w-16 h-16"></div>
                             @endif
-                        @endforeach
-                    </select>
+                        </td>
+                        <td class="px-6 py-4 font-semibold text-gray-900">{{ $p->nombre }}</td>
+                        <td class="px-6 py-4 font-mono text-gray-700">{{ $p->codigo }}</td>
+                        <td class="px-6 py-4 font-bold text-green-700 text-lg">Bs {{ number_format($p->precio, 2) }}</td>
+                        <td class="px-7 py-4 text-center">
+    @if($p->stock == 0)
+        <span class="inline-flex items-center px-4 py-2 bg-red-600 text-white font-bold text-sm rounded-full shadow-md">
+            Sin stock
+        </span>
+    @elseif($p->stock <= 5)
+        <span class="inline-flex items-center px-4 py-2 bg-orange-500 text-white font-bold text-sm rounded-full shadow-md ring-2 ring-orange-300">
+            {{ $p->stock }} und
+        </span>
+    @else
+        <span class="inline-flex  items-center px-4 py-2  text-black-500 text-sm font-bold text">
+            {{ $p->stock }} und
+        </span>
+    @endif
+</td>
+                        </td>
+                        <td class="px-6 py-4 text-gray-700">{{ $p->marca->nombre ?? '-' }}</td>
+                        <td class="px-6 py-4 space-x-3">
+                            <button wire:click="ver({{ $p->id }})"
+                                class="px-5 py-2 bg-gray-700 hover:bg-gray-800 text-white font-semibold rounded-lg shadow hover:shadow-lg transition">
+                                Ver
+                            </button>
+                            <button wire:click="editar({{ $p->id }})"
+                                class="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white font-semibold rounded-lg shadow hover:shadow-lg transition">
+                                Editar
+                            </button>
+                            <button wire:click="confirmarEliminar({{ $p->id }})"
+                                class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg shadow hover:shadow-lg transition">
+                                Eliminar
+                            </button>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="7" class="text-center py-20 text-gray-500 text-xl">
+                            No se encontraron productos
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+
+        <!-- PAGINACIÓN CORREGIDA -->
+        <div class="mt-10 flex justify-center">
+            {{ $productos->links() }}
+        </div>
+    </div>
+
+    <!-- MODAL CREAR / EDITAR -->
+    @if($modal)
+    <div class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[92vh] overflow-y-auto">
+            <div class="bg-gray-900 text-white p-8 rounded-t-2xl">
+                <h2 class="text-4xl font-black text-center">
+                    {{ $productoId ? 'EDITAR PRODUCTO' : 'NUEVO PRODUCTO' }}
+                </h2>
+            </div>
+
+            <div class="p-10 space-y-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Nombre *</label>
+                        <input type="text" wire:model="nombre" class="w-full px-5 py-3 border border-gray-300 rounded-lg focus:border-gray-800 focus:ring-2 focus:ring-gray-200">
+                        @error('nombre') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Código *</label>
+                        <input type="text" wire:model="codigo" class="w-full px-5 py-3 border border-gray-300 rounded-lg">
+                        @error('codigo') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Precio Venta *</label>
+                        <input type="number" step="0.01" wire:model="precio" class="w-full px-5 py-3 border border-gray-300 rounded-lg">
+                        @error('precio') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Costo Compra *</label>
+                        <input type="number" step="0.01" wire:model="costo_compra" class="w-full px-5 py-3 border border-gray-300 rounded-lg">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Stock *</label>
+                        <input type="number" wire:model="stock" class="w-full px-5 py-3 border border-gray-300 rounded-lg">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Categoría *</label>
+                        <select wire:model="categoria_id" class="w-full px-5 py-3 border border-gray-300 rounded-lg">
+                            <option value="">Seleccione categoría...</option>
+                            @foreach($categorias as $c)
+                                <option value="{{ $c->id }}">{{ $c->nombre }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Marca *</label>
+                        <select wire:model.live="marca_id" class="w-full px-5 py-3 border border-gray-300 rounded-lg">
+                            <option value="">Seleccione marca...</option>
+                            @foreach($marcas as $m)
+                                <option value="{{ $m->id }}">{{ $m->nombre }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Modelo *</label>
+                        <select wire:model="modelo_id" class="w-full px-5 py-3 border border-gray-300 rounded-lg">
+                            <option value="">Seleccione modelo...</option>
+                            @foreach($modelos as $mo)
+                                @if(!$marca_id || $mo->marca_id == $marca_id)
+                                    <option value="{{ $mo->id }}">{{ $mo->nombre }}</option>
+                                @endif
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Promo</label>
+                        <select wire:model="promo_id" class="w-full px-5 py-3 border border-gray-300 rounded-lg">
+                            <option value="">Sin promo</option>
+                            @foreach($promos as $promo)
+                                <option value="{{ $promo->id }}">{{ $promo->nombre }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Color</label>
+                        <input type="text" wire:model="color" class="w-full px-5 py-3 border border-gray-300 rounded-lg">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Tipo</label>
+                        <input type="text" wire:model="tipo" class="w-full px-5 py-3 border border-gray-300 rounded-lg">
+                    </div>
                 </div>
 
-                {{-- Promo --}}
+                <!-- DESCRIPCIÓN -->
                 <div>
-                    <label class="block text-sm font-medium">Promo</label>
-                    <select wire:model="promo_id" class="w-full border px-3 py-2 rounded">
-                        <option value="">Seleccione</option>
-                        @foreach($promos as $promo)
-                            <option value="{{ $promo->id }}">{{ $promo->nombre }}</option>
-                        @endforeach
-                    </select>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Descripción</label>
+                    <textarea wire:model="descripcion" rows="4" class="w-full px-5 py-4 border border-gray-300 rounded-lg"></textarea>
                 </div>
 
-                {{-- Imagen --}}
-                <div class="col-span-2">
-                    <label class="block text-sm font-medium">Imagen</label>
-                    <input type="file" wire:model="imagen" class="w-full border px-3 py-2 rounded">
+                <!-- IMAGEN CON CARGA -->
+                <div>
+                    <label class="block text-lg font-bold text-gray-800 mb-3">Imagen del producto</label>
+                    <input type="file" wire:model="imagen" class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none">
 
-                    @if ($imagen)
-                        <img src="{{ $imagen->temporaryUrl() }}" class="w-24 h-24 mt-2 rounded shadow">
+                    <div class="mt-6 flex justify-center">
+                    @if($imagen)
+                        <div class="relative inline-block">
+                            <div wire:loading wire:target="imagen" class="absolute inset-0 bg-white bg-opacity-90 rounded-2xl flex items-center justify-center z-10">
+                                <div class="text-2xl font-black text-gray-800 animate-pulse">
+                                    <svg class="w-12 h-12 animate-spin text-gray-600 mx-auto mb-4" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                    CARGANDO IMAGEN...
+                                </div>
+                            </div>
+                            <img src="{{ $imagen->temporaryUrl() }}" class="w-80 h-80 object-cover rounded-2xl shadow-2xl border-4 border-gray-300">
+                        </div>
                     @elseif($url_imagen)
-                        <img src="{{ asset('storage/'.$url_imagen) }}" class="w-24 h-24 mt-2 rounded shadow">
+                        <img src="{{ asset('storage/'.$url_imagen) }}" class="w-80 h-80 object-cover rounded-2xl shadow-2xl border-4 border-gray-300">
+                    @else
+                        <div class="bg-gray-200 border-4 border-dashed rounded-2xl w-80 h-80 flex items-center justify-center">
+                            <span class="text-gray-500 text-2xl font-bold">Sin imagen</span>
+                        </div>
                     @endif
                 </div>
+                </div>
 
+                <!-- BOTONES -->
+                <div class="flex justify-end gap-6 pt-8 border-t border-gray-200">
+                    <button wire:click="cerrarModal"
+                        class="px-10 py-4 bg-gray-600 hover:bg-gray-700 text-white font-bold text-lg rounded-xl shadow-lg transition">
+                        CANCELAR
+                    </button>
+                    <button wire:click="guardar"
+                        class="px-12 py-4 bg-gradient-to-r from-gray-800 to-black hover:from-black hover:to-gray-900 text-white font-black text-xl rounded-xl shadow-2xl transform hover:scale-105 transition">
+                        GUARDAR PRODUCTO
+                    </button>
+                </div>
             </div>
-
-            {{-- Descripción --}}
-            <div class="mt-3">
-                <label class="block text-sm font-medium">Descripción</label>
-                <textarea wire:model="descripcion"
-                    class="w-full border px-3 py-2 rounded" rows="3"></textarea>
-            </div>
-
-            {{-- Botones --}}
-            <div class="flex justify-end space-x-3 mt-6">
-                <button wire:click="cerrarModal"
-                    class="px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded-lg">
-                    Cancelar
-                </button>
-
-                <button wire:click="guardar"
-                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">
-                    Guardar
-                </button>
-            </div>
-
         </div>
     </div>
     @endif
 
-    {{-- SweetAlert2 --}}
-    <script>
-        window.addEventListener('toast', event => {
-            Swal.fire({
-                toast: true,
-                position: 'top-end',
-                timer: 3000,
-                showConfirmButton: false,
-                icon: 'success',
-                title: event.detail,
-            });
-        });
+    <!-- MODAL VER PRODUCTO (ELEGANTE) -->
+    @if($modalVer && $productoSeleccionado)
+    <div class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-8">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="bg-gray-900 text-white p-8 rounded-t-2xl text-center">
+                <h2 class="text-5xl font-black">DETALLE DEL PRODUCTO</h2>
+            </div>
+            <div class="p-10 grid grid-cols-1 md:grid-cols-2 gap-10">
+                <div class="text-center">
+                    @if($productoSeleccionado->url_imagen)
+                        <img src="{{ asset('storage/'.$productoSeleccionado->url_imagen) }}" class="w-full rounded-2xl shadow-2xl">
+                    @else
+                        <div class="bg-gray-200 border-4 border-dashed rounded-2xl w-full h-96 flex items-center justify-center text-3xl font-bold text-gray-400">
+                            SIN IMAGEN
+                        </div>
+                    @endif
+                </div>
+                <div class="space-y-6">
+                    <h3 class="text-4xl font-black text-gray-900">{{ $productoSeleccionado->nombre }}</h3>
+                    <p class="text-2xl font-mono text-gray-700">#{{ $productoSeleccionado->codigo }}</p>
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="bg-green-50 p-6 rounded-2xl text-center">
+                            <p class="text-green-800 font-black text-4xl">Bs {{ number_format($productoSeleccionado->precio, 2) }}</p>
+                            <p class="text-green-600 font-semibold">Precio de Venta</p>
+                        </div>
+                        <div class="bg-amber-50 p-6 rounded-2xl text-center">
+                            <p class="text-amber-800 font-black text-4xl">{{ $productoSeleccionado->stock }}</p>
+                            <p class="text-amber-600 font-semibold">En Stock</p>
+                        </div>
+                    </div>
+                    <div class="bg-gray-100 p-6 rounded-2xl space-y-3 text-lg">
+                        <p><strong>Marca:</strong> {{ $productoSeleccionado->marca->nombre ?? '-' }}</p>
+                        <p><strong>Modelo:</strong> {{ $productoSeleccionado->modelo->nombre ?? '-' }}</p>
+                        <p><strong>Categoría:</strong> {{ $productoSeleccionado->categoria->nombre ?? '-' }}</p>
+                        <p><strong>Color:</strong> {{ $productoSeleccionado->color ?? 'No definido' }}</p>
+                        <p><strong>Tipo:</strong> {{ $productoSeleccionado->tipo ?? 'No definido' }}</p>
+                        @if($productoSeleccionado->descripcion)
+                            <p class="mt-4"><strong>Descripción:</strong></p>
+                            <p class="text-gray-700 leading-relaxed">{{ $productoSeleccionado->descripcion }}</p>
+                        @endif
+                    </div>
+                </div>
+            </div>
+            <div class="p-8 text-center border-t border-gray-200">
+                <button wire:click="cerrarModal" class="px-20 py-5 bg-gray-900 hover:bg-black text-white font-black text-2xl rounded-xl shadow-2xl transition">
+                    CERRAR
+                </button>
+            </div>
+        </div>
+    </div>
+    @endif
 
-        window.addEventListener('confirmar-eliminar', event => {
+    <!-- Scripts -->
+    <script>
+        window.addEventListener('toast', e => Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: e.detail, timer: 3000, showConfirmButton: false }));
+        window.addEventListener('confirmar-eliminar', () => {
             Swal.fire({
-                title: "¿Eliminar?",
-                text: "Esta acción no se puede revertir",
-                icon: "warning",
+                title: '¿Eliminar producto?',
+                text: "No podrás revertir esta acción",
+                icon: 'warning',
                 showCancelButton: true,
-                confirmButtonText: "Sí, eliminar",
-                cancelButtonText: "Cancelar",
-            }).then(result => {
-                if (result.isConfirmed) {
-                    Livewire.dispatch('eliminar');
-                }
-            });
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#dc2626'
+            }).then(r => r.isConfirmed && Livewire.dispatch('eliminar'));
         });
     </script>
-
 </div>

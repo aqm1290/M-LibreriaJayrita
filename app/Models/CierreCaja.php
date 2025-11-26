@@ -1,35 +1,33 @@
 <?php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
 class CierreCaja extends Model
 {
-    protected $table = 'cierre_caja';
+   protected $table = 'cierre_cajas';
+   protected $primaryKey = 'id';
+   public $incrementing = true;
+    protected $keyType = 'int';
+    
     protected $fillable = [
-        'usuario_id',
-        'fecha',
-        'monto_apertura',
-        'total_efectivo',
-        'total_qr',
-        'total_ventas',
-        'cantidad_ventas',
-        'reporte_pdf',
-        'caja_abierta'
+        'fecha', 'usuario_id', 'monto_apertura', 'total_efectivo',
+        'total_qr', 'total_ventas', 'cantidad_ventas', 'monto_cierre_fisico',
+        'diferencia', 'observaciones', 'reporte_pdf', 'caja_abierta'
     ];
 
-    protected $casts = [
-        'fecha' => 'date',
-        'monto_apertura' => 'decimal:2',
-        'total_efectivo' => 'decimal:2',
-        'total_qr' => 'decimal:2',
-        'total_ventas' => 'decimal:2',
-        'caja_abierta' => 'boolean',
-    ];
+    public function usuario() { return $this->belongsTo(User::class); }
 
-    public function usuario()
+    public static function cajaAbiertaHoy()
     {
-        return $this->belongsTo(User::class);
+        return static::where('fecha', today())->where('caja_abierta', true)->first();
+    }
+
+    public static function hoy()
+    {
+        return static::firstOrCreate(
+            ['fecha' => today()],
+            ['usuario_id' => auth()->id() ?? 1, 'monto_apertura' => 0]
+        );
     }
 }

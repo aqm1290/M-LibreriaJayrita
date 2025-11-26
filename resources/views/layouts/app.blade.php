@@ -65,6 +65,9 @@
                         <a href="{{ route('caja.cierre') }}" class="flex items-center gap-3 px-4 py-2 rounded-lg text-sm {{ request()->routeIs('caja.cierre') ? 'bg-yellow-300 text-gray-900 font-bold' : 'text-gray-600 hover:bg-yellow-50' }}">
                             <i data-lucide="door-closed" class="w-4 h-4"></i> Cierre Diario
                         </a>
+                        <a href="{{ route('caja.buscar') }}" class="flex items-center gap-3 px-4 py-2 rounded-lg text-sm {{ request()->routeIs('caja.buscar') ? 'bg-yellow-300 text-gray-900 font-bold' : 'text-gray-600 hover:bg-yellow-50' }}">
+                            <i data-lucide="search" class="w-4 h-4"></i> Buscar producto 
+                        </a>
                     </div>
                 </div>
 
@@ -218,7 +221,13 @@
 
 @livewireScripts
 @stack('scripts')
-
+<script>
+    window.addEventListener('redirect-after', event => {
+        setTimeout(() => {
+            window.location.href = event.detail.url;
+        }, event.detail.delay || 0);
+    });
+</script>
 
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 @vite(['resources/js/dashboard.js'])

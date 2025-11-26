@@ -19,24 +19,40 @@ class CategoriaManager extends Component
     public $nombre = '';
     public $descripcion = '';
 
-    protected $rules = [
-        'nombre' => 'required|string|max:255',
-        'descripcion' => 'nullable|string',
-    ];
+    protected function rules()
+    {
+        return [
+            'nombre' => [
+                'required',
+                'string',
+                'max:100',
+                Rule::unique('categorias')->ignore($this->categoriaId),
+            ],
+            'descripcion' => 'nullable|string|max:500',
+        ];
+    }
 
-    protected $listeners = ['refreshComponent' => '$refresh'];
+    protected function messages()
+    {
+        return [
+            'nombre.required' => 'El nombre de la categoría es obligatorio.',
+            'nombre.max'      => 'El nombre no puede tener más de 100 caracteres.',
+            'nombre.unique'   => 'Ya existe una categoría con este nombre.',
+            'descripcion.max'=> 'La descripción no puede tener más de 500 caracteres.',
+        ];
+    }
 
     public function mount()
     {
-        $this->fill(['search' => request()->query('search', '')]);
+        $this->search = request()->query('search', '');
     }
 
     public function render()
     {
-        $categorias = Categoria::query()
-            ->where('nombre', 'like', "%{$this->search}%")
+        $categorias = Categoria::where('nombre', 'like', "%{$this->search}%")
+            ->orWhere('descripcion', 'like', "%{$this->search}%")
             ->orderBy('nombre')
-            ->paginate(10);
+            ->paginate(12);
 
         return view('livewire.categoria-manager', compact('categorias'));
     }
@@ -51,8 +67,8 @@ class CategoriaManager extends Component
     {
         $cat = Categoria::findOrFail($id);
         $this->categoriaId = $cat->id;
-        $this->nombre = $cat->nombre;
-        $this->descripcion = $cat->descripcion;
+        $this->nombre      = $cat->nombre;
+        $this->descripcion = $cat->descripcion ?? '';
         $this->modal = true;
     }
 
@@ -63,14 +79,18 @@ class CategoriaManager extends Component
         Categoria::updateOrCreate(
             ['id' => $this->categoriaId],
             [
-                'nombre' => $this->nombre,
+                'nombre'      => $this->nombre,
                 'descripcion' => $this->descripcion,
             ]
         );
 
-        session()->flash('message', $this->categoriaId ? 'Categoría actualizada.' : 'Categoría creada.');
-        $this->resetForm();
-        $this->modal = false;
+        $this->dispatch('toast', 
+            $this->categoriaId 
+                ? 'Categoría actualizada correctamente' 
+                : 'Categoría creada exitosamente'
+        );
+
+        $this->cerrarModal();
     }
 
     public function confirmarEliminar($id)
@@ -81,21 +101,34 @@ class CategoriaManager extends Component
 
     public function eliminar()
     {
-        Categoria::find($this->categoriaId)?->delete();
-        session()->flash('message', 'Categoría eliminada.');
+        $categoria = Categoria::find($this->categoriaId);
+        
+        if ($categoria && $categoria->productos()->count() > 0) {
+            $this->dispatch('toast', 'No se puede eliminar: hay productos asociados a esta categoría.');
+            $this->confirmDelete = false;
+            return;
+        }
+
+        $categoria?->delete();
+        $this->dispatch('toast', 'Categoría eliminada correctamente');
         $this->confirmDelete = false;
-        $this->resetPage();
     }
 
     public function cerrarModal()
     {
         $this->modal = false;
+        $this->confirmDelete = false;
+        $this->resetForm();
     }
 
     private function resetForm()
     {
-        $this->categoriaId = null;
-        $this->nombre = '';
-        $this->descripcion = '';
+        $this->reset(['categoriaId', 'nombre', 'descripcion']);
+        $this->resetErrorBag();
+    }
+
+    public function updatingSearch()
+    {
+        $this->resetPage();
     }
 }
