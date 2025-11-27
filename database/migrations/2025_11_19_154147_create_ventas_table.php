@@ -18,6 +18,7 @@ return new class extends Migration {
             $table->string('estado_pago')->default('pendiente');
             $table->string('metodo_pago')->nullable();
             $table->decimal('descuento_total', 10, 2)->default(0);
+            
 
             
            $table->timestamps();

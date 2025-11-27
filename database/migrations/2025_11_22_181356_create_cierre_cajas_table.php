@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('cierre_cajas', function (Blueprint $table) {
             $table->id();
-            $table->date('fecha')->unique(); 
+            $table->date('fecha'); 
             $table->foreignId('usuario_id')->constrained('users');
             $table->decimal('monto_apertura', 12, 2)->default(0);
             $table->decimal('total_efectivo', 12, 2)->nullable();
