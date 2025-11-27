@@ -16,6 +16,8 @@ class Venta extends Model
         'usuario_id',
         'total',
         'estado_pago',
+        'cliente_nombre',
+        'cliente_documento',
         'metodo_pago',
         'descuento_total',
         'ticket_pdf',

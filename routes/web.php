@@ -13,6 +13,7 @@ use App\Livewire\Inventario\EditEntradaInventario;
 
 use App\Livewire\Admin\Productos;
 use App\Livewire\Admin\Proveedores;
+use App\Livewire\Admin\Promociones;
 
 use App\Livewire\Caja\AperturaCaja;
 use App\Livewire\Caja\CierreDiario;
@@ -78,6 +79,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/marcas', MarcasComponent::class)->name('marcas');
         Route::get('/modelos', ModeloComponent::class)->name('modelos');
         Route::get('/proveedores', Proveedores::class)->name('proveedores');
+        Route::get('/admin/promociones', Promociones::class)->name('admin.promociones');
     });
 
     // === DESCARGA DE TICKETS Y PDF ===

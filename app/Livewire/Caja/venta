@@ -1,3 +1,4 @@
+
 <?php
 
 namespace App\Livewire\Caja;
@@ -9,7 +10,6 @@ use App\Models\Venta;
 use App\Models\Cliente;
 use App\Models\DetalleVenta;
 use App\Models\FidelidadCliente;
-
 
 class VentaPos extends Component
 {
@@ -211,15 +211,11 @@ class VentaPos extends Component
 
         DB::beginTransaction();
         try {
-                $venta = Venta::create([
+            $venta = Venta::create([
                 'usuario_id'        => $this->usuario_id,
                 'cliente_id'        => $this->cliente_id,
-                'cliente_nombre'    => $this->cliente_id 
-                    ? Cliente::find($this->cliente_id)?->nombre 
-                    : ($this->cliente_nombre ?: 'Cliente Genérico'),
-                'cliente_documento' => $this->cliente_id 
-                    ? Cliente::find($this->cliente_id)?->ci 
-                    : $this->cliente_documento,
+                'cliente_nombre'    => $this->cliente_id ? null : ($this->cliente_nombre ?: 'Cliente Genérico'),
+                'cliente_documento' => $this->cliente_id ? null : $this->cliente_documento,
                 'total'             => $this->total,
                 'estado_pago'       => $this->metodo_pago === 'efectivo' ? 'completada' : 'pendiente',
                 'metodo_pago'       => $this->metodo_pago,
@@ -242,64 +238,51 @@ class VentaPos extends Component
                 }
             }
 
-           DB::commit();
-
-            // === SISTEMA CLIENTE FIEL - AUTOMÁTICO ===
-            // === CLIENTE FIEL - ALERTA ÉPICA ===
+            // CLIENTE FIEL - FUNCIONA SÍ O SÍ
             if ($this->cliente_id) {
-                $cliente = \App\Models\Cliente::find($this->cliente_id);
-                if ($cliente) {
-                    $fidelidad = \App\Models\FidelidadCliente::firstOrCreate(
-                        ['cliente_id' => $cliente->id],
-                        ['compras_realizadas' => 0]
-                    );
+                $fidelidad = \App\Models\FidelidadCliente::updateOrCreate(
+                    ['cliente_id' => $this->cliente_id],
+                    ['compras_realizadas' => 0, 'premio_entregado' => false]
+                );
 
-                    $fidelidad->increment('compras_realizadas');
-                    $fidelidad->ultima_compra = now();
-                    $fidelidad->save();
+                $fidelidad->increment('compras_realizadas');
+                $fidelidad->ultima_compra = now();
+                $fidelidad->save();
 
-                    // SI LLEGA A 10 Y NO HA ENTREGADO PREMIO → ALERTA ÉPICA
-                    if ($fidelidad->compras_realizadas >= 10 && !$fidelidad->premio_entregado) {
-                        $this->dispatch('premio-cliente-fiel', [
-                            'cliente_id' => $cliente->id,
-                            'nombre' => $cliente->nombre,
-                            'ci' => $cliente->ci ?? 'Sin CI'
-                        ]);
-                    }
+                if ($fidelidad->compras_realizadas >= 10 && !$fidelidad->premio_entregado) {
+                    $this->dispatch('premio-cliente-fiel', [
+                        'cliente' => [
+                            'id' => $this->cliente_id,
+                            'nombre' => $this->cliente_nombre
+                        ],
+                        'compras' => $fidelidad->compras_realizadas
+                    ]);
                 }
             }
 
+            DB::commit();
+
             $this->dispatch('toast', '¡Venta registrada con éxito!');
             $this->dispatch('venta-creada', $venta->id);
-
-            // === RESETEO 
             $this->resetearTodo();
 
         } catch (\Throwable $e) {
             DB::rollBack();
             $this->dispatch('toast', 'Error al procesar la venta');
-            \Log::error('Error en Venta POS: ' . $e->getMessage(), ['exception' => $e]);
+            \Log::error('Error en Venta POS: ' . $e->getMessage());
         }
     }
-    public function entregarPremioClienteFiel($clienteId)
+
+    public function entregarPremio($clienteId)
     {
-        $fidelidad = \App\Models\FidelidadCliente::where('cliente_id', $clienteId)->first();
-        if ($fidelidad && $fidelidad->compras_realizadas >= 10 && !$fidelidad->premio_entregado) {
-            $fidelidad->update([
-                'premio_entregado' => true,
-                'compras_realizadas' => 0
-            ]);
-
-            $this->dispatch('toast', '¡Premio entregado y contador reiniciado!');
+        $fidelidad = FidelidadCliente::where('cliente_id', $clienteId)->first();
+        if ($fidelidad) {
+            $fidelidad->update(['premio_entregado' => true]);
         }
+        $this->dispatch('toast', '¡Premio entregado al cliente fiel!');
     }
 
-
-
-
-
-
-    // MÉTODO REUTILIZABLE 
+    // MÉTODO REUTILIZABLE (lo usamos también en limpiar carrito si querés)
     public function resetearTodo()
     {
         $this->reset([
@@ -462,6 +445,4 @@ class VentaPos extends Component
 
         return $this->cliente_nombre ?? 'Cliente ';
     }
-
-    
 }

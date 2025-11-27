@@ -18,4 +18,25 @@ class Cliente extends Model
     {
         return $this->ci ? "{$this->nombre} (CI: {$this->ci})" : $this->nombre;
     }
+
+    // Relación con fidelidad
+    public function fidelidad()
+    {
+        return $this->hasOne(FidelidadCliente::class, 'cliente_id');
+    }
+
+    // Saber si tiene premio pendiente
+    public function tienePremioPendiente()
+    {
+        return $this->fidelidad && 
+               $this->fidelidad->compras_realizadas >= 10 && 
+               !$this->fidelidad->premio_entregado;
+    }
+
+    // Obtener progreso (ej: 7/10)
+    public function progresoFidelidad()
+    {
+        $compras = $this->fidelidad?->compras_realizadas ?? 0;
+        return "$compras de 10 compras";
+    }
 }

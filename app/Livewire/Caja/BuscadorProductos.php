@@ -57,7 +57,7 @@ class BuscadorProductos extends Component
     {
         $this->dispatch('add-to-pos-cart', $productoId);
         $this->dispatch('toast', 'Producto agregado al carrito');
-        $this->cerrarModal(); // opcional: cierra el modal después de agregar
+        $this->cerrarModal(); 
     }
 
     public function limpiarFiltros()

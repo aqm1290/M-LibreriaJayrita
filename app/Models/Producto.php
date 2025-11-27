@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Producto extends Model
 {
@@ -18,6 +19,16 @@ class Producto extends Model
         'modelo_id', 'marca_id', 'promo_id', 'codigo',
     ];
 
+    public function getImagenUrlAttribute()
+    {
+        if (!$this->url_imagen) return null;
+        
+        if (Str::startsWith($this->url_imagen, ['http://', 'https://'])) {
+            return $this->url_imagen;
+        }
+
+        return asset('storage/' . $this->url_imagen);
+    }
     
     public function detallesEntradas(){return $this->hasMany(DetalleEntrada::class, 'producto_id');}
     public function categoria() { return $this->belongsTo(Categoria::class); }

@@ -116,6 +116,7 @@ class Productos extends Component
     {
         $p = Producto::findOrFail($id);
         $this->fill($p->only([
+            
             'id', 'nombre', 'descripcion', 'precio', 'stock', 'costo_compra',
             'color', 'tipo', 'categoria_id', 'marca_id', 'modelo_id', 'promo_id', 'codigo', 'url_imagen'
         ]));
@@ -131,32 +132,44 @@ class Productos extends Component
 
     public function guardar()
     {
-        $this->validate();
+        // REGLAS DINÁMICAS CORRECTAS
+        $rules = $this->rules;
 
+        // Esto es lo que estaba fallando
+        if ($this->productoId) {
+            $rules['codigo'] = "required|string|max:50|unique:productos,codigo,{$this->productoId}";
+        }
+
+        $this->validate($rules); // ← ahora sí pasa
+
+        // ... resto del código igual
         if ($this->imagen) {
+            // Si ya tenía imagen y sube una nueva, borramos la anterior
+            if ($this->url_imagen && $this->imagen) {
+                \Storage::disk('public')->delete($this->url_imagen);
+            }
             $this->url_imagen = $this->imagen->store('productos', 'public');
         }
 
         Producto::updateOrCreate(['id' => $this->productoId], [
-            'nombre' => $this->nombre,
-            'descripcion' => $this->descripcion,
-            'precio' => $this->precio,
-            'stock' => $this->stock,
-            'costo_compra' => $this->costo_compra,
-            'color' => $this->color,
-            'tipo' => $this->tipo,
-            'categoria_id' => $this->categoria_id,
-            'marca_id' => $this->marca_id,
-            'modelo_id' => $this->modelo_id,
-            'promo_id' => $this->promo_id,
-            'codigo' => $this->codigo,
-            'url_imagen' => $this->url_imagen,
+            'nombre'        => $this->nombre,
+            'codigo'        => $this->codigo,
+            'precio'        => $this->precio,
+            'costo_compra'  => $this->costo_compra,
+            'stock'         => $this->stock,
+            'categoria_id'  => $this->categoria_id,
+            'marca_id'      => $this->marca_id,
+            'modelo_id'     => $this->modelo_id,
+            'promo_id'      => $this->promo_id ?? null,
+            'color'         => $this->color,
+            'tipo'          => $this->tipo,
+            'descripcion'   => $this->descripcion,
+            'url_imagen'    => $this->url_imagen,
         ]);
 
         $this->dispatch('toast', $this->productoId ? 'Producto actualizado' : 'Producto creado');
         $this->cerrarModal();
     }
-
     public function confirmarEliminar($id)
     {
         $this->productoId = $id;

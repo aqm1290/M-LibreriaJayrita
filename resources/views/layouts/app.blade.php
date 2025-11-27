@@ -6,6 +6,7 @@
     <title>Librería Jayrita - @yield('title', 'Dashboard')</title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    
     @livewireStyles
 </head>
 <body class="h-full bg-gray-50 font-sans antialiased text-sm">
@@ -72,9 +73,9 @@
                 </div>
 
                 <!-- Inventario -->
-                <div x-data="{ open: {{ request()->is('entrada*') || request()->is('entradas*') ? 'true' : 'false' }} }">
+                <div x-data="{ open: {{ request()->routeIs(['entrada-inventario', 'entradas.*']) ? 'true' : 'false' }} }">
                     <button @click="open = !open"
-                        class="w-full flex items-center justify-between px-4 py-2.5 rounded-lg font-semibold transition-all {{ request()->is('entrada*') || request()->is('entradas*') ? 'bg-yellow-200 text-gray-900' : 'text-gray-700 hover:bg-yellow-100' }}">
+                        class="w-full flex items-center justify-between px-4 py-2.5 rounded-lg font-semibold transition-all {{ request()->routeIs(['entrada-inventario', 'entradas.*']) ? 'bg-yellow-200 text-gray-900' : 'text-gray-700 hover:bg-yellow-100' }}">
                         <div class="flex items-center gap-3">
                             <i data-lucide="boxes" class="w-5 h-5"></i>
                             Inventario
@@ -93,9 +94,11 @@
                 </div>
 
                 <!-- Catálogos -->
-                <div x-data="{ open: {{ request()->routeIs(['productos*','categorias*','marcas*','modelos*','proveedores*']) ? 'true' : 'false' }} }">
+                <div x-data="{ 
+                    open: {{ request()->routeIs(['productos*','categorias*','marcas*','modelos*','proveedores*','admin.promociones*']) ? 'true' : 'false' }} 
+                }">
                     <button @click="open = !open"
-                        class="w-full flex items-center justify-between px-4 py-2.5 rounded-lg font-semibold transition-all {{ request()->routeIs(['productos*','categorias*','marcas*','modelos*','proveedores*']) ? 'bg-yellow-200 text-gray-900' : 'text-gray-700 hover:bg-yellow-100' }}">
+                        class="w-full flex items-center justify-between px-4 py-2.5 rounded-lg font-semibold transition-all {{ request()->routeIs(['productos*','categorias*','marcas*','modelos*','proveedores*','admin.promociones*']) ? 'bg-yellow-200 text-gray-900' : 'text-gray-700 hover:bg-yellow-100' }}">
                         <div class="flex items-center gap-3">
                             <i data-lucide="folder-tree" class="w-5 h-5"></i>
                             Catálogos
@@ -119,6 +122,13 @@
                         <a href="{{ route('proveedores') }}" class="flex items-center gap-3 px-4 py-2 rounded-lg text-sm {{ request()->routeIs('proveedores*') ? 'bg-yellow-300 text-gray-900 font-bold' : 'text-gray-600 hover:bg-yellow-50' }}">
                             <i data-lucide="truck" class="w-4 h-4"></i> Proveedores
                         </a>
+
+                        <!-- PROMOCIONES AQUÍ -->
+                        <a href="{{ route('admin.promociones') }}" 
+                           class="flex items-center gap-3 px-4 py-2 rounded-lg text-sm {{ request()->routeIs('admin.promociones*') ? 'bg-yellow-300 text-gray-900 font-bold' : 'text-gray-600 hover:bg-yellow-50' }}">
+                            <i data-lucide="percent" class="w-4 h-4"></i> 
+                            <span class="font-bold">Promociones</span>
+                        </a>
                     </div>
                 </div>
 
@@ -140,7 +150,7 @@
     </aside>
 
     <!-- Overlay móvil -->
-    <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden lg:hidden"></div>
+    <div id="sidebar-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden lg:hidden" onclick="toggleSidebar()"></div>
 
     <!-- CONTENIDO PRINCIPAL -->
     <div class="flex-1 flex flex-col overflow-hidden">
@@ -148,12 +158,11 @@
             <div class="px-6 py-4 flex items-center justify-between">
 
                 <div class="flex items-center gap-4">
-                    <!-- Botón menú móvil -->
                     <button id="toggle-sidebar" class="p-3 rounded-xl bg-yellow-100 hover:bg-yellow-200 transition lg:hidden">
                         <i data-lucide="menu" class="w-6 h-6 text-orange-600"></i>
                     </button>
 
-                    <!-- Título dinámico con animación -->
+                    <!-- TÍTULO DINÁMICO PERFECTO -->
                     <h1 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-orange-600 opacity-0 translate-y-6 animate-slideUp">
                         @php
                             $titles = [
@@ -161,14 +170,17 @@
                                 'caja.pos'           => 'Punto de Venta',
                                 'caja.apertura'      => 'Apertura de Caja',
                                 'caja.cierre'        => 'Cierre de Caja',
+                                'caja.buscar'        => 'Buscar Producto',
+                                'entrada-inventario' => 'Nueva Entrada',
+                                'entradas.index'     => 'Historial de Entradas',
                                 'productos'          => 'Productos',
                                 'categorias'         => 'Categorías',
                                 'marcas'             => 'Marcas',
                                 'modelos'            => 'Modelos',
                                 'proveedores'        => 'Proveedores',
-                                'entrada-inventario' => 'Nueva Entrada',
-                                'entradas.index'     => 'Historial de Entradas',
+                                'admin.promociones'  => 'Promociones',   // ← AQUÍ ESTÁ
                             ];
+
                             $currentTitle = 'Dashboard';
                             foreach ($titles as $route => $title) {
                                 if (request()->routeIs($route . '*') || request()->routeIs($route)) {
@@ -221,16 +233,21 @@
 
 @livewireScripts
 @stack('scripts')
-<script>
-    window.addEventListener('redirect-after', event => {
-        setTimeout(() => {
-            window.location.href = event.detail.url;
-        }, event.detail.delay || 0);
-    });
-</script>
 
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-@vite(['resources/js/dashboard.js'])
+<script>
+    lucide.createIcons();
+
+    function toggleSidebar() {
+        document.getElementById('sidebar').classList.toggle('-translate-x-full');
+        document.getElementById('sidebar-overlay').classList.toggle('hidden');
+    }
+
+    // Cerrar sidebar al hacer clic fuera (móvil)
+    document.getElementById('sidebar-overlay')?.addEventListener('click', toggleSidebar);
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 </body>
 </html>

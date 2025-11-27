@@ -9,7 +9,6 @@
                 </svg>
             </div>
             <h1 class="text-4xl font-black text-gray-800 mb-2">LIBRERÍA JAYRA</h1>
-            <p class="text-lg text-gray-600">Sistema de Punto de Venta</p>
         </div>
 
         <!-- Card del Login -->
@@ -24,7 +23,7 @@
                         type="email" 
                         wire:model="email" 
                         class="w-full px-5 py-4 rounded-xl border-2 border-gray-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition duration-200 text-lg"
-                        placeholder="admin@jayra.com"
+                        
                         required
                     >
                     @error('email') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
@@ -37,20 +36,20 @@
                         type="password" 
                         wire:model="password" 
                         class="w-full px-5 py-4 rounded-xl border-2 border-gray-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 transition duration-200 text-lg"
-                        placeholder="••••••••"
+                        
                         required
                     >
                     @error('password') <span class="text-red-500 text-sm mt-1">{{ $message }}</span> @enderror
                 </div>
 
                 <!-- Recordar + Olvidé -->
-                <div class="flex items-center justify-between text-sm">
+                {{-- <div class="flex items-center justify-between text-sm">
                     <label class="flex items-center">
                         <input type="checkbox" wire:model="remember" class="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500">
                         <span class="ml-2 text-gray-600">Recordarme</span>
                     </label>
                     <a href="#" class="text-indigo-600 hover:text-indigo-800 font-medium">¿Olvidaste tu contraseña?</a>
-                </div>
+                </div> --}}
 
                 <!-- Botón Login -->
                 <button 
@@ -76,7 +75,9 @@
 
             <!-- Footer -->
             <div class="mt-8 text-center text-sm text-gray-500">
-                <p>© 2025 Librería Jayra •</p>
+                <footer>
+                    <p>&copy; <script>document.write(new Date().getFullYear())</script> Librería Jayra • Todos los derechos reservados.</p>
+                </footer>
             </div>
         </div>
     </div>

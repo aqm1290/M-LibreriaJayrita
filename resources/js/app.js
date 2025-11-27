@@ -2,8 +2,7 @@
 import './bootstrap';
 import '../css/app.css';
 import Swal from 'sweetalert2';
-import { createIcons } from 'lucide';
-
+import { createIcons, FileText, Edit, Trash, Truck } from 'lucide';
 window.Swal = Swal;
 
 import {
@@ -16,11 +15,15 @@ import {
     DoorClosed,
     Search,
     Boxes,
+    Menu,
+    CheckCircle,
+    tag,
     FilePlus,
     History,
     FolderTree,
     Package,
     Layers,
+    percent,
     Tag,
 
 } from 'lucide';
@@ -30,6 +33,8 @@ createIcons({
         X,
         ChevronDown,
         ShoppingCart,
+        tag,
+        percent,
         Home,
         Wallet,
         DoorOpen,
