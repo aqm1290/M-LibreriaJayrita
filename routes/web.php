@@ -14,6 +14,7 @@ use App\Livewire\Inventario\EditEntradaInventario;
 use App\Livewire\Admin\Productos;
 use App\Livewire\Admin\Proveedores;
 use App\Livewire\Admin\Promociones;
+use App\Livewire\Admin\CrearPersonal;
 
 use App\Livewire\Caja\AperturaCaja;
 use App\Livewire\Caja\CierreDiario;
@@ -29,12 +30,9 @@ use App\Http\Controllers\VentaPdfController;
 // ====================================================================
 Route::get('/login', Login::class)->name('login');
 
-Route::post('/logout', function () {
-    Auth::logout();
-    request()->session()->invalidate();
-    request()->session()->regenerateToken();
-    return redirect('/login');
-})->name('logout');
+
+
+
 
 // ====================================================================
 // RUTAS QUE REQUIEREN CAJA ABIERTA (POS + VENTAS)
@@ -44,32 +42,32 @@ Route::middleware(['auth', 'caja.abierta'])->group(function () {
 });
 
 // ====================================================================
-// APERTURA Y CIERRE DE CAJA (excluidos del middleware para que se puedan acceder)
+// APERTURA Y CIERRE DE CAJA
 // ====================================================================
 Route::middleware(['auth', 'rol:admin,cajero'])->group(function () {
     Route::get('/caja/apertura', AperturaCaja::class)->name('caja.apertura');
     Route::get('/caja/cierre', CierreDiario::class)->name('caja.cierre');
     Route::get('/caja/buscar', \App\Livewire\Caja\BuscadorProductos::class)
-     ->name('caja.buscar');
+        ->name('caja.buscar');
 });
 
 // ====================================================================
-// DASHBOARD Y ÁREAS ADMINISTRATIVAS (solo autenticados)
+// DASHBOARD Y ÁREAS ADMINISTRATIVAS
 // ====================================================================
 Route::middleware(['auth'])->group(function () {
 
     // Dashboard principal
     Route::get('/', Dashboard::class)->name('dashboard');
-    Route::get('/dashboard', Dashboard::class)->name('dashboard'); // por si alguien escribe /dashboard
+    Route::get('/dashboard', Dashboard::class)->name('dashboard');
 
     // === INVENTARIO (admin y cajero) ===
     Route::middleware('rol:admin,cajero')->group(function () {
         Route::get('/entrada-inventario', CreateEntradaInventario::class)
-             ->name('entrada-inventario');
+            ->name('entrada-inventario');
         Route::get('/entradas', IndexEntradaInventario::class)
-             ->name('entradas.index');
+            ->name('entradas.index');
         Route::get('/entradas/{id}/edit', EditEntradaInventario::class)
-             ->name('entradas.edit');
+            ->name('entradas.edit');
     });
 
     // === CATÁLOGOS – Solo admin ===
@@ -80,11 +78,12 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/modelos', ModeloComponent::class)->name('modelos');
         Route::get('/proveedores', Proveedores::class)->name('proveedores');
         Route::get('/admin/promociones', Promociones::class)->name('admin.promociones');
+        Route::get('/admin/crear-personal', CrearPersonal::class)->name('admin.crear-personal');
     });
 
     // === DESCARGA DE TICKETS Y PDF ===
     Route::get('/venta/ticket/{id}', [VentaPdfController::class, 'ticket'])
-         ->name('venta.ticket');
+        ->name('venta.ticket');
     Route::get('/venta/descargar/{id}', [VentaPdfController::class, 'descargar'])
-         ->name('venta.descargar');
+        ->name('venta.descargar');
 });

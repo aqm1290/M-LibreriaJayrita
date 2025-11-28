@@ -19,11 +19,12 @@ import {
     CheckCircle,
     tag,
     FilePlus,
+    percent,
     History,
     FolderTree,
     Package,
     Layers,
-    percent,
+
     Tag,
 
 } from 'lucide';
@@ -39,6 +40,7 @@ createIcons({
         Wallet,
         DoorOpen,
         DoorClosed,
+
         Search,
         Boxes,
         FilePlus,

@@ -93,10 +93,12 @@
                     </div>
                 </div>
 
+                
                 <!-- Catálogos -->
+                @if(Auth::user()->esAdmin())
                 <div x-data="{ 
                     open: {{ request()->routeIs(['productos*','categorias*','marcas*','modelos*','proveedores*','admin.promociones*']) ? 'true' : 'false' }} 
-                }">
+                    }">
                     <button @click="open = !open"
                         class="w-full flex items-center justify-between px-4 py-2.5 rounded-lg font-semibold transition-all {{ request()->routeIs(['productos*','categorias*','marcas*','modelos*','proveedores*','admin.promociones*']) ? 'bg-yellow-200 text-gray-900' : 'text-gray-700 hover:bg-yellow-100' }}">
                         <div class="flex items-center gap-3">
@@ -129,8 +131,19 @@
                             <i data-lucide="percent" class="w-4 h-4"></i> 
                             <span class="font-bold">Promociones</span>
                         </a>
+                        <a href="{{ route('admin.crear-personal') }}" 
+                        class="flex items-center gap-3 px-4 py-2 rounded-lg text-sm 
+                            {{ request()->routeIs('admin.crear-personal*') ? 'bg-yellow-300 text-gray-900 font-bold' : 'text-gray-600 hover:bg-yellow-50' }}">
+                            <i data-lucide="user-plus" class="w-4 h-4"></i> 
+                            Crear Personal
+                        </a>
                     </div>
+
+
+
                 </div>
+                @endif
+                    @livewire('logout-con-proteccion')
 
             </nav>
 
@@ -178,7 +191,8 @@
                                 'marcas'             => 'Marcas',
                                 'modelos'            => 'Modelos',
                                 'proveedores'        => 'Proveedores',
-                                'admin.promociones'  => 'Promociones',   // ← AQUÍ ESTÁ
+                                'admin.promociones'  => 'Promociones', 
+                                'admin.crear-personal' => 'Crear Personal', 
                             ];
 
                             $currentTitle = 'Dashboard';
@@ -233,9 +247,20 @@
 
 @livewireScripts
 @stack('scripts')
-
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 <script>
+
+
+
+
+
+
+
+
+
+
+
     lucide.createIcons();
 
     function toggleSidebar() {

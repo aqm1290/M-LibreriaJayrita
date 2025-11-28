@@ -40,11 +40,11 @@ class User extends Authenticatable
 
     public function esCajero(): bool
     {
-        return $this->rol === 'cajero' || $this->esAdmin();
+        return $this->rol === 'cajero';
     }
 
     public function esVendedor(): bool
     {
-        return in_array($this->rol, ['admin', 'cajero', 'vendedor']);
+        return $this->rol === 'vendedor';
     }
 }

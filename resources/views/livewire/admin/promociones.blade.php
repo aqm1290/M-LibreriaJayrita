@@ -60,7 +60,7 @@
                 </div>
             @empty
                 <div class="col-span-full text-center py-24">
-                    <div class="text-8xl mb-6 opacity-10">No promotions yet</div>
+                    <div class="text-8xl mb-6 opacity-10">NO HAY PROMOCIONES</div>
                     <p class="text-3xl text-amber-800 font-bold mb-8">No hay promociones creadas</p>
                     <button wire:click="crear" class="text-4xl font-black text-amber-600 hover:text-amber-700 underline">
                         ¡Crear la primera promoción!

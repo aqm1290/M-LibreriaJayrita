@@ -6,32 +6,32 @@ use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\Models\AperturaCaja;
 
 class LogoutConProteccion extends Component
 {
     public function intentarCerrarSesion()
     {
-        // Solo aplicamos la regla si es cajero o admin
-        if (!auth()->user()->esCajero() && !auth()->user()->esAdmin()) {
-            $this->logout();
-            return;
+        $user = auth()->user();
+
+        // Solo aplicamos la regla si es cajero
+        if ($user->esCajero()) {
+            $hoy = Carbon::today()->toDateString();
+
+            // Verificar si tiene caja abierta
+            $cajaAbierta = DB::table('aperturas_caja') // <- tu tabla de caja
+                ->where('usuario_id', $user->id)
+                ->whereDate('fecha_apertura', $hoy)
+                ->whereNull('fecha_cierre')
+                ->exists();
+
+            if ($cajaAbierta) {
+                $this->dispatch('alerta-caja-abierta');
+                return; // No cerramos sesión
+            }
         }
 
-        // Verificamos si este usuario tiene caja abierta hoy
-        $hoy = Carbon::today()->toDateString();
-
-        $cajaAbierta = DB::table('aperturas_caja')
-            ->where('usuario_id', auth()->id())
-            ->whereDate('fecha_apertura', $hoy)
-            ->whereNull('fecha_cierre')
-            ->exists();
-
-        if ($cajaAbierta) {
-            $this->dispatch('mostrar-alerta-caja-abierta');
-            return;
-        }
-
-        // Si no tiene caja abierta → cierra sesión normal
+        // Si no tiene caja abierta o no es cajero, cierra sesión
         $this->logout();
     }
 

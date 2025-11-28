@@ -13,8 +13,7 @@ return new class extends Migration {
             $table->string('horario');
             $table->string('turno'); // mañana, tarde, noche
             $table->string('telefono')->nullable();
-            $table->timestamp('creado_en')->useCurrent();
-            $table->timestamp('actualizado_en')->useCurrent()->useCurrentOnUpdate();
+            $table->timestamps();
         });
     }
 
