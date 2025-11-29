@@ -2,19 +2,28 @@
 
 namespace App\Livewire;
 
-use Livewire\Component;
 use App\Models\Marca;
+use Livewire\Component;
+use Livewire\WithFileUploads;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Livewire\WithPagination;  
 
 class MarcasComponent extends Component
 {
+    use WithFileUploads;
+    use WithPagination;
+
     public $search = '';
+    public $mostrarInactivos = false;    
     public $modal = false;
     public $confirmDelete = false;
 
     public $marca_id = null;
     public $nombre = '';
     public $descripcion = '';
+    public $imagen;
+    public $url_imagen;
 
     protected function rules()
     {
@@ -26,23 +35,16 @@ class MarcasComponent extends Component
                 Rule::unique('marcas')->ignore($this->marca_id),
             ],
             'descripcion' => 'nullable|string|max:500',
-        ];
-    }
-
-    protected function messages()
-    {
-        return [
-            'nombre.required' => 'El nombre de la marca es obligatorio.',
-            'nombre.max'      => 'El nombre no puede tener más de 100 caracteres.',
-            'nombre.unique'   => 'Ya existe una marca con este nombre.',
-            'descripcion.max'=> 'La descripción no puede tener más de 500 caracteres.',
+            'imagen'      => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ];
     }
 
     public function render()
     {
-        $marcas = Marca::where('nombre', 'like', "%{$this->search}%")
-            ->orWhere('descripcion', 'like', "%{$this->search}%")
+        $marcas = Marca::withCount('productos')
+            ->when($this->search !== '', fn($q) => $q->where('nombre', 'like', "%{$this->search}%")
+                ->orWhere('descripcion', 'like', "%{$this->search}%"))
+            ->when(!$this->mostrarInactivos, fn($q) => $q->where('activo', true))
             ->orderBy('nombre')
             ->paginate(12);
 
@@ -61,6 +63,8 @@ class MarcasComponent extends Component
         $this->marca_id    = $marca->id;
         $this->nombre      = $marca->nombre;
         $this->descripcion = $marca->descripcion ?? '';
+        $this->url_imagen  = $marca->url_imagen;
+        $this->imagen      = null;
         $this->modal = true;
     }
 
@@ -68,20 +72,23 @@ class MarcasComponent extends Component
     {
         $this->validate();
 
-        Marca::updateOrCreate(
-            ['id' => $this->marca_id],
-            [
-                'nombre'      => $this->nombre,
-                'descripcion' => $this->descripcion,
-            ]
-        );
+        $rutaImagen = $this->url_imagen;
 
-        $this->dispatch('toast', 
-            $this->marca_id 
-                ? 'Marca actualizada correctamente' 
-                : 'Marca creada exitosamente'
-        );
+        if ($this->imagen) {
+            if ($this->url_imagen && Storage::disk('public')->exists($this->url_imagen)) {
+                Storage::disk('public')->delete($this->url_imagen);
+            }
+            $rutaImagen = $this->imagen->store('marcas', 'public');
+        }
 
+        Marca::updateOrCreate(['id' => $this->marca_id], [
+            'nombre'      => $this->nombre,
+            'descripcion' => $this->descripcion,
+            'url_imagen'  => $rutaImagen,
+            'activo'      => true,
+        ]);
+
+        $this->dispatch('toast', $this->marca_id ? 'Marca actualizada correctamente' : 'Marca creada exitosamente');
         $this->cerrarModal();
     }
 
@@ -95,15 +102,18 @@ class MarcasComponent extends Component
     {
         $marca = Marca::find($this->marca_id);
 
-        if ($marca && $marca->productos()->count() > 0) {
-            $this->dispatch('toast', 'No se puede eliminar: hay productos asociados a esta marca.');
-            $this->confirmDelete = false;
-            return;
+        if ($marca) {
+            $marca->activo = !$marca->activo;
+            $marca->save(); // ← Aquí se dispara el Observer y se desactivan productos + modelos
+
+            $this->dispatch('toast', $marca->activo 
+                ? 'Marca reactivada correctamente' 
+                : 'Marca y todos sus productos/modelos desactivados'
+            );
         }
 
-        $marca?->delete();
-        $this->dispatch('toast', 'Marca eliminada correctamente');
         $this->confirmDelete = false;
+        $this->marca_id = null;
     }
 
     public function cerrarModal()
@@ -115,12 +125,23 @@ class MarcasComponent extends Component
 
     private function resetForm()
     {
-        $this->reset(['marca_id', 'nombre', 'descripcion']);
+        $this->reset(['marca_id', 'nombre', 'descripcion', 'imagen', 'url_imagen']);
         $this->resetErrorBag();
     }
 
     public function updatingSearch()
     {
         $this->resetPage();
+    }
+
+    public function updatedMostrarInactivos()
+    {
+        $this->resetPage();
+    }
+
+    // ←←←← LA CLAVE: ESTE MÉTODO MAGICO ←←←←
+    public function getMarcaProperty()
+    {
+        return $this->marca_id ? Marca::find($this->marca_id) : null;
     }
 }

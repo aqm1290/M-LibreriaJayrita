@@ -11,8 +11,8 @@ return new class extends Migration {
             $table->id();
             $table->string('nombre')->unique();
             $table->text('descripcion')->nullable();
-            $table->timestamp('creado_en')->useCurrent();
-            $table->timestamp('actualizado_en')->useCurrent()->useCurrentOnUpdate();
+            $table->boolean('activo')->default(true);
+            $table->timestamps();
         });
     }
 

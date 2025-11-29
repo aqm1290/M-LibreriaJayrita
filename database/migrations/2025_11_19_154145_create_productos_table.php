@@ -18,6 +18,8 @@ return new class extends Migration {
             $table->string('url_imagen')->nullable();
             $table->string('color')->nullable();
             $table->string('tipo')->nullable();
+            $table->boolean('activo')->default(true);
+
             $table->foreignId('categoria_id')->constrained('categorias')->onDelete('cascade');
             $table->foreignId('modelo_id')->constrained('modelos')->onDelete('cascade');
             $table->foreignId('marca_id')->constrained('marcas')->onDelete('cascade');

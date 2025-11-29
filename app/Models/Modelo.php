@@ -9,14 +9,17 @@ class Modelo extends Model
 {
     use HasFactory;
 
-    public $timestamps = false;
-    const CREATED_AT = 'creado_en';
-    const UPDATED_AT = 'actualizado_en';
+    public $timestamps = true;
+    
 
     protected $fillable = [
         'marca_id',
         'nombre',
         'descripcion',
+        'activo',
+    ];
+    protected $casts = [
+        'activo' => 'boolean',
     ];
 
     public function marca()

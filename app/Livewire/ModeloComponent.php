@@ -13,6 +13,7 @@ class ModeloComponent extends Component
     use WithPagination;
 
     public $search = '';
+    public $mostrarInactivos = false;
     public $modal = false;
     public $confirmDelete = false;
 
@@ -28,36 +29,30 @@ class ModeloComponent extends Component
                 'required',
                 'string',
                 'max:150',
-                Rule::unique('modelos')->where(fn($query) => $query->where('marca_id', $this->marca_id))->ignore($this->modeloId),
+                Rule::unique('modelos')
+                    ->where(fn($q) => $q->where('marca_id', $this->marca_id))
+                    ->ignore($this->modeloId)
             ],
             'marca_id' => 'required|exists:marcas,id',
             'descripcion' => 'nullable|string|max:500',
         ];
     }
 
-    protected function messages()
-    {
-        return [
-            'nombre.required' => 'El nombre del modelo es obligatorio.',
-            'nombre.max'      => 'El nombre no puede tener más de 150 caracteres.',
-            'nombre.unique'   => 'Ya existe un modelo con este nombre para la marca seleccionada.',
-            'marca_id.required' => 'Debes seleccionar una marca.',
-            'marca_id.exists'   => 'La marca seleccionada no es válida.',
-            'descripcion.max'   => 'La descripción no puede tener más de 500 caracteres.',
-        ];
-    }
-
     public function render()
     {
-        $modelos = Modelo::with('marca')
-            ->when($this->search, function ($query) {
-                $query->where('nombre', 'like', "%{$this->search}%")
-                      ->orWhereHas('marca', fn($q) => $q->where('nombre', 'like', "%{$this->search}%"));
+        $modelos = Modelo::with(['marca'])->withCount('productos')
+            ->when($this->search !== '', function ($q) {
+                $q->where('nombre', 'like', "%{$this->search}%")
+                  ->orWhereHas('marca', fn($m) => $m->where('nombre', 'like', "%{$this->search}%"));
             })
+            ->when($this->mostrarInactivos,
+                fn($q) => $q->where('activo', false),   // SOLO INACTIVOS
+                fn($q) => $q->where('activo', true)     // SOLO ACTIVOS
+            )
             ->orderBy('nombre')
             ->paginate(12);
 
-        $marcas = Marca::orderBy('nombre')->get();
+        $marcas = Marca::where('activo', true)->orderBy('nombre')->get();
 
         return view('livewire.modelo-component', compact('modelos', 'marcas'));
     }
@@ -70,31 +65,28 @@ class ModeloComponent extends Component
 
     public function editar($id)
     {
-        $modelo = Modelo::findOrFail($id);
-        $this->modeloId    = $modelo->id;
-        $this->nombre      = $modelo->nombre;
-        $this->descripcion = $modelo->descripcion ?? '';
-        $this->marca_id    = $modelo->marca_id;
-        $this->modal = true;
+        $m = Modelo::findOrFail($id);
+        $this->modeloId     = $m->id;
+        $this->nombre       = $m->nombre;
+        $this->descripcion  = $m->descripcion ?? '';
+        $this->marca_id     = $m->marca_id;
+        $this->modal        = true;
     }
 
     public function guardar()
     {
         $this->validate();
 
-        Modelo::updateOrCreate(
-            ['id' => $this->modeloId],
-            [
-                'nombre'      => $this->nombre,
-                'descripcion' => $this->descripcion,
-                'marca_id'    => $this->marca_id,
-            ]
-        );
+        Modelo::updateOrCreate(['id' => $this->modeloId], [
+            'nombre'      => $this->nombre,
+            'descripcion' => $this->descripcion,
+            'marca_id'    => $this->marca_id,
+            'activo'      => true,
+        ]);
 
-        $this->dispatch('toast',
-            $this->modeloId
-                ? 'Modelo actualizado correctamente'
-                : 'Modelo creado exitosamente'
+        $this->dispatch('toast', $this->modeloId
+            ? 'Modelo actualizado correctamente'
+            : 'Modelo creado exitosamente'
         );
 
         $this->cerrarModal();
@@ -108,17 +100,20 @@ class ModeloComponent extends Component
 
     public function eliminar()
     {
-        $modelo = Modelo::find($this->modeloId);
+        $m = Modelo::find($this->modeloId);
 
-        if ($modelo && $modelo->productos()->count() > 0) {
-            $this->dispatch('toast', 'No se puede eliminar: hay productos con este modelo.');
-            $this->confirmDelete = false;
-            return;
+        if ($m) {
+            $m->activo = !$m->activo;
+            $m->save(); // ← Observer actualiza productos automáticamente
+
+            $this->dispatch('toast', $m->activo
+                ? 'Modelo reactivado correctamente'
+                : 'Modelo y todos sus productos desactivados'
+            );
         }
 
-        $modelo?->delete();
-        $this->dispatch('toast', 'Modelo eliminado correctamente');
         $this->confirmDelete = false;
+        $this->modeloId = null;
     }
 
     public function cerrarModal()
@@ -137,5 +132,16 @@ class ModeloComponent extends Component
     public function updatingSearch()
     {
         $this->resetPage();
+    }
+
+    public function updatedMostrarInactivos()
+    {
+        $this->resetPage();
+    }
+
+    // MÉTODO MÁGICO QUE ELIMINA EL ERROR DE $modelo PARA SIEMPRE
+    public function getModeloProperty()
+    {
+        return $this->modeloId ? Modelo::find($this->modeloId) : null;
     }
 }

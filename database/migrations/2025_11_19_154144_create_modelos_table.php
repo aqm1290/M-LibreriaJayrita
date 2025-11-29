@@ -12,8 +12,8 @@ return new class extends Migration {
             $table->foreignId('marca_id')->constrained('marcas')->onDelete('cascade');
             $table->string('nombre');
             $table->text('descripcion')->nullable();
-            $table->timestamp('creado_en')->useCurrent();
-            $table->timestamp('actualizado_en')->useCurrent()->useCurrentOnUpdate();
+            $table->boolean('activo')->default(true);
+            $table->timestamps();
         });
     }
 

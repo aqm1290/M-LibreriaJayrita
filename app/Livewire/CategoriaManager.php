@@ -12,6 +12,7 @@ class CategoriaManager extends Component
     use WithPagination;
 
     public $search = '';
+    public $mostrarInactivos = false;
     public $modal = false;
     public $confirmDelete = false;
 
@@ -26,32 +27,26 @@ class CategoriaManager extends Component
                 'required',
                 'string',
                 'max:100',
-                Rule::unique('categorias')->ignore($this->categoriaId),
+                Rule::unique('categorias')->ignore($this->categoriaId)
             ],
             'descripcion' => 'nullable|string|max:500',
         ];
     }
 
-    protected function messages()
-    {
-        return [
-            'nombre.required' => 'El nombre de la categoría es obligatorio.',
-            'nombre.max'      => 'El nombre no puede tener más de 100 caracteres.',
-            'nombre.unique'   => 'Ya existe una categoría con este nombre.',
-            'descripcion.max'=> 'La descripción no puede tener más de 500 caracteres.',
-        ];
-    }
-
-    public function mount()
-    {
-        $this->search = request()->query('search', '');
-    }
+    protected $messages = [
+        'nombre.required' => 'El nombre de la categoría es obligatorio.',
+        'nombre.unique'   => 'Ya existe una categoría con ese nombre.',
+        'nombre.max'      => 'El nombre no puede tener más de 100 caracteres.',
+    ];
 
     public function render()
     {
-        $categorias = Categoria::where('nombre', 'like', "%{$this->search}%")
-            ->orWhere('descripcion', 'like', "%{$this->search}%")
-            ->orderBy('nombre')
+        $categorias = Categoria::withCount('productos')
+            ->when($this->search !== '', function ($q) {
+                $q->where('nombre', 'like', "%{$this->search}%")
+                  ->orWhere('descripcion', 'like', "%{$this->search}%");
+            })
+            ->when($this->mostrarInactivos, fn($q) => $q->where('activo', false), fn($q) => $q->where('activo', true))            ->orderBy('nombre')
             ->paginate(12);
 
         return view('livewire.categoria-manager', compact('categorias'));
@@ -69,25 +64,22 @@ class CategoriaManager extends Component
         $this->categoriaId = $cat->id;
         $this->nombre      = $cat->nombre;
         $this->descripcion = $cat->descripcion ?? '';
-        $this->modal = true;
+        $this->modal       = true;
     }
 
     public function guardar()
     {
         $this->validate();
 
-        Categoria::updateOrCreate(
-            ['id' => $this->categoriaId],
-            [
-                'nombre'      => $this->nombre,
-                'descripcion' => $this->descripcion,
-            ]
-        );
+        Categoria::updateOrCreate(['id' => $this->categoriaId], [
+            'nombre'      => $this->nombre,
+            'descripcion' => $this->descripcion,
+            'activo'      => true,
+        ]);
 
-        $this->dispatch('toast', 
-            $this->categoriaId 
-                ? 'Categoría actualizada correctamente' 
-                : 'Categoría creada exitosamente'
+        $this->dispatch('toast', $this->categoriaId
+            ? 'Categoría actualizada correctamente'
+            : 'Categoría creada exitosamente'
         );
 
         $this->cerrarModal();
@@ -101,17 +93,20 @@ class CategoriaManager extends Component
 
     public function eliminar()
     {
-        $categoria = Categoria::find($this->categoriaId);
-        
-        if ($categoria && $categoria->productos()->count() > 0) {
-            $this->dispatch('toast', 'No se puede eliminar: hay productos asociados a esta categoría.');
-            $this->confirmDelete = false;
-            return;
+        $cat = Categoria::find($this->categoriaId);
+
+        if ($cat) {
+            $cat->activo = !$cat->activo;
+            $cat->save(); // ← Dispara el Observer → todos los productos se desactivan/reactivan
+
+            $this->dispatch('toast', $cat->activo
+                ? 'Categoría reactivada correctamente'
+                : 'Categoría y todos sus productos desactivados'
+            );
         }
 
-        $categoria?->delete();
-        $this->dispatch('toast', 'Categoría eliminada correctamente');
         $this->confirmDelete = false;
+        $this->categoriaId = null;
     }
 
     public function cerrarModal()
@@ -130,5 +125,16 @@ class CategoriaManager extends Component
     public function updatingSearch()
     {
         $this->resetPage();
+    }
+
+    public function updatedMostrarInactivos()
+    {
+        $this->resetPage();
+    }
+
+    // EL MÉTODO MÁGICO QUE ELIMINA EL ERROR PARA SIEMPRE
+    public function getCategoriaProperty()
+    {
+        return $this->categoriaId ? Categoria::find($this->categoriaId) : null;
     }
 }
