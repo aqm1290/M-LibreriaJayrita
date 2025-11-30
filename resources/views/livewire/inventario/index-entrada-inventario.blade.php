@@ -6,18 +6,18 @@
         </div>
     @endif
 
+    <div class="mb-6">
+        <input type="text" wire:model.live="search"
+               placeholder="Buscar por proveedor, fecha o observación..."
+               class="w-full px-5 py-3 border border-gray-300 rounded-lg shadow focus:ring-2 focus:ring-blue-500">
+    </div>
+
     <div class="flex flex-col sm:flex-row items-center justify-between mb-8 gap-4">
         <h2 class="text-3xl font-extrabold text-gray-800">Entradas de Inventario</h2>
         <a href="{{ route('entrada-inventario') }}"
             class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3 rounded-lg shadow-lg transition">
             + Nueva Entrada
         </a>
-    </div>
-
-    <div class="mb-6">
-        <input type="text" wire:model.live="search"
-               placeholder="Buscar por proveedor, fecha o observación..."
-               class="w-full px-5 py-3 border border-gray-300 rounded-lg shadow focus:ring-2 focus:ring-blue-500">
     </div>
 
     <div class="bg-white rounded-lg shadow overflow-hidden">

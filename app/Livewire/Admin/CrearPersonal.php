@@ -59,4 +59,5 @@ class CrearPersonal extends Component
         return view('livewire.admin.crear-personal')
             ->layout('layouts.app');
     }
+
 }

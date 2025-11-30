@@ -1,6 +1,5 @@
 <?php
 
-// app/Models/Promocion.php
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -27,7 +26,6 @@ class Promocion extends Model
         'termina_en'  => 'datetime',
     ];
 
-    // Productos ligados manualmente (promo_producto)
     public function productos()
     {
         return $this->belongsToMany(Producto::class, 'promo_producto', 'promo_id', 'producto_id');
@@ -51,23 +49,5 @@ class Promocion extends Model
     public function productoRegalo()
     {
         return $this->belongsTo(Producto::class, 'producto_regalo_id');
-    }
-
-    public function usos()
-    {
-        return $this->hasMany(PromocionUso::class, 'promociones_id');
-    }
-
-    // Alcance: solo promociones vigentes y activas
-    public function scopeVigentes(Builder $q): Builder
-    {
-        $now = Carbon::now();
-
-        return $q->where('activa', true)
-            ->where('inicia_en', '<=', $now)
-            ->where(function ($q2) use ($now) {
-                $q2->whereNull('termina_en')
-                   ->orWhere('termina_en', '>=', $now);
-            });
     }
 }
