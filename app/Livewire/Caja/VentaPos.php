@@ -10,6 +10,7 @@ use App\Models\Cliente;
 use App\Models\DetalleVenta;
 use App\Models\FidelidadCliente;
 
+
 class VentaPos extends Component
 {
     public $search = '';
@@ -46,7 +47,7 @@ class VentaPos extends Component
 
     protected $listeners = [
         'confirmar-venta' => 'finalizarVenta',
-        'venta-creada'    => 'ventaCreada',
+        'venta-creada' => 'ventaCreada',
         'add-to-pos-cart' => 'agregarProducto',
     ];
 
@@ -54,15 +55,13 @@ class VentaPos extends Component
     {
         $hoy = today()->toDateString();
         $cierre = \App\Models\CierreCaja::where('fecha', $hoy)->first();
-
         if (!session()->has('turno_activo_id')) {
             return redirect()->route('caja.apertura');
         }
-
+        
         $this->usuario_id = auth()->id() ?? 1;
         $this->resetearCliente();
     }
-
     public function resetearCliente()
     {
         $this->cliente_id = null;
@@ -113,12 +112,12 @@ class VentaPos extends Component
         }
 
         $this->cart[] = [
-            'producto_id'     => $p->id,
-            'nombre'          => $p->nombre,
+            'producto_id' => $p->id,
+            'nombre' => $p->nombre,
             'precio_unitario' => (float) $p->precio,
-            'cantidad'        => 1,
-            'subtotal'        => (float) $p->precio,
-            'stock'           => $p->stock,
+            'cantidad' => 1,
+            'subtotal' => (float) $p->precio,
+            'stock' => $p->stock
         ];
 
         $this->search = '';
@@ -169,7 +168,6 @@ class VentaPos extends Component
             $this->cambio = 0;
         }
     }
-
     public function updatedEfectivoRecibido($value)
     {
         $this->calcularTotales();
@@ -195,9 +193,9 @@ class VentaPos extends Component
         $this->calcularTotales();
 
         $this->dispatch('confirmar-venta', [
-            'total'     => $this->total,
-            'items'     => count($this->cart),
-            'productos' => $this->cart,
+            'total' => $this->total,
+            'items' => count($this->cart),
+            'productos' => $this->cart
         ]);
     }
 
@@ -212,11 +210,11 @@ class VentaPos extends Component
 
         DB::beginTransaction();
         try {
-            $venta = Venta::create([
+                $venta = Venta::create([
                 'usuario_id'        => $this->usuario_id,
                 'cliente_id'        => $this->cliente_id,
-                'cliente_nombre'    => $this->cliente_id
-                    ? Cliente::find($this->cliente_id)?->nombre
+                'cliente_nombre'    => $this->cliente_id 
+                    ? Cliente::find($this->cliente_id)?->nombre 
                     : ($this->cliente_nombre ?: 'Cliente Genérico'),
                 'cliente_documento' => $this->cliente_id 
                     ? Cliente::find($this->cliente_id)?->ci 
@@ -226,16 +224,16 @@ class VentaPos extends Component
                 'metodo_pago'       => $this->metodo_pago,
                 'impuesto'          => $this->total_impuesto,
                 'descuento_total'   => $this->descuento,
-                'turno_id'          => session('turno_activo_id'), // CLAVE PARA EL REPORTE
+                'turno_id' => session('turno_activo_id'),
             ]);
 
             foreach ($this->cart as $item) {
                 DetalleVenta::create([
-                    'venta_id'   => $venta->id,
-                    'producto_id'=> $item['producto_id'],
-                    'cantidad'   => $item['cantidad'],
-                    'precio'     => $item['precio_unitario'],
-                    'subtotal'   => $item['subtotal'],
+                    'venta_id'    => $venta->id,
+                    'producto_id' => $item['producto_id'],
+                    'cantidad'    => $item['cantidad'],
+                    'precio'      => $item['precio_unitario'],
+                    'subtotal'    => $item['subtotal'],
                 ]);
 
                 $producto = Producto::find($item['producto_id']);
@@ -244,9 +242,10 @@ class VentaPos extends Component
                 }
             }
 
-            DB::commit();
+           DB::commit();
 
-            // FIDELIDAD CLIENTE (igual que ya tenías)
+            // === SISTEMA CLIENTE FIEL - AUTOMÁTICO ===
+            // === CLIENTE FIEL - ALERTA ÉPICA ===
             if ($this->cliente_id) {
                 $cliente = \App\Models\Cliente::find($this->cliente_id);
                 if ($cliente) {
@@ -259,11 +258,12 @@ class VentaPos extends Component
                     $fidelidad->ultima_compra = now();
                     $fidelidad->save();
 
+                    // SI LLEGA A 10 Y NO HA ENTREGADO PREMIO → ALERTA ÉPICA
                     if ($fidelidad->compras_realizadas >= 10 && !$fidelidad->premio_entregado) {
                         $this->dispatch('premio-cliente-fiel', [
                             'cliente_id' => $cliente->id,
-                            'nombre'     => $cliente->nombre,
-                            'ci'         => $cliente->ci ?? 'Sin CI',
+                            'nombre' => $cliente->nombre,
+                            'ci' => $cliente->ci ?? 'Sin CI'
                         ]);
                     }
                 }
@@ -272,6 +272,7 @@ class VentaPos extends Component
             $this->dispatch('toast', '¡Venta registrada con éxito!');
             $this->dispatch('venta-creada', $venta->id);
 
+            // === RESETEO 
             $this->resetearTodo();
 
         } catch (\Throwable $e) {
@@ -280,8 +281,6 @@ class VentaPos extends Component
             \Log::error('Error en Venta POS: ' . $e->getMessage(), ['exception' => $e]);
         }
     }
-
-
     public function entregarPremioClienteFiel($clienteId)
     {
         $fidelidad = \App\Models\FidelidadCliente::where('cliente_id', $clienteId)->first();

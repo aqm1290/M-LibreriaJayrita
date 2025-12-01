@@ -46,8 +46,8 @@ class ModeloComponent extends Component
                   ->orWhereHas('marca', fn($m) => $m->where('nombre', 'like', "%{$this->search}%"));
             })
             ->when($this->mostrarInactivos,
-                fn($q) => $q->where('activo', false),   // SOLO INACTIVOS
-                fn($q) => $q->where('activo', true)     // SOLO ACTIVOS
+                fn($q) => $q->where('activo', false),
+                fn($q) => $q->where('activo', true)
             )
             ->orderBy('nombre')
             ->paginate(12);
@@ -57,12 +57,14 @@ class ModeloComponent extends Component
         return view('livewire.modelo-component', compact('modelos', 'marcas'));
     }
 
-    public function crear()
+    // ABRIR MODAL PARA CREAR
+    public function abrirCrear()
     {
         $this->resetForm();
         $this->modal = true;
     }
 
+    // EDITAR
     public function editar($id)
     {
         $m = Modelo::findOrFail($id);
@@ -73,6 +75,7 @@ class ModeloComponent extends Component
         $this->modal        = true;
     }
 
+    // GUARDAR (CREAR O ACTUALIZAR)
     public function guardar()
     {
         $this->validate();
@@ -92,23 +95,25 @@ class ModeloComponent extends Component
         $this->cerrarModal();
     }
 
+    // CONFIRMAR ELIMINAR/ACTIVAR
     public function confirmarEliminar($id)
     {
         $this->modeloId = $id;
         $this->confirmDelete = true;
     }
 
+    // ACTIVAR / DESACTIVAR
     public function eliminar()
     {
         $m = Modelo::find($this->modeloId);
 
         if ($m) {
             $m->activo = !$m->activo;
-            $m->save(); // ← Observer actualiza productos automáticamente
+            $m->save();
 
             $this->dispatch('toast', $m->activo
                 ? 'Modelo reactivado correctamente'
-                : 'Modelo y todos sus productos desactivados'
+                : 'Modelo desactivado (y todos sus productos también)'
             );
         }
 
@@ -137,11 +142,5 @@ class ModeloComponent extends Component
     public function updatedMostrarInactivos()
     {
         $this->resetPage();
-    }
-
-    // MÉTODO MÁGICO QUE ELIMINA EL ERROR DE $modelo PARA SIEMPRE
-    public function getModeloProperty()
-    {
-        return $this->modeloId ? Modelo::find($this->modeloId) : null;
     }
 }
