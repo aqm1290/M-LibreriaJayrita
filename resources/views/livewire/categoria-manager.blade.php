@@ -190,9 +190,25 @@
             </div>
         </div>
 
-        <!-- PAGINACIÓN -->
-        <div class="flex justify-center">
-            {{ $categorias->links() }}
+        <!-- PAGINACIÓN EN ESPAÑOL BONITA -->
+        <div class="px-6 py-5 bg-white border-t border-slate-100">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <!-- Texto de resultados -->
+                <div class="text-sm text-slate-600">
+                    Mostrando 
+                    <span class="font-bold text-slate-900">{{ $categorias->firstItem() }}</span> 
+                    al 
+                    <span class="font-bold text-slate-900">{{ $categorias->lastItem() }}</span> 
+                    de 
+                    <span class="font-bold text-slate-900">{{ $categorias->total() }}</span> 
+                    resultados
+                </div>
+
+                <!-- Paginación con íconos y estilo pro -->
+                <div class="flex items-center gap-2">
+                    {{ $categorias->onEachSide(1)->links('vendor.pagination.tailwind-espanol') }}
+                </div>
+            </div>
         </div>
     </div>
 

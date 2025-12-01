@@ -55,7 +55,7 @@
                            {{ request()->routeIs('dashboard') ? 'bg-yellow-300 text-gray-900 shadow-md' : 'text-gray-700 hover:bg-yellow-100' }}"
                 >
                     <i data-lucide="home" class="w-5 h-5"></i>
-                    Dashboard
+                    Panel de Control
                 </a>
 
                 <!-- Caja y Ventas -->
@@ -257,7 +257,6 @@
                     </div>
                     <div>
                         <p class="font-black text-gray-900 text-base">{{ Auth::user()->name ?? 'Admin' }}</p>
-                        <p class="text-xs font-medium text-gray-600">Administrador</p>
                     </div>
                 </div>
             </div>
@@ -290,7 +289,7 @@
                     >
                         @php
                             $titles = [
-                                'dashboard'             => 'Dashboard',
+                                'dashboard'             => 'Panel de Control',
                                 'caja.pos'              => 'Punto de Venta',
                                 'caja.apertura'         => 'Apertura de Caja',
                                 'caja.cierre'           => 'Cierre de Caja',
@@ -319,34 +318,56 @@
                         {{ $currentTitle }}
                     </h1>
                 </div>
-
-                <!-- Estado de caja -->
+                {{-- Estado de caja en el header usando TurnoCaja --}}
                 @php
-                    $hoy = now()->format('Y-m-d');
-                    $cajaAbierta = \App\Models\CierreCaja::whereDate('fecha', $hoy)
-                        ->where('caja_abierta', true)
-                        ->exists();
+                    $turnoActivo = \App\Models\TurnoCaja::where('usuario_id', auth()->id())
+                        ->whereDate('fecha', today())
+                        ->where('activo', true)
+                        ->first();
+                    $cajaAbierta = (bool) $turnoActivo;
                 @endphp
 
                 <div>
                     @if(!$cajaAbierta && !request()->routeIs('caja.apertura'))
+                        {{-- Caja cerrada → BOTÓN VERDE para abrir --}}
                         <a
                             href="{{ route('caja.apertura') }}"
-                            class="px-6 py-3 bg-gradient-to-r from-red-600 to-orange-600 text-white
-                                   font-black text-sm rounded-xl shadow-xl hover:scale-105 transition"
+                            class="px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white
+                                font-black text-sm rounded-xl shadow-xl hover:scale-105 transition flex items-center gap-2"
                         >
+                            <i data-lucide="unlock" class="w-5 h-5"></i>
                             ABRIR CAJA HOY
                         </a>
+
+                    @elseif($cajaAbierta && !request()->routeIs('caja.cierre'))
+                        {{-- Caja abierta → BOTÓN ROJO para cerrar --}}
+                        <a
+                            href="{{ route('caja.cierre') }}"
+                            class="px-6 py-3 bg-gradient-to-r from-red-600 to-rose-700 text-white
+                                font-black text-sm rounded-xl shadow-xl hover:scale-105 transition flex items-center gap-2"
+                        >
+                            <i data-lucide="lock" class="w-5 h-5"></i>
+                            CERRAR CAJA
+                        </a>
+
                     @else
+                        {{-- Ya estás en apertura o cierre --}}
                         <div
-                            class="px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white
-                                   font-black text-sm rounded-xl shadow-xl flex items-center gap-2"
+                            class="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white
+                                font-black text-sm rounded-xl shadow-xl flex items-center gap-2"
                         >
                             <i data-lucide="check-circle" class="w-5 h-5"></i>
                             CAJA ABIERTA
                         </div>
                     @endif
                 </div>
+
+
+
+
+
+
+
             </div>
         </header>
 

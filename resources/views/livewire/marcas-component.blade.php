@@ -221,9 +221,25 @@
             </div>
         </div>
 
-        <!-- PAGINACIÓN -->
-        <div class="flex justify-center">
-            {{ $marcas->links() }}
+        <!-- PAGINACIÓN EN ESPAÑOL BONITA -->
+        <div class="px-6 py-5 bg-white border-t border-slate-100">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <!-- Texto de resultados -->
+                <div class="text-sm text-slate-600">
+                    Mostrando 
+                    <span class="font-bold text-slate-900">{{ $marcas->firstItem() }}</span> 
+                    al 
+                    <span class="font-bold text-slate-900">{{ $marcas->lastItem() }}</span> 
+                    de 
+                    <span class="font-bold text-slate-900">{{ $marcas->total() }}</span> 
+                    resultados
+                </div>
+
+                <!-- Paginación con íconos y estilo pro -->
+                <div class="flex items-center gap-2">
+                    {{ $marcas->onEachSide(1)->links('vendor.pagination.tailwind-espanol') }}
+                </div>
+            </div>
         </div>
     </div>
 
