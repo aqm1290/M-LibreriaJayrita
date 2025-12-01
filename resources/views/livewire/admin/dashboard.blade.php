@@ -12,7 +12,10 @@
                 </span>
             </p>
             <p class="text-lg text-gray-500 mt-2">
-                Hora actual: <span class="font-bold text-gray-700"> {{ \Carbon\Carbon::now()->locale('es')->isoFormat('HH:mm:ss') }}</span>
+                Hora actual : 
+                <span class="font-bold text-gray-700">
+                    {{ \Carbon\Carbon::now('America/La_Paz')->isoFormat('HH:mm:ss') }}
+                </span>
             </p>
         </div>
 

@@ -24,7 +24,8 @@ class VentaPos extends Component
     public $total_impuesto = 0;
     public $total = 0;
     public $cambio = 0;
-   
+    public $texto_qr = '';
+
     //cliente
     public $cliente_id = null;
     public $cliente_nombre = 'Cliente';
@@ -166,6 +167,12 @@ class VentaPos extends Component
             $this->cambio = round($recibido - $this->total, 2);
         } else {
             $this->cambio = 0;
+        }
+        if ($this->metodo_pago === 'qr') {
+            $this->texto_qr = 'PAGO LIBRERÍA JAYRITA - ' .
+                            'MONTO: ' . number_format($this->total, 2, '.', '') . ' Bs';
+        } else {
+            $this->texto_qr = '';
         }
     }
     public function updatedEfectivoRecibido($value)

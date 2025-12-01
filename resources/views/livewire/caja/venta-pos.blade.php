@@ -240,11 +240,16 @@
                         </div>
                     </div>
 
+                    
                     {{-- Método de pago --}}
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-3 uppercase tracking-wide">Método de pago</label>
-                        <select wire:model.live="metodo_pago"
-                                class="w-full px-6 py-5 rounded-xl bg-gray-100 font-bold text-xl focus:ring-4 focus:ring-[#3483FA]/30">
+                        <label class="block text-sm font-bold text-gray-700 mb-3 uppercase tracking-wide">
+                            Método de pago
+                        </label>
+                        <select
+                            wire:model.live="metodo_pago"
+                            class="w-full px-6 py-5 rounded-xl bg-gray-100 font-bold text-xl focus:ring-4 focus:ring-[#3483FA30]"
+                        >
                             <option value="efectivo">Efectivo</option>
                             <option value="qr">QR / Transferencia</option>
                         </select>
@@ -252,15 +257,60 @@
 
                     @if($metodo_pago === 'efectivo')
                         <div class="space-y-6">
-                            <input type="text" inputmode="decimal" wire:model.lazy="efectivo_recibido"
-                                   placeholder="Monto recibido"
-                                   class="w-full text-center text-6xl font-black py-8 rounded-3xl bg-green-50 text-green-700 border-4 border-green-300 focus:border-green-500 focus:ring-4 focus:ring-green-200 outline-none">
+                            <input
+                                type="text"
+                                inputmode="decimal"
+                                wire:model.lazy="efectivo_recibido"
+                                placeholder="Monto recibido"
+                                class="w-full text-center text-6xl font-black py-8 rounded-3xl bg-green-50 text-green-700 border-4 border-green-300 focus:border-green-500 focus:ring-4 focus:ring-green-200 outline-none"
+                            >
                             <div class="@if($cambio >= 0) bg-gradient-to-br from-green-600 to-green-700 @else bg-red-600 @endif text-white p-6 rounded-3xl text-center shadow-2xl">
-                                <p class="text-3xl font-bold">@if($cambio >= 0) Cambio a devolver @else Falta dinero @endif</p>
-                                <p class="text-5xl font-black mt-3">Bs {{ number_format(abs($cambio), 2) }}</p>
+                                <p class="text-3xl font-bold">
+                                    @if($cambio >= 0)
+                                        Cambio a devolver
+                                    @else
+                                        Falta dinero
+                                    @endif
+                                </p>
+                                <p class="text-5xl font-black mt-3">
+                                    Bs {{ number_format(abs($cambio), 2) }}
+                                </p>
+                            </div>
+                        </div>
+                    @else
+                        {{-- QR de demostración para pagos QR / Transferencia --}}
+                        <div class="mt-6 space-y-4">
+                                
+                            <div class="flex flex-col items-center justify-center bg-white rounded-3xl border border-gray-200 p-6">
+                                @if($total > 0)
+                                    <div class="bg-white p-4 rounded-2xl shadow-md">
+                                        {!! QrCode::size(220)->margin(1)->generate($texto_qr ?: 'PAGO LIBRERIA JAYRITA') !!}
+                                    </div>
+                                    <p class="mt-3 text-lg font-black text-gray-800">
+                                        Monto a cancelar: <span class="text-[#3483FA]">Bs {{ number_format($total, 2) }}</span>
+                                    </p>
+                                @else
+                                    <p class="text-gray-400 text-sm">
+                                        Agrega productos para generar el QR de ejemplo.
+                                    </p>
+                                @endif
                             </div>
                         </div>
                     @endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
                     {{-- Botón finalizar --}}
                     <button wire:click="confirmarVenta"
