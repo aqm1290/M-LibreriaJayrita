@@ -24,21 +24,26 @@
             <!-- Logo -->
             <div class="flex items-center justify-between px-6 py-6 bg-gradient-to-r from-yellow-400 to-orange-500">
                 <div class="flex items-center gap-4">
-                    <div
-                        class="w-12 h-12 bg-white rounded-xl shadow-xl flex items-center justify-center
-                               font-black text-2xl text-orange-600"
-                    >
-                        LJ
+                    <div class="w-12 h-12 rounded-full bg-white shadow-xl flex items-center justify-center overflow-hidden">
+                        <img
+                            src="{{ asset('images/logo.jpg') }}"
+                            alt="Librería Jayrita"
+                            class="w-full h-full object-contain"
+                        >
                     </div>
                     <div>
-                        <h1 class="text-2xl font-black text-gray-900">JAYRITA</h1>
-                        <p class="text-xs font-bold text-gray-800">Librería & Papelería</p>
+                        <h1 class="text-2xl font-black text-gray-900 leading-tight">LIBRERIA</h1>
+                        <p class="text-sm font-black tracking-wide text-gray-900 -mt-1">JAYRITA</p>
+                        <p class="text-[0.65rem] font-bold text-gray-800/90 uppercase tracking-[0.2em]">
+                            Papelería & más
+                        </p>
                     </div>
                 </div>
                 <button onclick="toggleSidebar()" class="lg:hidden">
                     <i data-lucide="x" class="w-6 h-6 text-gray-900"></i>
                 </button>
             </div>
+
 
             <!-- MENÚ -->
             <nav class="flex-1 px-4 py-4 space-y-2 overflow-y-auto">
@@ -225,6 +230,14 @@
                                 <i data-lucide="user-plus" class="w-4 h-4"></i>
                                 Crear Personal
                             </a>
+                            <a
+                                href="{{ route('historial.pdfs') }}"
+                                class="flex items-center gap-3 px-4 py-2.5 rounded-lg font-semibold transition-all
+                                    {{ request()->routeIs('historial.pdfs') ? 'bg-yellow-300 text-gray-900 shadow-md' : 'text-gray-700 hover:bg-yellow-100' }}"
+                            >
+                                <i data-lucide="file-text" class="w-5 h-5"></i>
+                                PDFs de tickets y cierres
+                            </a>
                         </div>
                     </div>
                 @endif
@@ -291,6 +304,7 @@
                                 'proveedores'           => 'Proveedores',
                                 'admin.promociones'     => 'Promociones',
                                 'admin.crear-personal'  => 'Crear Personal',
+                                'historial.pdfs'         => 'PDFs de Tickets y Cierres',
                             ];
 
                             $currentTitle = 'Dashboard';

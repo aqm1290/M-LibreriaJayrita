@@ -16,7 +16,7 @@ class VentaPdfController extends Controller
         $pdf = Pdf::loadView('pdf.ticket', compact('venta'))
             ->setPaper([0, 0, 220, 1000], 'portrait'); // 80mm ancho
 
-        // Nombre bonito del archivo
+        // Nombre bonito del adrchivo
         $fileName = 'ticket_' . str_pad($id, 6, '0', STR_PAD_LEFT) . '.pdf';
         $ruta = 'tickets/' . $fileName;
 

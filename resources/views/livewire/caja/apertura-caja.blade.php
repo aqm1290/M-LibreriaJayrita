@@ -1,6 +1,7 @@
 <div class="min-h-screen bg-gradient-to-br from-amber-50 via-white to-amber-100 flex items-center justify-center px-4 py-8">
     <div class="max-w-3xl w-full">
         <div class="bg-white rounded-3xl shadow-2xl border border-amber-100 overflow-hidden">
+
             {{-- CABECERA --}}
             <div class="px-8 md:px-10 pt-8 pb-6 text-center bg-gradient-to-r from-amber-300 via-amber-200 to-amber-300 border-b border-amber-200">
                 <p class="text-xs font-semibold tracking-[0.3em] text-amber-800 uppercase mb-2">
@@ -10,7 +11,7 @@
                     Apertura de caja
                 </h1>
                 <p class="text-sm md:text-base text-amber-900/80 mt-2 font-medium">
-                    {{ now()->format('l d \d\e F \d\e Y') }}
+                    {{ now('America/La_Paz')->translatedFormat('l j \d\e F \d\e Y') }}
                 </p>
             </div>
 
@@ -27,7 +28,7 @@
                         <input
                             type="number"
                             step="0.01"
-                            wire:model="monto"
+                            wire:model.live="monto"
                             class="w-full text-4xl md:text-5xl font-black text-center
                                    bg-amber-50 border-2 border-amber-300 rounded-2xl
                                    py-4 md:py-5 text-amber-900 tracking-widest
@@ -79,15 +80,15 @@
                             Fecha
                         </p>
                         <p class="mt-1 text-amber-900 font-bold">
-                            {{ now()->format('d/m/Y') }}
+                            {{ now('America/La_Paz')->translatedFormat('d/m/Y') }}
                         </p>
                     </div>
                     <div>
                         <p class="text-amber-700 font-semibold uppercase tracking-wide">
-                            Hora actual
+                            Hora actual 
                         </p>
                         <p class="mt-1 text-amber-900 font-bold">
-                            {{ now()->format('H:i:s') }}
+                            {{ now('America/La_Paz')->format('H:i:s') }}
                         </p>
                     </div>
                 </div>

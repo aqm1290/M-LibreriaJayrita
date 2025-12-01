@@ -9,6 +9,7 @@ import 'alpinejs';
 import Swal from 'sweetalert2';
 window.Swal = Swal;
 
+
 // Lucide (iconos)
 import { createIcons } from 'lucide';
 import {

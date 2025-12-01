@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Cierre de Caja - {{ $fecha }}</title>
+    <title>Cierre de Caja - Turno {{ $turno->id ?? '' }}</title>
     <style>
         body { font-family: DejaVu Sans, sans-serif; margin: 40px; background: white; color: #1f2937; }
         .header { text-align: center; margin-bottom: 40px; }
@@ -25,17 +25,39 @@
         <img src="{{ public_path('images/logo-jayrita.png') }}" class="logo" alt="Librería Jayrita">
         <div class="title">REPORTE DE CIERRE DE CAJA</div>
         <div class="subtitle">
-            {{ \Carbon\Carbon::parse($fecha)->format('d/m/Y') }} | Cajero: {{ $cajero->name }}
+            {{ \Carbon\Carbon::parse($fecha)->format('d/m/Y') }}
+            |
+            Cajero: {{ optional($turno->usuario)->name ?? 'N/A' }}
+            |
+            Turno: {{ $turno->id }} · Apertura: {{ $turno->hora_apertura }} · Cierre: {{ $horaCierre }}
         </div>
     </div>
 
     <table>
-        <tr><th>Apertura de caja</th>           <td>Bs {{ number_format($apertura, 2) }}</td></tr>
-        <tr><th>Ventas en efectivo</th>         <td>Bs {{ number_format($efectivo, 2) }}</td></tr>
-        <tr><th>Ventas QR / Transferencia</th> <td>Bs {{ number_format($qr, 2) }}</td></tr>
-        <tr class="total"><th>TOTAL VENTAS DEL DÍA</th> <td>Bs {{ number_format($totalDia, 2) }}</td></tr>
-        <tr class="total"><th>DINERO ESPERADO</th>     <td>Bs {{ number_format($totalEsperado, 2) }}</td></tr>
-        <tr class="total"><th>DINERO FÍSICO CONTADO</th><td>Bs {{ number_format($montoFisico, 2) }}</td></tr>
+        <tr>
+            <th>Apertura de caja</th>
+            <td>Bs {{ number_format($apertura, 2) }}</td>
+        </tr>
+        <tr>
+            <th>Ventas en efectivo</th>
+            <td>Bs {{ number_format($efectivo, 2) }}</td>
+        </tr>
+        <tr>
+            <th>Ventas QR / Transferencia</th>
+            <td>Bs {{ number_format($qr, 2) }}</td>
+        </tr>
+        <tr class="total">
+            <th>TOTAL VENTAS DEL DÍA</th>
+            <td>Bs {{ number_format($totalDia, 2) }}</td>
+        </tr>
+        <tr class="total">
+            <th>DINERO ESPERADO</th>
+            <td>Bs {{ number_format($totalEsperado, 2) }}</td>
+        </tr>
+        <tr class="total">
+            <th>DINERO FÍSICO CONTADO</th>
+            <td>Bs {{ number_format($montoFisico, 2) }}</td>
+        </tr>
         <tr>
             <td colspan="2" class="diferencia {{ $diferencia >= 0 ? 'positiva' : 'negativa' }}">
                 DIFERENCIA: Bs {{ number_format(abs($diferencia), 2) }}
@@ -46,14 +68,19 @@
 
     @if($observaciones)
         <div style="margin: 40px 0; padding: 20px; background: #f3f4f6; border-radius: 12px; font-size: 16px;">
-            <strong>Observaciones del cajero:</strong><br>{{ nl2br(e($observaciones)) }}
+            <strong>Observaciones del cajero:</strong><br>{!! nl2br(e($observaciones)) !!}
         </div>
     @endif
 
     @if($productosTop10->count())
         <h2 style="margin: 50px 0 20px; font-size: 26px; color: #1d4ed8;">Top 10 Productos Más Vendidos</h2>
         <table>
-            <tr><th style="width: 60px;">#</th><th>Producto</th><th style="width: 120px;">Cant.</th><th style="width: 150px;">Monto</th></tr>
+            <tr>
+                <th style="width: 60px;">#</th>
+                <th>Producto</th>
+                <th style="width: 120px;">Cant.</th>
+                <th style="width: 150px;">Monto</th>
+            </tr>
             @foreach($productosTop10 as $i => $p)
                 <tr>
                     <td><strong>{{ $i+1 }}</strong></td>
@@ -63,7 +90,7 @@
                 </tr>
             @endforeach
         </table>
-    @endif>
+    @endif
 
     <div class="footer">
         Reporte generado el {{ now()->format('d/m/Y \a \l\a\s H:i') }} | Librería Jayrita © 2025

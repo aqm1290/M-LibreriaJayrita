@@ -255,9 +255,9 @@
                             <input type="text" inputmode="decimal" wire:model.lazy="efectivo_recibido"
                                    placeholder="Monto recibido"
                                    class="w-full text-center text-6xl font-black py-8 rounded-3xl bg-green-50 text-green-700 border-4 border-green-300 focus:border-green-500 focus:ring-4 focus:ring-green-200 outline-none">
-                            <div class="@if($cambio >= 0) bg-gradient-to-br from-green-600 to-green-700 @else bg-red-600 @endif text-white p-10 rounded-3xl text-center shadow-2xl">
+                            <div class="@if($cambio >= 0) bg-gradient-to-br from-green-600 to-green-700 @else bg-red-600 @endif text-white p-6 rounded-3xl text-center shadow-2xl">
                                 <p class="text-3xl font-bold">@if($cambio >= 0) Cambio a devolver @else Falta dinero @endif</p>
-                                <p class="text-8xl font-black mt-3">Bs {{ number_format(abs($cambio), 2) }}</p>
+                                <p class="text-5xl font-black mt-3">Bs {{ number_format(abs($cambio), 2) }}</p>
                             </div>
                         </div>
                     @endif

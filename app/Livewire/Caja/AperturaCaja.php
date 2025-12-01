@@ -3,23 +3,21 @@
 namespace App\Livewire\Caja;
 
 use Livewire\Component;
-use App\Models\CierreCaja;
+use App\Models\TurnoCaja;
 
 class AperturaCaja extends Component
 {
     public $monto = 0;
-    public $cajaAbierta = false;
-    public $montoApertura = 0;
 
-        // app/Livewire/Caja/AperturaCaja.php
     public function mount()
     {
-        $this->redirectIfAlreadyOpen();
-    }
+        // Si ya hay un turno activo para este usuario, ir directo al POS
+        $turno = TurnoCaja::where('usuario_id', auth()->id())
+            ->where('activo', true)
+            ->first();
 
-    public function redirectIfAlreadyOpen()
-    {
-        if (CierreCaja::cajaAbiertaHoy()) {
+        if ($turno) {
+            session(['turno_activo_id' => $turno->id]);
             return redirect()->route('caja.pos');
         }
     }
@@ -27,21 +25,33 @@ class AperturaCaja extends Component
     public function abrirCaja()
     {
         $this->validate([
-            'monto' => 'required|numeric|min:0'
+            'monto' => 'required|numeric|min:0',
         ]);
 
-        CierreCaja::updateOrCreate(
-            ['fecha' => today()],
-            [
-                'usuario_id' => auth()->id(),
-                'monto_apertura' => $this->monto,
-                'caja_abierta' => true
-            ]
-        );
+        $turno = TurnoCaja::create([
+            'usuario_id'      => auth()->id(),
+            'fecha'           => date('Y-m-d'),
+            'hora_apertura'   => date('H:i:s'),
+            'monto_apertura'  => $this->monto,
+            'activo'          => true,
+            'total_ventas'    => 0,
+            'total_efectivo'  => 0,
+            'total_qr'        => 0,
+            'diferencia'      => 0,
+            'cantidad_ventas' => 0,
+        ]);
 
-        $this->dispatch('toast', '¡Caja abierta con éxito! Puedes empezar a vender.');
+        session(['turno_activo_id' => $turno->id]);
+
+        $this->dispatch('swal', [
+            'title' => 'Caja abierta',
+            'text'  => 'El turno se inició correctamente.',
+            'icon'  => 'success',
+        ]);
+
         return redirect()->route('caja.pos');
     }
+
     public function render()
     {
         return view('livewire.caja.apertura-caja')

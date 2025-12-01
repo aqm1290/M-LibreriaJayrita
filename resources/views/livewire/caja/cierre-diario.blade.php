@@ -1,151 +1,81 @@
-<div class="min-h-screen bg-gradient-to-br from-amber-10 via-white to-amber-100 py-8 px-4 md:px-6">
-    <div class="max-w-6xl mx-auto space-y-8">
+<div class="min-h-screen bg-gradient-to-br from-amber-50 via-white to-amber-100 py-12 px-6">
+    <div class="max-w-7xl mx-auto">
 
-        {{-- Título y fecha --}}
-        <div class="text-center space-y-2">
-            <p class="text-xs font-semibold tracking-[0.3em] text-amber-700 uppercase">
-                Punto de venta
-            </p>
-            <h1 class="text-3xl md:text-4xl font-black text-amber-900">
-                Cierre de caja
-            </h1>
-            <p class="text-sm md:text-base text-amber-800/80">
-                {{ now()->format('l d \d\e F \d\e Y - H:i') }}
-            </p>
+        <div class="text-center mb-10">
+            <p class="text-sm font-bold tracking-widest text-amber-700 uppercase">Punto de Venta</p>
+            <h1 class="text-5xl font-black text-amber-900 mt-2">Cierre de Caja</h1>
+            <p class="text-lg text-amber-800 mt-2">{{ now()->format('l d \d\e F \d\e Y - H:i') }}</p>
         </div>
 
         @if($yaCerrado)
-            {{-- CAJA YA CERRADA --}}
-            <div class="bg-white rounded-3xl shadow-2xl border border-emerald-200 px-6 md:px-10 py-8 md:py-10">
-                <div class="text-center space-y-4 md:space-y-6">
-                    <h2 class="text-2xl md:text-3xl font-black text-emerald-700">
-                        ¡Caja cerrada correctamente!
-                    </h2>
-                    <p class="text-lg md:text-2xl text-slate-800">
-                        Total del día:
-                        <span class="font-black text-emerald-700">
-                            Bs {{ number_format($totalDia, 2) }}
-                        </span>
-                    </p>
-
-                    <div class="flex flex-col md:flex-row gap-4 md:gap-6 justify-center items-center pt-2">
-                        @if($reportePdf)
-                            <a
-                                href="{{ asset('storage/' . $reportePdf) }}"
-                                target="_blank"
-                                class="inline-flex items-center justify-center px-6 md:px-8 py-3 md:py-4 rounded-2xl
-                                       bg-emerald-600 hover:bg-emerald-700 text-white text-sm md:text-base font-semibold
-                                       shadow-md hover:shadow-xl transform hover:-translate-y-0.5 transition"
-                            >
-                                Descargar reporte PDF
-                            </a>
-                        @endif
-
-                        <a
-                            href="{{ route('dashboard') }}"
-                            class="inline-flex items-center justify-center px-6 md:px-8 py-3 md:py-4 rounded-2xl
-                                   bg-slate-900 hover:bg-black text-white text-sm md:text-base font-semibold
-                                   shadow-md hover:shadow-xl transform hover:-translate-y-0.5 transition gap-2"
-                        >
-                            <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-                            </svg>
-                            Salir y volver al inicio
-                        </a>
-                    </div>
-
-                    <div class="pt-4 text-xs md:text-sm text-slate-500">
-                        <p>Buen trabajo hoy.</p>
-                        <p class="mt-1">Puedes cerrar esta pestaña o regresar al dashboard.</p>
-                    </div>
+            <!-- PANTALLA DE ÉXITO -->
+            <div class="bg-gradient-to-r from-emerald-50 to-green-50 rounded-3xl p-12 text-center shadow-2xl border border-emerald-200">
+                <h2 class="text-5xl font-black text-emerald-700 mb-6">¡Caja Cerrada con Éxito!</h2>
+                <p class="text-3xl mb-8">
+                    Total del día:
+                    <span class="text-emerald-600 font-black">
+                        Bs {{ number_format($totalDia, 2) }}
+                    </span>
+                </p>
+                <div class="flex flex-col md:flex-row gap-6 justify-center">
+                    <a href="{{ route('cierre.pdf', $turno->id) }}" target="_blank"
+                       class="px-12 py-5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xl rounded-2xl shadow-lg transform hover:scale-105 transition">
+                        Ver Reporte PDF
+                    </a>
+                    <a href="{{ route('cierre.descargar', $turno->id) }}"
+                       class="px-12 py-5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xl rounded-2xl shadow-lg transform hover:scale-105 transition">
+                        Descargar Reporte
+                    </a>
+                    <a href="{{ route('dashboard') }}"
+                       class="px-12 py-5 bg-slate-800 hover:bg-black text-white font-bold text-xl rounded-2xl shadow-lg transform hover:scale-105 transition">
+                        Volver al Dashboard
+                    </a>
                 </div>
             </div>
+
         @else
-            {{-- BLOQUE DINERO ESPERADO --}}
-            <div class="bg-gradient-to-r from-amber-400 to-orange-500 rounded-3xl px-6 md:px-10 py-6 md:py-8 text-center text-white shadow-xl">
-                <p class="text-xs md:text-sm font-semibold uppercase tracking-wide">
-                    Dinero esperado en caja
-                </p>
-                <p class="mt-3 text-3xl md:text-5xl font-black">
-                    Bs {{ number_format($efectivo + $apertura, 2) }}
-                </p>
-                <p class="mt-2 text-xs md:text-sm opacity-90">
-                    Apertura + efectivo del día
-                </p>
+            <!-- FORMULARIO DE CIERRE -->
+            <div class="bg-gradient-to-r from-amber-400 to-orange-500 rounded-3xl p-10 text-white shadow-2xl text-center mb-10">
+                <p class="text-xl font-bold uppercase tracking-wider">Dinero Esperado en Caja</p>
+                <p class="text-7xl font-black mt-4">Bs {{ number_format($efectivo + $apertura, 2) }}</p>
             </div>
 
-            {{-- FORMULARIO CIERRE --}}
-            <div class="bg-white rounded-3xl shadow-2xl border border-amber-100 px-6 md:px-10 py-8 md:py-10 space-y-8">
-                <form wire:submit.prevent="generarCierre" class="space-y-8">
+            <form wire:submit="generarCierre" class="bg-white rounded-3xl shadow-2xl p-10 border border-amber-100 space-y-10">
+                <div>
+                    <label class="block text-3xl font-bold text-center mb-6 text-slate-900">
+                        Monto Físico en Caja
+                    </label>
+                    <input type="number" step="0.01" wire:model.live="montoFisico" required autofocus
+                           class="w-full text-7xl font-black text-center bg-amber-50 border-4 border-amber-400 rounded-3xl py-8 focus:border-amber-600 outline-none"
+                           placeholder="0.00">
+                </div>
 
-                    <div>
-                        <label class="block text-base md:text-lg font-semibold text-center text-slate-900 mb-4">
-                            ¿Cuánto dinero físico hay en caja?
-                        </label>
-                        <input
-                            type="number"
-                            step="0.01"
-                            wire:model.live="montoFisico"
-                            required
-                            autofocus
-                            class="w-full text-3xl md:text-5xl font-black text-center border-2 md:border-4 border-amber-300
-                                   rounded-2xl md:rounded-3xl py-4 md:py-6 bg-amber-50 text-amber-900
-                                   focus:border-amber-500 focus:ring-2 md:focus:ring-4 focus:ring-amber-200 outline-none transition"
-                            placeholder="0.00"
-                        >
-                    </div>
+                <div>
+                    <label class="block text-xl font-semibold mb-3">Observaciones (opcional)</label>
+                    <textarea wire:model="observaciones" rows="4"
+                              class="w-full rounded-2xl border border-slate-300 p-5 text-lg focus:border-slate-500 outline-none"></textarea>
+                </div>
 
-                    <div>
-                        <label class="block text-sm md:text-base font-semibold text-slate-800 mb-2">
-                            Observaciones (opcional)
-                        </label>
-                        <textarea
-                            wire:model="observaciones"
-                            rows="4"
-                            class="w-full border border-slate-200 rounded-2xl p-3 md:p-4 text-sm md:text-base
-                                   bg-slate-50 focus:outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-200 transition"
-                            placeholder="Ej: Diferencia por error de cambio, billetes falsos, etc."
-                        ></textarea>
-                    </div>
+                <div class="text-center">
+                    <button type="submit"
+                            class="px-20 py-7 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white text-3xl font-black rounded-3xl shadow-2xl transform hover:scale-105 transition duration-300">
+                        Cerrar Caja
+                    </button>
+                </div>
+            </form>
 
-                    <div class="text-center pt-2">
-                        <button
-                            type="submit"
-                            class="inline-flex items-center justify-center px-8 md:px-14 py-3.5 md:py-4 rounded-2xl
-                                   bg-red-600 hover:bg-red-700 text-white text-lg md:text-2xl font-black tracking-wide
-                                   shadow-xl hover:shadow-2xl transform hover:-translate-y-0.5 active:scale-95 transition"
-                        >
-                            Cerrar caja y generar reporte
-                        </button>
-                        <p class="mt-3 text-[0.7rem] md:text-xs text-slate-500">
-                            Se guardará un resumen del día y se bloquearán nuevas ventas hasta la próxima apertura.
-                        </p>
-                    </div>
-                </form>
-            </div>
-
-            {{-- TOP 10 PRODUCTOS --}}
-            @if($productosTop10->count())
-                <div class="mt-8 bg-gradient-to-r from-amber-50 to-orange-50 rounded-3xl px-6 md:px-10 py-7 md:py-8">
-                    <h3 class="text-lg md:text-2xl font-black text-center text-amber-900 mb-5">
-                        Top 10 productos más vendidos
+            @if($productosVendidos->count())
+                <div class="mt-12 bg-gradient-to-r from-amber-50 to-orange-50 rounded-3xl p-10 shadow-xl">
+                    <h3 class="text-3xl font-black text-center text-amber-900 mb-8">
+                        Productos Vendidos Hoy ({{ $productosVendidos->count() }})
                     </h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-                        @foreach($productosTop10 as $i => $p)
-                            <div class="bg-white rounded-2xl shadow-md border border-amber-100 px-5 py-5 text-center">
-                                <p class="text-3xl md:text-4xl font-black text-amber-500">
-                                    #{{ $i + 1 }}
-                                </p>
-                                <p class="mt-2 text-sm md:text-base font-semibold text-slate-900 line-clamp-2">
-                                    {{ $p->nombre }}
-                                </p>
-                                <p class="mt-3 text-xl md:text-2xl font-black text-emerald-600">
-                                    {{ $p->cantidad }} und
-                                </p>
-                                <p class="mt-1 text-sm md:text-base font-semibold text-slate-800">
-                                    Bs {{ number_format($p->monto, 2) }}
-                                </p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        @foreach($productosVendidos as $i => $p)
+                            <div class="bg-white rounded-2xl p-8 text-center shadow-lg border border-amber-100 transform hover:scale-105 transition">
+                                <div class="text-5xl font-black text-amber-600">#{{ $i + 1 }}</div>
+                                <h4 class="text-xl font-bold text-slate-800 mt-3">{{ $p->nombre }}</h4>
+                                <p class="text-4xl font-black text-emerald-600 mt-4">{{ $p->cantidad }} und</p>
+                                <p class="text-2xl text-slate-700 mt-2">Bs {{ number_format($p->monto, 2) }}</p>
                             </div>
                         @endforeach
                     </div>
@@ -153,4 +83,23 @@
             @endif
         @endif
     </div>
+
+    <!-- SWEETALERT FUNCIONANDO PERFECTO -->
+    <script>
+        document.addEventListener('livewire:initialized', () => {
+            @this.on('swal', (event) => {
+                Swal.fire({
+                    title: event.title,
+                    html: event.html || event.text,
+                    icon: event.icon,
+                    confirmButtonText: '¡Perfecto! CAJA CERRADA',
+                    allowOutsideClick: false,
+                    customClass: {
+                        confirmButton: 'px-8 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl'
+                    },
+                    buttonsStyling: false
+                });
+            });
+        });
+    </script>
 </div>

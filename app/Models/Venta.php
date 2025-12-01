@@ -21,6 +21,7 @@ class Venta extends Model
         'metodo_pago',
         'descuento_total',
         'ticket_pdf',
+        'turno_id',
         
     ];
 
