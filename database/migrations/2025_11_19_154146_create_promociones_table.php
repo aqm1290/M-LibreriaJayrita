@@ -6,16 +6,15 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up()
+    public function up(): void
     {
         Schema::create('promociones', function (Blueprint $table) {
             $table->id();
             $table->string('nombre');
             $table->string('codigo')->unique()->nullable();
-            $table->string('descripcion')->nullable();
+            $table->text('descripcion')->nullable();
 
-
-            // 4 tipos de promoción SOLO
+            // TIPO DE PROMOCIÓN
             $table->enum('tipo', [
                 'descuento_porcentaje',
                 'descuento_monto',
@@ -25,17 +24,22 @@ return new class extends Migration
 
             $table->decimal('valor_descuento', 10, 2)->nullable();
 
-            // Para 2x1
-            $table->foreignId('producto_2x1_id')->nullable()->constrained('productos')->onDelete('set null');
+            // LÍMITE DE USOS POR CLIENTE
+            $table->integer('limite_usos')->nullable(); // null = ilimitado
 
-            // Para Compra X lleva Y
-            $table->foreignId('producto_compra_id')->nullable()->constrained('productos')->onDelete('set null');
-            $table->foreignId('producto_regalo_id')->nullable()->constrained('productos')->onDelete('set null');
+            // PRODUCTOS ESPECÍFICOS (JSON)
+            $table->json('products_2x1')->nullable();
+            $table->json('products_compra')->nullable();
+            $table->json('products_regalo')->nullable();
 
-            // Aplicar a toda la tienda o categoría
+            // ÁMBITO DE APLICACIÓN
             $table->boolean('aplica_todo')->default(true);
-            $table->foreignId('categoria_id')->nullable()->constrained()->onDelete('set null');
+            $table->foreignId('categoria_id')->nullable()->constrained('categorias')->onDelete('set null');
+            $table->foreignId('marca_id')->nullable()->constrained('marcas')->onDelete('set null');
+            $table->foreignId('modelo_id')->nullable()->constrained('modelos')->onDelete('set null');
+            $table->json('productos_seleccionados')->nullable(); // IDs manuales
 
+            // FECHAS Y ESTADO
             $table->dateTime('inicia_en');
             $table->dateTime('termina_en')->nullable();
             $table->boolean('activa')->default(true);
@@ -44,7 +48,7 @@ return new class extends Migration
         });
     }
 
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('promociones');
     }

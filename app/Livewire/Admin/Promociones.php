@@ -6,78 +6,81 @@ use Livewire\Component;
 use App\Models\Promocion;
 use App\Models\Producto;
 use App\Models\Categoria;
+use App\Models\Marca;
+use App\Models\Modelo;
 use Illuminate\Validation\Rule;
 use Carbon\Carbon;
 
 class Promociones extends Component
 {
+    // Modal
     public $modal = false;
     public $promoId = null;
 
-    // Buscadores especiales
-    public $query_2x1 = '';
-    public $resultados_2x1 = [];
+    // Datos básicos
+    public $nombre = '';
+    public $codigo = '';
+    public $descripcion = '';
+    public $tipo = 'descuento_porcentaje'; // porcentaje, monto, 2x1, compra_lleva
+    public $valor_descuento = null;
+    public $limite_usos = null;
 
+    // Ámbito (NO se usa cuando tipo = compra_lleva)
+    public $aplica_todo = true;
+    public $categoria_id = null;
+    public $marca_id = null;
+    public $modelo_id = null;
+    public $productosSeleccionados = []; // [['id'=>, 'nombre'=>], ...]
+
+    // Productos especiales compra_lleva (solo 1 y 1)
+    public $products_compra = [];   // [['id'=>, 'nombre'=>], ...]
+    public $products_regalo = [];   // [['id'=>, 'nombre'=>], ...]
     public $query_compra = '';
-    public $resultados_compra = [];
-
     public $query_regalo = '';
+    public $resultados_compra = [];
     public $resultados_regalo = [];
 
-    // Datos básicos
-    public $nombre;
-    public $codigo;
-    public $descripcion;
-
-    // Tipo de promo
-    public $tipo = 'descuento_porcentaje';
-    public $valor_descuento;
-
-    // Datos especiales según tipo (ahora ARRAYS de arrays con id y nombre)
-    public $productos_2x1 = [];      // [{'id' => x, 'nombre' => y}, ...]
-    public $productos_compra = [];
-    public $productos_regalo = [];
-
-    // Ámbito
-    public $aplica_todo = true;
-    public $categoria_id;
-    public $productosSeleccionados = []; // [{'id' => x, 'nombre' => y}, ...]
-
-    // Fechas/estado
+    // Fechas y estado
     public $inicia_en;
     public $termina_en;
     public $activa = true;
 
-    // Buscador de productos generales
+    // Búsqueda en listado
+    public $search = '';
+
+    // Buscador de productos para ámbito
     public $query = '';
     public $resultados = [];
 
-    // Filtros de listado
-    public $search = '';
-
+    // Catálogos
     public $categorias = [];
+    public $marcas = [];
+    public $modelos = [];
 
     public function mount()
     {
         $this->categorias = Categoria::orderBy('nombre')->get();
+        $this->marcas     = Marca::orderBy('nombre')->get();
+        $this->modelos    = Modelo::orderBy('nombre')->get();
         $this->inicia_en  = now()->format('Y-m-d\TH:i');
-        $this->activa     = true;
     }
 
     public function render()
     {
-        $promos = Promocion::when($this->search, function ($q) {
-                $q->where('nombre', 'like', "%{$this->search}%")
-                  ->orWhere('codigo', 'like', "%{$this->search}%");
+        $promos = Promocion::with(['categoria','marca','modelo','usos'])
+            ->when($this->search, function ($q) {
+                $q->where(function ($qq) {
+                    $qq->where('nombre', 'like', "%{$this->search}%")
+                       ->orWhere('codigo', 'like', "%{$this->search}%");
+                });
             })
-            ->with('productos', 'categoria')
             ->orderByDesc('id')
             ->get();
 
         return view('livewire.admin.promociones', compact('promos'));
     }
 
-    // ----------------- UI acciones -----------------
+    // ========= CRUD =========
 
     public function crear()
     {
@@ -87,49 +90,29 @@ class Promociones extends Component
 
     public function editar($id)
     {
-        $p = Promocion::with('productos')->findOrFail($id);
+        $p = Promocion::findOrFail($id);
 
-        $this->promoId      = $p->id;
-        $this->nombre       = $p->nombre;
-        $this->codigo       = $p->codigo;
-        $this->descripcion  = $p->descripcion;
-        $this->tipo         = $p->tipo;
+        $this->promoId         = $p->id;
+        $this->nombre          = $p->nombre;
+        $this->codigo          = $p->codigo;
+        $this->descripcion     = $p->descripcion;
+        $this->tipo            = $p->tipo;
         $this->valor_descuento = $p->valor_descuento;
-        $this->aplica_todo  = $p->aplica_todo;
-        $this->categoria_id = $p->categoria_id;
-        $this->inicia_en    = $p->inicia_en?->format('Y-m-d\TH:i');
-        $this->termina_en   = $p->termina_en?->format('Y-m-d\TH:i');
-        $this->activa       = $p->activa;
+        $this->limite_usos     = $p->limite_usos;
+        $this->aplica_todo     = $p->aplica_todo;
+        $this->categoria_id    = $p->categoria_id;
+        $this->marca_id        = $p->marca_id;
+        $this->modelo_id       = $p->modelo_id;
+        $this->inicia_en       = $p->inicia_en?->format('Y-m-d\TH:i');
+        $this->termina_en      = $p->termina_en?->format('Y-m-d\TH:i');
+        $this->activa          = $p->activa;
 
-        // Cargar productos generales como array de ['id', 'nombre']
-        $this->productosSeleccionados = $p->productos->map(function ($prod) {
-            return ['id' => $prod->id, 'nombre' => $prod->nombre];
-        })->toArray();
+        // Ámbito productos
+        $this->productosSeleccionados = $this->cargarProductosDesdeIds($p->productos_seleccionados ?? []);
 
-        // Cargar arrays especiales (asumiendo JSON en BD)
-        $this->productos_2x1 = [];
-        if ($p->products_2x1) {
-            $prods = Producto::whereIn('id', $p->products_2x1)->get();
-            $this->products_2x1 = $prods->map(function ($prod) {
-                return ['id' => $prod->id, 'nombre' => $prod->nombre];
-            })->toArray();
-        }
-
-        $this->productos_compra = [];
-        if ($p->products_compra) {
-            $prods = Producto::whereIn('id', $p->products_compra)->get();
-            $this->productos_compra = $prods->map(function ($prod) {
-                return ['id' => $prod->id, 'nombre' => $prod->nombre];
-            })->toArray();
-        }
-
-        $this->productos_regalo = [];
-        if ($p->products_regalo) {
-            $prods = Producto::whereIn('id', $p->products_regalo)->get();
-            $this->productos_regalo = $prods->map(function ($prod) {
-                return ['id' => $prod->id, 'nombre' => $prod->nombre];
-            })->toArray();
-        }
+        // Compra X lleva Y
+        $this->products_compra = $this->cargarProductosDesdeIds($p->products_compra ?? []);
+        $this->products_regalo = $this->cargarProductosDesdeIds($p->products_regalo ?? []);
 
         $this->modal = true;
     }
@@ -149,144 +132,156 @@ class Promociones extends Component
     private function resetForm()
     {
         $this->reset([
-            'promoId','nombre','codigo','descripcion',
-            'tipo','valor_descuento',
-            'productos_2x1','productos_compra','productos_regalo',
-            'aplica_todo','categoria_id','productosSeleccionados',
+            'promoId','nombre','codigo','descripcion','tipo','valor_descuento','limite_usos',
+            'aplica_todo','categoria_id','marca_id','modelo_id','productosSeleccionados',
+            'products_compra','products_regalo',
             'inicia_en','termina_en','activa',
-            'query','resultados',
-            'query_2x1','resultados_2x1',
-            'query_compra','resultados_compra',
-            'query_regalo','resultados_regalo',
+            'query','resultados','query_compra','query_regalo','resultados_compra','resultados_regalo',
         ]);
 
         $this->tipo        = 'descuento_porcentaje';
         $this->aplica_todo = true;
         $this->inicia_en   = now()->format('Y-m-d\TH:i');
         $this->activa      = true;
+        $this->limite_usos = null;
     }
 
-    // ----------------- Guardar -----------------
+    public function updatedTipo()
+    {
+        $this->valor_descuento = null;
+
+        if ($this->tipo === 'compra_lleva') {
+            // este tipo no usa ámbito
+            $this->aplica_todo            = false;
+            $this->categoria_id           = null;
+            $this->marca_id               = null;
+            $this->modelo_id              = null;
+            $this->productosSeleccionados = [];
+        }
+    }
 
     public function guardar()
     {
+        if ($this->limite_usos === '' || $this->limite_usos === '0') {
+            $this->limite_usos = null;
+        }
+
         $rules = [
             'nombre'      => 'required|string|max:255',
-            'codigo'      => 'nullable|string|max:50',
+            'codigo'      => [
+                'nullable','string','max:50',
+                Rule::unique('promociones','codigo')->ignore($this->promoId),
+            ],
             'tipo'        => ['required', Rule::in(['descuento_porcentaje','descuento_monto','2x1','compra_lleva'])],
             'inicia_en'   => 'required|date',
             'termina_en'  => 'nullable|date|after_or_equal:inicia_en',
-            'aplica_todo' => 'boolean',
-            'activa'      => 'boolean',
+            'limite_usos' => 'nullable|integer|min:1',
         ];
 
-        // Si no aplica a toda la tienda y no hay categoría, exigimos productos generales
-        if (!$this->aplica_todo && !$this->categoria_id) {
-            $rules['productosSeleccionados'] = 'required|array|min:1';
+        if (in_array($this->tipo, ['descuento_porcentaje','descuento_monto'])) {
+            $rules['valor_descuento'] = $this->tipo === 'descuento_porcentaje'
+                ? 'required|numeric|min:1|max:100'
+                : 'required|numeric|min:0.01';
         }
 
-        // Reglas según tipo
-        if ($this->tipo === 'descuento_porcentaje') {
-            $rules['valor_descuento'] = 'required|numeric|min:1|max:100';
-        }
-
-        if ($this->tipo === 'descuento_monto') {
-            $rules['valor_descuento'] = 'required|numeric|min:0.1';
-        }
-
-        if ($this->tipo === '2x1') {
-            $rules['productos_2x1'] = 'required|array|min:1';
+        if ($this->tipo !== 'compra_lleva' && !$this->aplica_todo) {
+            if (
+                !$this->categoria_id &&
+                !$this->marca_id &&
+                !$this->modelo_id &&
+                empty($this->productosSeleccionados)
+            ) {
+                $this->addError('categoria_id', 'Selecciona al menos una categoría, marca, modelo o productos específicos.');
+                return;
+            }
         }
 
         if ($this->tipo === 'compra_lleva') {
-            $rules['productos_compra'] = 'required|array|min:1';
-            $rules['productos_regalo'] = 'required|array|min:1';
+            if (!count($this->products_compra) || !count($this->products_regalo)) {
+                $this->addError('tipo', 'Debes elegir el producto de compra y el producto de regalo.');
+                return;
+            }
         }
 
         $this->validate($rules);
 
-        $promo = Promocion::updateOrCreate(['id' => $this->promoId], [
+        $data = [
             'nombre'          => $this->nombre,
             'codigo'          => $this->codigo,
-            'descripcion'     => $this->descripcion ?: $this->generarDescripcion(),
+            'descripcion'     => $this->descripcion,
             'tipo'            => $this->tipo,
-            'valor_descuento' => $this->valor_descuento ?: null,
-            'producto_2x1_id'    => null, // Deprecated, using JSON
-            'producto_compra_id' => null,
-            'producto_regalo_id' => null,
-            'aplica_todo'        => $this->aplica_todo,
-            'categoria_id'       => $this->categoria_id ?: null,
-            'inicia_en'          => Carbon::parse($this->inicia_en),
-            'termina_en'         => $this->termina_en ? Carbon::parse($this->termina_en) : null,
-            'activa'             => $this->activa,
-        ]);
+            'valor_descuento' => $this->valor_descuento,
+            'limite_usos'     => $this->limite_usos,
+            'inicia_en'       => Carbon::parse($this->inicia_en),
+            'termina_en'      => $this->termina_en ? Carbon::parse($this->termina_en) : null,
+            'activa'          => $this->activa,
+        ];
 
-        // Sync productos generales
-        if ($this->aplica_todo || $this->categoria_id) {
-            $promo->productos()->detach();
+        if ($this->tipo === 'compra_lleva') {
+            $data['aplica_todo']             = false;
+            $data['categoria_id']            = null;
+            $data['marca_id']                = null;
+            $data['modelo_id']               = null;
+            $data['productos_seleccionados'] = [];
+            $data['products_compra']         = collect($this->products_compra)->pluck('id')->values()->toArray();
+            $data['products_regalo']         = collect($this->products_regalo)->pluck('id')->values()->toArray();
+        } else {
+            $data['aplica_todo']             = $this->aplica_todo;
+            $data['categoria_id']            = $this->categoria_id;
+            $data['marca_id']                = $this->marca_id;
+            $data['modelo_id']               = $this->modelo_id;
+            $data['productos_seleccionados'] = $this->aplica_todo
+                ? []
+                : collect($this->productosSeleccionados)->pluck('id')->values()->toArray();
+            $data['products_compra']         = null;
+            $data['products_regalo']         = null;
         }
-        if (!$this->aplica_todo && $this->productosSeleccionados) {
-            $promo->productos()->sync(collect($this->productosSeleccionados)->pluck('id'));
-        }
 
-        // Guardar arrays especiales como JSON (solo IDs)
-        $promo->products_2x1 = collect($this->products_2x1)->pluck('id')->toArray();
-        $promo->products_compra = collect($this->products_compra)->pluck('id')->toArray();
-        $promo->products_regalo = collect($this->products_regalo)->pluck('id')->toArray();
-        $promo->save();
+        $data['products_2x1'] = null;
 
-        $this->dispatch('toast', 'Promoción guardada correctamente');
+        Promocion::updateOrCreate(['id' => $this->promoId], $data);
+
+        $this->dispatch('toast', '¡Promoción guardada con éxito!');
         $this->cerrarModal();
     }
 
-    private function generarDescripcion()
-    {
-        $texto = $this->aplica_todo
-            ? 'TODA LA TIENDA'
-            : (count($this->productosSeleccionados).' producto'.(count($this->productosSeleccionados) > 1 ? 's' : ''));
-
-        return match ($this->tipo) {
-            '2x1'                  => "2x1 en $texto",
-            'compra_lleva'         => "Compra y lleva gratis en $texto",
-            'descuento_porcentaje' => "{$this->valor_descuento}% OFF en $texto",
-            'descuento_monto'      => "Bs {$this->valor_descuento} OFF en $texto",
-            default                => $this->nombre,
-        };
-    }
-
-    // ----------------- Ámbito y buscador general -----------------
-
-    public function updatedAplicaTodo($value)
-    {
-        if ($value) {
-            $this->productosSeleccionados = [];
-            $this->query      = '';
-            $this->resultados = [];
-            $this->categoria_id = null;
-        }
-    }
+    // ========= Buscador ámbito =========
 
     public function updatedQuery()
     {
-        if (!$this->aplica_todo && strlen($this->query) >= 2) {
-            $this->resultados = Producto::where(function ($q) {
-                    $q->where('nombre', 'like', "%{$this->query}%")
-                      ->orWhere('codigo', 'like', "%{$this->query}%");
-                })
-                ->limit(12)
-                ->get(['id', 'nombre', 'codigo', 'stock']);
-        } else {
+        if (strlen($this->query) < 2) {
             $this->resultados = [];
+            return;
         }
+
+        $this->resultados = Producto::where('nombre', 'like', "%{$this->query}%")
+            ->orWhere('codigo', 'like', "%{$this->query}%")
+            ->limit(10)
+            ->get(['id','nombre','codigo','stock'])
+            ->map(fn($p) => [
+                'id'     => $p->id,
+                'nombre' => $p->nombre,
+                'codigo' => $p->codigo,
+                'stock'  => $p->stock,
+            ])
+            ->toArray();
     }
 
     public function agregarProducto($id)
     {
-        $prod = Producto::find($id);
-        if ($prod && !collect($this->productosSeleccionados)->contains('id', $id)) {
-            $this->productosSeleccionados[] = ['id' => $id, 'nombre' => $prod->nombre];
+        if (collect($this->productosSeleccionados)->contains('id', $id)) {
+            return;
         }
-        $this->query = '';
+
+        $prod = Producto::select('id','nombre','codigo')->find($id);
+        if ($prod) {
+            $this->productosSeleccionados[] = [
+                'id'     => $prod->id,
+                'nombre' => $prod->nombre.' ('.$prod->codigo.')',
+            ];
+        }
+
+        $this->query      = '';
         $this->resultados = [];
     }
 
@@ -296,91 +291,76 @@ class Promociones extends Component
         $this->productosSeleccionados = array_values($this->productosSeleccionados);
     }
 
-    // === BUSCADORES EN TIEMPO REAL PARA 2x1 Y COMPRA-LLEVA ===
-
-    public function updatedQuery2x1()
-    {
-        if (strlen($this->query_2x1) >= 2) {
-            $this->resultados_2x1 = Producto::where('nombre', 'like', "%{$this->query_2x1}%")
-                ->orWhere('codigo', 'like', "%{$this->query_2x1}%")
-                ->limit(10)
-                ->get(['id', 'nombre', 'codigo', 'stock']);
-        } else {
-            $this->resultados_2x1 = [];
-        }
-    }
+    // ========= Buscadores compra_lleva =========
 
     public function updatedQueryCompra()
     {
-        if (strlen($this->query_compra) >= 2) {
-            $this->resultados_compra = Producto::where('nombre', 'like', "%{$this->query_compra}%")
-                ->orWhere('codigo', 'like', "%{$this->query_compra}%")
-                ->limit(10)
-                ->get(['id', 'nombre', 'codigo', 'stock']);
-        } else {
-            $this->resultados_compra = [];
-        }
+        $this->resultados_compra = $this->buscarProductosSimple($this->query_compra);
     }
 
     public function updatedQueryRegalo()
     {
-        if (strlen($this->query_regalo) >= 2) {
-            $this->resultados_regalo = Producto::where('nombre', 'like', "%{$this->query_regalo}%")
-                ->orWhere('codigo', 'like', "%{$this->query_regalo}%")
-                ->limit(10)
-                ->get(['id', 'nombre', 'codigo', 'stock']);
-        } else {
-            $this->resultados_regalo = [];
-        }
+        $this->resultados_regalo = $this->buscarProductosSimple($this->query_regalo);
     }
 
-    // === SELECCIONAR Y QUITAR PRODUCTOS ESPECIALES (VARIOS) ===
-
-    public function seleccionar2x1($id)
+    private function buscarProductosSimple($texto)
     {
-        $prod = Producto::find($id);
-        if ($prod && !collect($this->products_2x1)->contains('id', $id)) {
-            $this->products_2x1[] = ['id' => $id, 'nombre' => $prod->nombre];
+        if (strlen($texto) < 2) {
+            return [];
         }
-        $this->query_2x1 = '';
-        $this->resultados_2x1 = [];
-    }
 
-    public function quitar2x1($index)
-    {
-        unset($this->products_2x1[$index]);
-        $this->products_2x1 = array_values($this->products_2x1);
+        return Producto::where('nombre', 'like', "%{$texto}%")
+            ->orWhere('codigo', 'like', "%{$texto}%")
+            ->limit(10)
+            ->get(['id','nombre','codigo','stock'])
+            ->map(fn($p) => [
+                'id'     => $p->id,
+                'nombre' => $p->nombre,
+                'codigo' => $p->codigo,
+                'stock'  => $p->stock,
+            ])
+            ->toArray();
     }
 
     public function seleccionarCompra($id)
     {
-        $prod = Producto::find($id);
-        if ($prod && !collect($this->products_compra)->contains('id', $id)) {
-            $this->products_compra[] = ['id' => $id, 'nombre' => $prod->nombre];
-        }
-        $this->query_compra = '';
+        $this->products_compra = [];
+        $this->agregarProductoALista('products_compra', $id);
+        $this->query_compra      = '';
         $this->resultados_compra = [];
-    }
-
-    public function quitarCompra($index)
-    {
-        unset($this->products_compra[$index]);
-        $this->products_compra = array_values($this->products_compra);
     }
 
     public function seleccionarRegalo($id)
     {
-        $prod = Producto::find($id);
-        if ($prod && !collect($this->products_regalo)->contains('id', $id)) {
-            $this->products_regalo[] = ['id' => $id, 'nombre' => $prod->nombre];
-        }
-        $this->query_regalo = '';
+        $this->products_regalo = [];
+        $this->agregarProductoALista('products_regalo', $id);
+        $this->query_regalo      = '';
         $this->resultados_regalo = [];
     }
 
-    public function quitarRegalo($index)
+    private function agregarProductoALista($prop, $id)
     {
-        unset($this->products_regalo[$index]);
-        $this->products_regalo = array_values($this->products_regalo);
+        $prod = Producto::select('id','nombre','codigo')->find($id);
+        if ($prod) {
+            $this->$prop[] = [
+                'id'     => $prod->id,
+                'nombre' => $prod->nombre.' ('.$prod->codigo.')',
+            ];
+        }
+    }
+
+    // ========= Helpers =========
+
+    private function cargarProductosDesdeIds(array $ids)
+    {
+        if (empty($ids)) return [];
+
+        return Producto::whereIn('id', $ids)
+            ->get(['id','nombre','codigo'])
+            ->map(fn($p) => [
+                'id'     => $p->id,
+                'nombre' => $p->nombre.' ('.$p->codigo.')',
+            ])
+            ->toArray();
     }
 }

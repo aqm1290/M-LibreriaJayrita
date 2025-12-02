@@ -6,24 +6,38 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
+    public function up()
     {
-       Schema::create('promocion_usos', function (Blueprint $table) {
+        Schema::create('promocion_usos', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('promociones_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
-            $table->foreignId('venta_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('promocion_id')
+                  ->constrained('promociones')
+                  ->onDelete('cascade');
+
+            // Cambiado a cliente_id porque tú usas modelo Cliente y tabla clientes
+            $table->foreignId('cliente_id')
+                  ->nullable()
+                  ->constrained('clientes')
+                  ->onDelete('set null');
+
+            $table->foreignId('venta_id')
+                  ->nullable()
+                  ->constrained('ventas')
+                  ->onDelete('cascade');
+
+            $table->string('ip_address')->nullable();
+            $table->timestamp('usado_en')->useCurrent();
+
+            // Evita que un cliente use más de una vez la misma promo (opcional, pero recomendado)
+            $table->unique(['promocion_id', 'cliente_id']);
+
+            $table->index(['promocion_id', 'cliente_id']);
+            $table->index('usado_en');
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('promocion_usos');
     }
