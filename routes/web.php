@@ -29,6 +29,32 @@ use App\Livewire\Auth\Login;
 use App\Http\Controllers\VentaPdfController;
 use App\Http\Controllers\CierrePdfController;  // ← NUEVO
 
+
+
+
+use App\Http\Controllers\TiendaController;
+use App\Http\Controllers\ProductoController;
+use App\Http\Controllers\MarcaController;
+
+
+
+Route::get('/tienda', [TiendaController::class, 'index'])->name('tienda.home');
+// Ruta para cargar el producto vía AJAX
+Route::get('/producto/{id}', [TiendaController::class, 'showAjax'])
+     ->name('producto.ajax');
+     // Ruta para ver el producto completo
+
+Route::get('/tienda/productos/{producto}', [ProductoController::class, 'show'])
+    ->name('tienda.producto-show');
+
+
+Route::get('/marcas/{marca}', [MarcaController::class, 'show'])
+    ->name('marcas.show');
+
+    // En routes/web.php
+
+
+
 // ====================================================================
 // LOGIN
 // ====================================================================
@@ -101,3 +127,4 @@ Route::middleware(['auth'])->group(function () {
         ->name('cierre.descargar')
         ->middleware('rol:admin,cajero');
 });
+

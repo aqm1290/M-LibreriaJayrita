@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;   // ← ASÍ SÍ
 
 class Marca extends Model
 {
@@ -21,6 +22,16 @@ class Marca extends Model
     protected $casts = [
         'activo' => 'boolean',
     ];
+    public function getLogoUrlAttribute()
+    {
+        if (!$this->url_imagen) return null;
+
+        if (Str::startsWith($this->url_imagen, ['http://', 'https://'])) {
+            return $this->url_imagen;
+        }
+
+        return asset('storage/' . $this->url_imagen);
+    }
 
     public function modelos()
     {

@@ -29,12 +29,19 @@
                 </div>
             @else
                 <a href="{{ route('caja.apertura') }}" 
-                   class="inline-flex items-center gap-5 px-10 py-6 bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white rounded-3xl font-black text-2xl shadow-2xl transition transform hover:scale-105">
-                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+                class="inline-flex items-center justify-center gap-3 px-8 py-4
+                        bg-gradient-to-r from-yellow-500 to-orange-600 
+                        hover:from-yellow-600 hover:to-orange-700
+                        text-white font-bold rounded-2xl shadow-lg 
+                        hover:shadow-xl transform hover:-translate-y-0.5 hover:scale-[1.02] 
+                        transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                            d="M12 4v16m8-8H4"/>
                     </svg>
-                    Abrir Caja del Día
+                    <span class="text-base tracking-wide">ABRIR CAJA DEL DÍA</span>
                 </a>
+
             @endif
         @endif
     </div>
@@ -47,10 +54,10 @@
                 Resumen de Ventas del Día
             </h2>
 {{--             <a href="{{ route('ventas.index') }}" class="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white rounded-2xl font-black shadow-xl transition transform hover:scale-105">
- --}}                Ver Todas las Ventas
+ --}}             {{--    Ver Todas las Ventas
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
-                </svg>
+                </svg> --}}
             </a>
         </div>
 

@@ -24,6 +24,8 @@ class Producto extends Model
         'activo' => 'boolean',
     ];
 
+
+    
     // Accessor URL imagen
     public function getImagenUrlAttribute()
     {
@@ -35,7 +37,7 @@ class Producto extends Model
 
         return asset('storage/' . $this->url_imagen);
     }
-
+    
     // Relaciones básicas
     public function detallesEntradas()
     {
