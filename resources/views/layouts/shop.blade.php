@@ -11,8 +11,6 @@
     <link rel="apple-touch-icon" href="{{ asset('shop/assets/img/favicon.png') }}">
 
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
     {{-- Fonts --}}
     <link href="https://fonts.googleapis.com" rel="preconnect">
@@ -31,6 +29,31 @@
     {{-- Main CSS --}}
     <link rel="stylesheet" href="{{ asset('shop/assets/css/main.css') }}">
 
+    <style>
+        .hover-lift {
+            transition: all 0.4s ease;
+        }
+
+        .hover-lift:hover {
+            transform: translateY(-12px);
+            box-shadow: 0 20px 40px rgba(255, 215, 0, 0.2) !important;
+        }
+
+        .hover-lift:hover img {
+            transform: scale(1.08);
+        }
+
+        .carousel-control-prev,
+        .carousel-control-next {
+            width: 60px;
+            opacity: 0.8;
+        }
+
+        .carousel-control-prev:hover,
+        .carousel-control-next:hover {
+            opacity: 1;
+        }
+    </style>
     @stack('styles')
 </head>
 

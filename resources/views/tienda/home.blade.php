@@ -23,8 +23,8 @@
                             <a href="#productos" class="btn btn-warning btn-lg px-5 py-3">
                                 Ver Novedades
                             </a>
-                            <a href="{{ url('/catalogo') }}" class="btn btn-outline-primary btn-lg px-5 py-3">
-                                Explorar Catálogo
+                            <a href="{{ route('productos.index') }}" class="btn btn-outline-warning btn-lg px-5 py-3">
+                                Todos los Productos
                             </a>
                         </div>
                     </div>
@@ -39,20 +39,25 @@
 
     {{-- ================== MARCAS (ANTES SERVICES) ================== --}}
     <section id="services" class="services section py-5 bg-black">
+        <!-- Section Title -->
         <div class="container section-title" data-aos="fade-up">
             <h2 class="text-white">Marcas</h2>
             <div>
                 <span>Nuestras</span>
                 <span class="description-title text-warning">Marcas Destacadas</span>
             </div>
-            <p class="mt-3 text-white-50">Trabajamos con las mejores editoriales y proveedores de papelería escolar.</p>
+            <p class="mt-3 text-white-50">
+                Trabajamos con las mejores editoriales y proveedores de papelería escolar.
+            </p>
         </div>
 
         <div class="container" data-aos="fade-up" data-aos-delay="100">
-            <div class="service-header mb-5">
+
+            <!-- Header -->
+            <div class="services-header mb-5">
                 <div class="row align-items-center">
                     <div class="col-lg-8">
-                        <h2 class="service-heading fw-bold text-white">
+                        <h2 class="services-heading fw-bold text-white">
                             <div>Proveedores de</div>
                             <div><span class="text-warning">Confianza y Calidad</span></div>
                         </h2>
@@ -62,9 +67,8 @@
                             Solo trabajamos con marcas reconocidas que garantizan calidad y durabilidad.
                         </p>
 
-                        <!-- AQUÍ ESTÁ LA MAGIA: REDIRIGE A LA PRIMERA MARCA O DESHABILITA -->
                         @if ($marcas->count() > 0)
-                            <a href="{{ route('marcas.show', $marcas->first()) }}" class="btn btn-outline-warning btn-lg">
+                            <a href="{{ route('marcas.index') }}" class="btn btn-outline-warning btn-lg">
                                 Ver Todas las Marcas
                                 <i class="bi bi-arrow-right ms-2"></i>
                             </a>
@@ -77,29 +81,36 @@
                 </div>
             </div>
 
+            <!-- Grid de marcas -->
             <div class="row justify-content-center g-4 g-xl-5">
                 @forelse($marcas as $marca)
                     <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="{{ $loop->iteration * 100 }}">
                         <div
-                            class="service-card position-relative overflow-hidden rounded-4 bg-dark border border-secondary hover-lift transition text-center p-5">
+                            class="service-card position-relative z-1 overflow-hidden rounded-4
+                                bg-dark border border-secondary hover-lift transition text-center p-5">
 
-                            <div class="brand-icon mx-auto mb-4">
-                                <img src="{{ $marca->imagen_url }}" alt="{{ $marca->nombre }}" class="img-fluid brand-logo"
+                            <!-- Logo -->
+                            <div class="service-icon brand-icon mx-auto mb-4">
+                                <img src="{{ $marca->logo_url ?? asset('images/no-image.png') }}" alt="{{ $marca->nombre }}"
+                                    class="img-fluid brand-logo"
                                     style="max-height: 100px; width: auto; object-fit: contain;">
                             </div>
 
-                            <a href="{{ route('marcas.show', $marca) }}"
+                            <!-- Botón circular -->
+                            <a href="{{ route('marcas.show', $marca->id) }}"
                                 class="card-action d-flex align-items-center justify-content-center rounded-circle shadow-lg">
                                 <i class="bi bi-arrow-up-right"></i>
                             </a>
 
+                            <!-- Nombre -->
                             <h3 class="h4 fw-bold text-white mb-3">
-                                <a href="{{ route('marcas.show', $marca) }}"
+                                <a href="{{ route('marcas.show', $marca->id) }}"
                                     class="text-white text-decoration-none stretched-link">
                                     {{ $marca->nombre }}
                                 </a>
                             </h3>
 
+                            <!-- Descripción -->
                             @if ($marca->descripcion)
                                 <p class="text-white-50 small mb-0">
                                     {{ Str::limit($marca->descripcion, 100) }}
@@ -109,12 +120,15 @@
                     </div>
                 @empty
                     <div class="col-12 text-center py-5">
-                        <p class="text-white-50 fs-3">Pronto tendremos nuestras marcas destacadas</p>
+                        <p class="text-white-50 fs-3">
+                            Pronto tendremos nuestras marcas destacadas
+                        </p>
                     </div>
                 @endforelse
             </div>
         </div>
     </section>
+
 
     {{-- ================== PORTFOLIO = PRODUCTOS (CON FILTRO POR CATEGORÍA) ================== --}}
     <section id="portfolio" class="portfolio section">
@@ -206,45 +220,144 @@
     </section>
 
     {{-- ================== PRODUCTOS DESTACADOS / LISTA SIMPLE ================== --}}
-    <section id="productos" class="py-5">
+    <section id="productos" class="productos-carousel section py-5 bg-black">
         <div class="container">
             <div class="text-center mb-5" data-aos="fade-up">
-                <h2 class="display-5 fw-bold">Novedades y Más Vendidos</h2>
-                <p class="lead text-muted">Los favoritos de esta semana</p>
+                <h2 class="display-5 fw-bold text-white">Novedades y Más Vendidos</h2>
+                <p class="lead text-white-50">Los favoritos de esta semana</p>
             </div>
+        </div>
 
-            <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-4">
-                @forelse($productos as $producto)
-                    <div class="col" data-aos="fade-up" data-aos-delay="{{ $loop->iteration * 80 }}">
-                        <div class="card h-100 border-0 shadow-sm hover-shadow transition">
-                            <img src="{{ $producto->imagen_url ?? asset('/assets/imgages/no-image.jpg') }}"
-                                class="card-img-top" alt="{{ $producto->nombre }}"
-                                style="height: 260px; object-fit: cover;">
-                            <div class="card-body text-center d-flex flex-column">
-                                <h6 class="card-title mb-2">{{ Str::limit($producto->nombre, 35) }}</h6>
-                                <p class="text-muted small">{{ $producto->autor ?? 'Varios' }}</p>
-                                <p class="fw-bold text-primary mt-auto">Bs. {{ number_format($producto->precio ?? 0, 2) }}
-                                </p>
-                                <a href="" class="btn btn-sm btn-outline-primary mt-2">
-                                    Ver detalle
-                                </a>
+        <div class="container" data-aos="fade-up" data-aos-delay="100">
+            <div class="swiper init-swiper productos-hero-slider">
+
+                <script type="application/json" class="swiper-config">
+            {
+              "loop": true,
+              "speed": 900,
+              "autoplay": { "delay": 6000 },
+              "slidesPerView": 1,
+              "spaceBetween": 30,
+              "centeredSlides": true,
+              "effect": "coverflow",
+              "coverflowEffect": {
+                "rotate": 20,
+                "stretch": 0,
+                "depth": 200,
+                "modifier": 1,
+                "slideShadows": false
+              },
+              "navigation": {
+                "nextEl": ".productos-swiper-next",
+                "prevEl": ".productos-swiper-prev"
+              },
+              "pagination": {
+                "el": ".productos-swiper-pagination",
+                "clickable": true
+              },
+              "breakpoints": {
+                "992": {
+                  "slidesPerView": 1.3
+                }
+              }
+            }
+            </script>
+
+                <div class="swiper-wrapper">
+
+                    @forelse($productos as $producto)
+                        <div class="swiper-slide">
+                            <div class="card bg-dark text-white border-0 rounded-4 overflow-hidden shadow-lg">
+                                <div class="row g-0 align-items-stretch">
+
+                                    <div class="col-md-5">
+                                        <div class="h-100 w-100" style="background:#000;">
+                                            <img src="{{ $producto->imagen_url ?? asset('images/no-image.png') }}"
+                                                alt="{{ $producto->nombre }}" class="img-fluid h-100 w-100"
+                                                style="object-fit: cover;">
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-7">
+                                        <div class="card-body d-flex flex-column h-100 p-4 p-lg-5">
+                                            <span class="badge bg-warning text-dark mb-3">
+                                                Novedad
+                                            </span>
+
+                                            <h3 class="card-title fw-bold mb-2">
+                                                {{ Str::limit($producto->nombre, 60) }}
+                                            </h3>
+
+                                            <p class="text-white-50 mb-2">
+                                                {{ $producto->autor ?? 'Autor desconocido' }}
+                                            </p>
+
+                                            <p class="text-white-50 flex-grow-1 mb-3">
+                                                {{ Str::limit($producto->descripcion ?? 'Sin descripción.', 180) }}
+                                            </p>
+
+                                            <div class="d-flex align-items-center justify-content-between mt-auto">
+                                                <div>
+                                                    <span class="text-white-50 small d-block">Precio</span>
+                                                    <span class="h4 text-warning mb-0">
+                                                        Bs. {{ number_format($producto->precio ?? 0, 2) }}
+                                                    </span>
+                                                </div>
+
+                                                <div class="d-flex gap-2">
+                                                    <a href="{{ route('tienda.producto-show', $producto->id) }}"
+                                                        class="btn btn-warning text-dark fw-bold">
+                                                        Ver detalle
+                                                    </a>
+                                                    <button class="btn btn-outline-light">
+                                                        <i class="bi bi-cart-plus"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                </div>
                             </div>
                         </div>
+                    @empty
+                        <div class="swiper-slide">
+                            <div class="text-center py-5">
+                                <p class="text-white-50 fs-4 mb-0">Pronto tendremos novedades.</p>
+                            </div>
+                        </div>
+                    @endforelse
+
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mt-4 px-3 px-lg-0">
+                    <div class="productos-swiper-nav d-flex gap-2">
+                        <button class="btn btn-outline-light rounded-circle productos-swiper-prev">
+                            <i class="bi bi-arrow-left"></i>
+                        </button>
+                        <button class="btn btn-outline-light rounded-circle productos-swiper-next">
+                            <i class="bi bi-arrow-right"></i>
+                        </button>
                     </div>
-                @empty
-                    <div class="col-12 text-center py-5">
-                        <p class="text-muted fs-4">Pronto tendremos novedades.</p>
-                    </div>
-                @endforelse
+
+                    <div class="productos-swiper-pagination text-end"></div>
+                </div>
+
             </div>
 
             <div class="text-center mt-5">
-                <a href="{{ url('/catalogo') }}" class="btn btn-primary btn-lg">
+                <a href="{{ url('/catalogo') }}" class="btn btn-outline-warning btn-lg">
                     Ver todo el catálogo →
                 </a>
             </div>
         </div>
     </section>
+
+
+    <!-- Hover lift CSS (agrega esto en tu main.css si no lo tienes) -->
+
+
 
     {{-- ================== ABOUT (AL FINAL, Mejorar) ================== --}}
     <section id="about" class="about section py-5 ">

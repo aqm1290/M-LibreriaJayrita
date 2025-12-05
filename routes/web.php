@@ -35,6 +35,9 @@ use App\Http\Controllers\CierrePdfController;  // ← NUEVO
 use App\Http\Controllers\TiendaController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\MarcaController;
+use App\Http\Controllers\CategoriaController;
+use App\Http\Controllers\ModeloController;
+
 
 
 
@@ -42,16 +45,26 @@ Route::get('/tienda', [TiendaController::class, 'index'])->name('tienda.home');
 // Ruta para cargar el producto vía AJAX
 Route::get('/producto/{id}', [TiendaController::class, 'showAjax'])
      ->name('producto.ajax');
-     // Ruta para ver el producto completo
 
 Route::get('/tienda/productos/{producto}', [ProductoController::class, 'show'])
     ->name('tienda.producto-show');
+Route::get('/tienda/productos', [ProductoController::class, 'index'])
+    ->name('productos.index');
 
 
 Route::get('/marcas/{marca}', [MarcaController::class, 'show'])
     ->name('marcas.show');
+Route::get('/tienda/marcas', [MarcaController::class, 'index'])
+    ->name('marcas.index');
 
-    // En routes/web.php
+
+
+Route::get('/modelos/{modelo}', [ModeloController::class, 'show'])
+    ->name('modelos.show');
+
+Route::get('/categorias/{categoria}', [CategoriaController::class, 'show'])
+    ->name('categorias.show');
+
 
 
 

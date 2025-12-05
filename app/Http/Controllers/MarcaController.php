@@ -7,12 +7,26 @@ use Illuminate\Http\Request;
 
 class MarcaController extends Controller
 {
-   public function show(Marca $marca)
+    public function index()
     {
-        $modelos = $marca->modelos()->orderBy('nombre')->get();
+        // todas las marcas activas, puedes paginar si quieres
+        $marcas = Marca::orderBy('nombre')->get();
+
+        return view('tienda.marcas-index', compact('marcas'));
+    }
+
+    public function show(Marca $marca)
+    {
+        $modelos = $marca->modelos()
+            ->withCount(['productos' => function ($q) {
+                $q->where('activo', true);
+            }])
+            ->orderBy('nombre')
+            ->get();
 
         return view('tienda.marca-show', compact('marca', 'modelos'));
     }
+
     public function productosAjax(Modelo $modelo)
     {
         $productos = $modelo->productos()
