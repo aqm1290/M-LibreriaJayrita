@@ -11,8 +11,9 @@ use Illuminate\Support\Facades\Hash;
 class CrearPersonal extends Component
 {
     public $name, $email, $password, $telefono = '';
-    public $tipo = 'cajero'; // cajero o vendedor
-    public $horario = '', $turno = 'mañana';
+    public $tipo = 'cajero'; // siempre por defecto cajero
+    public $horario = '';
+    public $turno = 'mañana';
 
     protected $rules = [
         'name' => 'required|string|max:255',
@@ -49,8 +50,9 @@ class CrearPersonal extends Component
                 'telefono' => $this->telefono,
             ]);
         }
-
         $this->reset();
+        $this->tipo   = 'cajero';
+        $this->turno  = 'mañana';
         session()->flash('success', '¡Personal creado con éxito!');
     }
 

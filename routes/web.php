@@ -119,6 +119,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/proveedores', Proveedores::class)->name('proveedores');
         Route::get('/admin/promociones', Promociones::class)->name('admin.promociones');
         Route::get('/admin/crear-personal', CrearPersonal::class)->name('admin.crear-personal');
+        Route::get('/productos-vendidos', App\Livewire\ProductosVendidosTable::class)
+        ->name('productos.vendidos')
+        ->middleware('auth');
     });
 
     // ====================================================================

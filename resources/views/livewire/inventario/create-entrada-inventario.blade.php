@@ -1,143 +1,189 @@
 <div>
     <!-- TODO TU FORMULARIO (el mismo de antes) -->
-    <div class="min-h-screen bg-gray-50 py-12">
+    <div class="min-h-screen bg-gradient-to-br from-yellow-100 via-yellow-50 to-orange-100 py-12">
         <div class="max-w-7xl mx-auto px-4">
 
-            <h1 class="text-4xl font-extrabold text-gray-800 text-center mb-10">
+            <h1 class="text-4xl font-extrabold text-slate-900 text-center mb-3">
                 Nueva Entrada de Inventario
             </h1>
+            <p class="text-center text-sm md:text-base text-orange-700/90 mb-10">
+                Registra el ingreso de productos a tu almacén.
+            </p>
 
-            <div class="bg-white rounded-3xl shadow-2xl border border-gray-200 overflow-hidden">
+            <div class="bg-white rounded-3xl shadow-2xl border border-yellow-200 overflow-hidden">
                 <div class="p-8">
                     <form wire:submit.prevent="submit" class="space-y-8">
 
                         <!-- Proveedor y Fecha -->
                         <div class="grid md:grid-cols-2 gap-8">
                             <div>
-                                <label class="block text-sm font-bold text-gray-700 mb-2">Proveedor</label>
-                                <select wire:model.live="proveedor_id" class="w-full px-5 py-4 border border-gray-300 rounded-xl focus:ring-4 focus:ring-blue-500 text-lg">
+                                <label class="block text-sm font-bold text-slate-800 mb-2">Proveedor</label>
+                                <select wire:model.live="proveedor_id"
+                                    class="w-full px-5 py-4 border border-yellow-300 rounded-xl focus:ring-4 focus:ring-yellow-300 focus:border-yellow-600 text-lg bg-white/90">
                                     <option value="">-- Seleccione proveedor --</option>
-                                    @foreach($proveedores as $p)
-                                        <option value="{{ $p->id }}">{{ $p->nombre }} @if($p->empresa)- {{ $p->empresa }}@endif</option>
+                                    @foreach ($proveedores as $p)
+                                        <option value="{{ $p->id }}">{{ $p->nombre }} @if ($p->empresa)
+                                                - {{ $p->empresa }}
+                                            @endif
+                                        </option>
                                     @endforeach
                                 </select>
-                                @error('proveedor_id') <p class="text-red-600 text-sm mt-2">{{ $message }}</p> @enderror
+                                @error('proveedor_id')
+                                    <p class="text-rose-600 text-sm mt-2">{{ $message }}</p>
+                                @enderror
                             </div>
                             <div>
-                                <label class="block text-sm font-bold text-gray-700 mb-2">Fecha</label>
-                                <input type="date" wire:model.live="fecha" class="w-full px-5 py-4 border border-gray-300 rounded-xl focus:ring-4 focus:ring-blue-500 text-lg">
-                                @error('fecha') <p class="text-red-600 text-sm mt-2">{{ $message }}</p> @enderror
+                                <label class="block text-sm font-bold text-slate-800 mb-2">Fecha</label>
+                                <input type="date" wire:model.live="fecha"
+                                    class="w-full px-5 py-4 border border-yellow-300 rounded-xl focus:ring-4 focus:ring-yellow-300 focus:border-yellow-600 text-lg bg-white/90">
+                                @error('fecha')
+                                    <p class="text-rose-600 text-sm mt-2">{{ $message }}</p>
+                                @enderror
                             </div>
                         </div>
 
                         <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-2">Observación (opcional)</label>
-                            <input type="text" wire:model.live="observacion" placeholder="Ej: Factura #5891 - Contado" class="w-full px-5 py-4 border border-gray-300 rounded-xl focus:ring-4 focus:ring-blue-500 text-lg">
+                            <label class="block text-sm font-bold text-slate-800 mb-2">Observación (opcional)</label>
+                            <input type="text" wire:model.live="observacion"
+                                placeholder="Ej: Factura #5891 - Contado"
+                                class="w-full px-5 py-4 border border-yellow-300 rounded-xl focus:ring-4 focus:ring-yellow-300 focus:border-yellow-600 text-lg bg-white/90">
                         </div>
 
-                        <!-- TABLA DE PRODUCTOS -->
-                        <div class="border-t-4 border-blue-600 pt-8">
-                            <div class="flex justify-between items-center mb-6">
-                                <h2 class="text-3xl font-bold text-gray-800">Detalle de Productos</h2>
-                                <button type="button" wire:click="addDetalle"
-                                        class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-xl shadow-lg transition transform hover:scale-105">
-                                    + Agregar Producto
-                                </button>
-                            </div>
+                        <!-- BUSCADOR GLOBAL + BOTÓN AGREGAR -->
+                        <div class="border-t-4 border-yellow-500 pt-8 space-y-4">
+                            <h2 class="text-2xl font-bold text-slate-900 mt-4">
+                                Detalle de productos
+                            </h2>
+                        </div>
 
-                            <div class="overflow-x-auto rounded-xl border border-gray-300">
-                                <table class="w-full">
-                                    <thead class="bg-gradient-to-r from-blue-700 to-blue-900 text-white">
-                                        <tr>
-                                            <th class="px-6 py-5 text-left font-bold">Producto</th>
-                                            <th class="px-6 py-5 text-center font-bold">Cantidad</th>
-                                            <th class="px-6 py-5 text-center font-bold">Costo Unit.</th>
-                                            <th class="px-6 py-5 text-center font-bold">Subtotal</th>
-                                            <th class="px-6 py-5 text-center font-bold"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="bg-white divide-y divide-gray-200">
-                                        @foreach($detalles as $index => $detalle)
-                                            <tr class="hover:bg-gray-50 transition">
-                                                <td class="px-6 py-5 relative">
-                                                    <input type="text"
-                                                           wire:model.live.debounce.300ms="busquedas.{{ $index }}"
-                                                           placeholder="Buscar producto..."
-                                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-4 focus:ring-blue-500 text-lg"
-                                                           autocomplete="off">
+                        <!-- LISTA DE PRODUCTOS (SIN TABLA) -->
+                        <div class="space-y-4">
+                            @foreach ($detalles as $index => $detalle)
+                                <div class="bg-white rounded-2xl border border-yellow-200 shadow-sm p-5 space-y-4">
 
-                                                    @if(!empty($busquedas[$index]))
-                                                        <div class="absolute z-50 left-0 right-0 top-full mt-1 bg-white border border-gray-300 rounded-lg shadow-2xl max-h-60 overflow-y-auto">
-                                                            @foreach($this->buscarProductos($index) as $prod)
-                                                                <div wire:click="seleccionarProducto({{ $index }}, {{ $prod->id }})"
-                                                                     class="px-4 py-3 hover:bg-blue-100 cursor-pointer border-b last:border-b-0 flex justify-between">
-                                                                    <div><strong>{{ $prod->nombre }}</strong> @if($prod->codigo)<span class="text-gray-500">({{ $prod->codigo }})</span>@endif</div>
-                                                                    <span class="text-sm text-gray-500">Stock: {{ $prod->stock }}</span>
-                                                                </div>
-                                                            @endforeach
-                                                        </div>
-                                                    @endif
+                                    <div class="flex items-start justify-between gap-3">
+                                        <div class="flex-1">
+                                            <label
+                                                class="block text-xs font-semibold text-slate-700 mb-1 uppercase tracking-wide">
+                                                Producto
+                                            </label>
+                                            <input type="text"
+                                                wire:model.live.debounce.300ms="busquedas.{{ $index }}"
+                                                placeholder="Buscar producto..."
+                                                class="w-full px-4 py-3 border border-yellow-300 rounded-xl focus:ring-4 focus:ring-yellow-300 focus:border-yellow-600 text-base bg-white/90"
+                                                autocomplete="off">
 
-                                                    @if(!empty($detalle['producto_id']))
-                                                        <div class="mt-3 p-3 bg-emerald-50 border border-emerald-300 rounded-lg">
-                                                            <span class="text-emerald-800 font-bold text-lg">
-                                                                {{ \App\Models\Producto::find($detalle['producto_id'])->nombre }}
-                                                                @if(\App\Models\Producto::find($detalle['producto_id'])->codigo)
-                                                                    ({{ \App\Models\Producto::find($detalle['producto_id'])->codigo }})
+                                            @if (!empty($busquedas[$index]))
+                                                <div
+                                                    class="mt-2 bg-white border border-yellow-200 rounded-2xl shadow-2xl max-h-60 overflow-y-auto">
+                                                    @foreach ($this->buscarProductos($index) as $prod)
+                                                        <button type="button"
+                                                            wire:click="seleccionarProducto({{ $index }}, {{ $prod->id }})"
+                                                            class="w-full text-left px-4 py-3 hover:bg-yellow-50 flex justify-between border-b last:border-b-0">
+                                                            <div>
+                                                                <strong>{{ $prod->nombre }}</strong>
+                                                                @if ($prod->codigo)
+                                                                    <span
+                                                                        class="text-xs text-slate-500">({{ $prod->codigo }})</span>
                                                                 @endif
+                                                            </div>
+                                                            <span class="text-xs text-slate-500">
+                                                                Stock: {{ $prod->stock }}
                                                             </span>
-                                                        </div>
-                                                    @endif
+                                                        </button>
+                                                    @endforeach
+                                                </div>
+                                            @endif
 
-                                                    <input type="hidden" wire:model="detalles.{{ $index }}.producto_id">
-                                                    @error("detalles.$index.producto_id") <p class="text-red-600 text-xs mt-2">{{ $message }}</p> @enderror
-                                                </td>
-
-                                                <td class="px-6 py-5 text-center">
-                                                    <input type="text" inputmode="numeric"
-                                                           wire:model.blur="detalles.{{ $index }}.cantidad"
-                                                           onclick="this.select()"
-                                                           placeholder="0"
-                                                           class="w-28 px-4 py-3 text-center font-bold text-xl border border-gray-300 rounded-lg focus:ring-4 focus:ring-blue-500">
-                                                    @error("detalles.$index.cantidad") <p class="text-red-600 text-xs mt-2">{{ $message }}</p> @enderror
-                                                </td>
-
-                                                <td class="px-6 py-5 text-center">
-                                                    <input type="text" inputmode="decimal"
-                                                           wire:model.blur="detalles.{{ $index }}.costo"
-                                                           onclick="this.select()"
-                                                           placeholder="0.00"
-                                                           class="w-36 px-4 py-3 text-right font-bold text-green-700 border border-gray-300 rounded-lg focus:ring-4 focus:ring-blue-500">
-                                                    @error("detalles.$index.costo") <p class="text-red-600 text-xs mt-2">{{ $message }}</p> @enderror
-                                                </td>
-
-                                                <td class="px-6 py-5 text-center">
-                                                    <div class="text-2xl font-black text-blue-600">
-                                                        Bs {{ number_format($detalle['subtotal'] ?? 0, 2) }}
+                                            @if (!empty($detalle['producto_id']))
+                                                @php
+                                                    $pModel = \App\Models\Producto::find($detalle['producto_id']);
+                                                @endphp
+                                                @if ($pModel)
+                                                    <div
+                                                        class="mt-3 p-3 bg-emerald-50 border border-emerald-300 rounded-lg">
+                                                        <span class="text-emerald-800 font-bold text-sm md:text-base">
+                                                            {{ $pModel->nombre }}
+                                                            @if ($pModel->codigo)
+                                                                ({{ $pModel->codigo }})
+                                                            @endif
+                                                        </span>
                                                     </div>
-                                                </td>
+                                                @endif
+                                            @endif
 
-                                                <td class="px-6 py-5 text-center">
-                                                    @if(count($detalles) > 1)
-                                                        <button type="button" wire:click="removeDetalle({{ $index }})"
-                                                                class="text-red-600 hover:text-red-800 text-4xl font-bold hover:scale-125 transition">×</button>
-                                                    @endif
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
+                                            <input type="hidden"
+                                                wire:model="detalles.{{ $index }}.producto_id">
+                                            @error("detalles.$index.producto_id")
+                                                <p class="text-rose-600 text-xs mt-2">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+
+                                        @if (count($detalles) > 1)
+                                            <button type="button" wire:click="removeDetalle({{ $index }})"
+                                                class="text-rose-600 hover:text-rose-800 text-3xl font-bold hover:scale-125 transition leading-none"
+                                                title="Quitar producto">
+                                                ×
+                                            </button>
+                                        @endif
+                                    </div>
+
+                                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                                        <div>
+                                            <label
+                                                class="block text-xs font-semibold text-slate-700 mb-1 uppercase tracking-wide">
+                                                Cantidad
+                                            </label>
+                                            <input type="text" inputmode="numeric"
+                                                wire:model.blur="detalles.{{ $index }}.cantidad"
+                                                onclick="this.select()" placeholder="0"
+                                                class="w-full px-4 py-3 text-center font-bold text-lg border border-yellow-300 rounded-xl focus:ring-4 focus:ring-yellow-300 focus:border-yellow-600 bg-white/90">
+                                            @error("detalles.$index.cantidad")
+                                                <p class="text-rose-600 text-xs mt-2">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+
+                                        <div>
+                                            <label
+                                                class="block text-xs font-semibold text-slate-700 mb-1 uppercase tracking-wide">
+                                                Costo unitario (Bs)
+                                            </label>
+                                            <input type="text" inputmode="decimal"
+                                                wire:model.blur="detalles.{{ $index }}.costo"
+                                                onclick="this.select()" placeholder="0.00"
+                                                class="w-full px-4 py-3 text-right font-bold text-emerald-700 border border-yellow-300 rounded-xl focus:ring-4 focus:ring-yellow-300 focus:border-yellow-600 bg-white/90">
+                                            @error("detalles.$index.costo")
+                                                <p class="text-rose-600 text-xs mt-2">{{ $message }}</p>
+                                            @enderror
+                                        </div>
+
+                                        <div class="md:text-right">
+                                            <p
+                                                class="text-xs font-semibold text-slate-700 mb-1 uppercase tracking-wide">
+                                                Subtotal
+                                            </p>
+                                            <div class="text-2xl font-black text-orange-600">
+                                                Bs {{ number_format($detalle['subtotal'] ?? 0, 2) }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
                         </div>
 
                         <!-- TOTAL GENERAL -->
-                        <div class="mt-10 p-8 bg-gradient-to-r from-blue-700 to-indigo-800 rounded-3xl text-white text-center shadow-2xl">
+                        <div
+                            class="mt-10 p-8 bg-gradient-to-r from-yellow-500 via-amber-500 to-orange-600 rounded-3xl text-white text-center shadow-2xl border border-yellow-200">
                             <h2 class="text-3xl font-extrabold mb-3">TOTAL GENERAL</h2>
                             <div class="text-5xl font-black">
                                 <span wire:loading wire:target="detalles" class="inline-block">
-                                    <svg class="animate-spin h-14 w-14 text-white/70" viewBox="0 0 24 24">
-                                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none" class="opacity-25"></circle>
-                                        <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" class="opacity-75"></path>
+                                    <svg class="animate-spin h-14 w-14 text-white/80" viewBox="0 0 24 24">
+                                        <rcle cx="12" cy="12" r="10" stroke="currentColor"
+                                            stroke-width="4" fill="none" class="opacity-25">
+                                            </circle>
+                                            <path fill="currentColor"
+                                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                                class="opacity-75"></path>
                                     </svg>
                                 </span>
                                 <span wire:loading.remove wire:target="detalles">
@@ -148,7 +194,8 @@
 
                         <div class="text-center mt-10">
                             <button type="submit"
-                                    class="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-bold text-2xl py-6 px-32 rounded-3xl shadow-2xl transition transform hover:scale-105">
+                                class="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800
+                                       text-white font-bold text-2xl py-6 px-32 rounded-3xl shadow-2xl transition transform hover:scale-105">
                                 Guardar Entrada
                             </button>
                         </div>
@@ -158,27 +205,22 @@
         </div>
     </div>
 
-                    <!-- TOAST PEQUEÑO, LIMPIO Y SIN NINGÚN MENSAJE EN CONSOLA -->
-            @if($showToast)
-                <div 
-                    x-data="{ show: true }" 
-                    x-show="show" 
-                    x-transition:enter="transition ease-out duration-300"
-                    x-transition:enter-start="opacity-0 transform translate-y-[-10px]"
-                    x-transition:enter-end="opacity-100 transform translate-y-0"
-                    x-transition:leave="transition ease-in duration-200"
-                    x-transition:leave-end="opacity-0"
-                    x-init="setTimeout(() => show = false, 3000)"
-                    class="fixed top-6 right-6 z-50"
-                >
-                    <div class="bg-emerald-600 text-white px-7 py-3 rounded-full shadow-xl flex items-center space-x-3 border border-white/30">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                        <span class="text-sm font-bold tracking-wider">{{ $toastMessage }}</span>
-                    </div>
-                </div>
-            @endif
+    <!-- TOAST PEQUEÑO, LIMPIO Y SIN NINGÚN MENSAJE EN CONSOLA -->
+    @if ($showToast)
+        <div x-data="{ show: true }" x-show="show" x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0 transform translate-y-[-10px]"
+            x-transition:enter-end="opacity-100 transform translate-y-0"
+            x-transition:leave="transition ease-in duration-200" x-transition:leave-end="opacity-0"
+            x-init="setTimeout(() => show = false, 3000)" class="fixed top-6 right-6 z-50">
+            <div
+                class="bg-emerald-600 text-white px-7 py-3 rounded-full shadow-xl flex items-center space-x-3 border border-white/30">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span class="text-sm font-bold tracking-wider">{{ $toastMessage }}</span>
+            </div>
+        </div>
+    @endif
 
     <!-- SWEETALERT2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

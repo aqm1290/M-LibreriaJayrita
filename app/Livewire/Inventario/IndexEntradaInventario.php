@@ -81,14 +81,64 @@ class IndexEntradaInventario extends Component
         $entradas = EntradaInventario::with('proveedor')
             ->when($this->search, function ($query) {
                 $query->whereHas('proveedor', fn($q) => $q->where('nombre', 'like', "%{$this->search}%"))
-                      ->orWhere('fecha', 'like', "%{$this->search}%")
-                      ->orWhere('observacion', 'like', "%{$this->search}%");
+                    ->orWhere('fecha', 'like', "%{$this->search}%")
+                    ->orWhere('observacion', 'like', "%{$this->search}%");
             })
             ->latest()
             ->paginate(10);
 
         return view('livewire.inventario.index-entrada-inventario', [
-            'entradas' => $entradas
+            'entradas'      => $entradas,
+            'comparaciones' => $this->comparaciones,
         ]);
     }
+
+
+    public function getComparacionesProperty()
+{
+    $entradas = EntradaInventario::with(['detalles.producto', 'proveedor'])
+        ->latest()
+        ->take(30)
+        ->get();
+
+    $filas = [];
+
+    foreach ($entradas as $entrada) {
+        foreach ($entrada->detalles as $detalle) {
+            if (!$detalle->producto) {
+                continue;
+            }
+
+            $producto = $detalle->producto;
+
+            $costoEntrada = (float) $detalle->costo;
+            // AHORA COMPARA CONTRA costo_compra DEL PRODUCTO
+            $costoReferencia = (float) ($producto->costo_compra ?? 0);
+
+            $diferenciaAbs = $costoEntrada - $costoReferencia;
+            $diferenciaPct = $costoReferencia > 0
+                ? ($diferenciaAbs / $costoReferencia) * 100
+                : null;
+
+            $filas[] = [
+                'entrada_id'       => $entrada->id,
+                'fecha'            => $entrada->fecha,
+                'proveedor'        => optional($entrada->proveedor)->nombre,
+                'producto'         => $producto->nombre,
+                'codigo'           => $producto->codigo,
+                'costo_entrada'    => $costoEntrada,
+                // IMPORTANTE: este es el costo_compra del producto
+                'costo_compra_ref' => $costoReferencia,
+                'diferencia_abs'   => $diferenciaAbs,
+                'diferencia_pct'   => $diferenciaPct,
+            ];
+        }
+    }
+
+    return collect($filas)
+        ->sortByDesc('fecha')
+        ->values();
+}
+
+
 }

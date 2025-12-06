@@ -14,6 +14,8 @@ class CreateEntradaInventario extends Component
     public $proveedor_id = '';
     public $fecha;
     public $observacion = '';
+    public $processing = false; // ← agrega esta línea arriba
+
     public $detalles = [];
     public $total = 0.0;
 
@@ -135,48 +137,54 @@ class CreateEntradaInventario extends Component
         $this->dispatch('confirmar-guardado');
     }
 
-    public function guardarConfirmado()
-    {
-        try {
-            DB::transaction(function () {
-                $entrada = EntradaInventario::create([
-                    'proveedor_id' => $this->proveedor_id,
-                    'fecha' => $this->fecha,
-                    'observacion' => $this->observacion,
-                    'total' => $this->total,
+
+public function guardarConfirmado()
+{
+    if ($this->processing) {
+        return; // ← evita que se ejecute dos veces
+    }
+
+    $this->processing = true;
+
+    try {
+        DB::transaction(function () {
+            $entrada = EntradaInventario::create([
+                'proveedor_id' => $this->proveedor_id,
+                'fecha' => $this->fecha,
+                'observacion' => $this->observacion,
+                'total' => $this->total,
+            ]);
+
+            foreach ($this->detalles as $d) {
+                if (empty($d['producto_id'])) continue;
+
+                DetalleEntrada::create([
+                    'entrada_inventario_id' => $entrada->id,
+                    'producto_id' => $d['producto_id'],
+                    'cantidad' => $d['cantidad'],
+                    'costo' => $d['costo'],
+                    'subtotal' => $d['subtotal'],
                 ]);
 
-                foreach ($this->detalles as $d) {
-                    DetalleEntrada::create([
-                        'entrada_inventario_id' => $entrada->id,
-                        'producto_id' => $d['producto_id'],
-                        'cantidad' => $d['cantidad'],
-                        'costo' => $d['costo'],
-                        'subtotal' => $d['subtotal'],
-                    ]);
+                // Esto se ejecuta solo una vez
+                Producto::where('id', $d['producto_id'])->increment('stock', $d['cantidad']);
+            }
+        });
 
-                    Producto::where('id', $d['producto_id'])->increment('stock', $d['cantidad']);
-                }
-            });
+        $this->toastMessage = 'Entrada registrada correctamente';
+        $this->showToast = true;
 
-            // ESTO ES LO QUE HACE QUE APAREZCA EL TOAST BONITO
-            $this->toastMessage = 'Entrada registrada correctamente';
-            $this->showToast = true;
+        $this->reset(['proveedor_id', 'observacion', 'detalles', 'total', 'busquedas']);
+        $this->addDetalle();
+        $this->fecha = now()->format('Y-m-d');
 
-            // Limpiamos el formulario
-            $this->reset(['proveedor_id', 'observacion', 'detalles', 'total', 'busquedas']);
-            $this->addDetalle();
-            $this->fecha = now()->format('Y-m-d');
-
-            // Esto hace que el toast desaparezca solo después de 4 segundos
-            $this->dispatch('toast-success');
-
-        } catch (\Exception $e) {
-            $this->toastMessage = 'Error al guardar: ' . $e->getMessage();
-            $this->showToast = true;
-            $this->dispatch('toast-error');
-        }
+    } catch (\Exception $e) {
+        $this->toastMessage = 'Error: ' . $e->getMessage();
+        $this->showToast = true;
+    } finally {
+        $this->processing = false; // ← siempre libera el candado
     }
+}
 
     public function render()
     {
