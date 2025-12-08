@@ -12,23 +12,18 @@ class TiendaController extends Controller
 {
     public function index()
     {
-        $productos = Producto::with(['categoria', 'marca', 'modelo'])
-            ->where('activo', true)
-            ->latest('id')
-            ->take(12)
-            ->get();
-
+        // Marcas sí las sigues usando directo en Blade estático
         $marcas = Marca::where('activo', true)
             ->orderBy('nombre')
             ->take(12)
             ->get();
 
-        $categorias = Categoria::where('activo', true)
-            ->orderBy('nombre')
-            ->get();
+        // Productos y categorías YA NO se pasan a la vista,
+        // los cargará el componente Livewire HomeProductos
 
-        return view('tienda.home', compact('productos', 'marcas', 'categorias'));
+        return view('tienda.home', compact('marcas'));
     }
+
 
     public function showAjax($id)
     {

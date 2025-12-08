@@ -10,8 +10,6 @@
     <link rel="icon" href="{{ asset('shop/assets/img/Logo-favicon.png') }}">
     <link rel="apple-touch-icon" href="{{ asset('shop/assets/img/favicon.png') }}">
 
-
-
     {{-- Fonts --}}
     <link href="https://fonts.googleapis.com" rel="preconnect">
     <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
@@ -28,6 +26,10 @@
 
     {{-- Main CSS --}}
     <link rel="stylesheet" href="{{ asset('shop/assets/css/main.css') }}">
+
+
+    {{-- Livewire --}}
+    @livewireStyles
 
     <style>
         .hover-lift {
@@ -54,21 +56,34 @@
             opacity: 1;
         }
     </style>
+
     @stack('styles')
 </head>
 
 <body class="index-page">
 
     @include('partials.tienda-header')
-    <main class="main">
-        @yield('content')
+
+    <main class="main min-vh-100 d-flex flex-column">
+        <div class="flex-grow-1 py-5">
+            @yield('content')
+            {{-- Para componentes Livewire que usen ->layout('layouts.shop') --}}
+            {{ $slot ?? '' }}
+        </div>
     </main>
 
     @include('partials.tienda-footer')
 
+    {{-- Botón scroll top --}}
     <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center">
         <i class="bi bi-arrow-up-short"></i>
     </a>
+
+
+
+    {{-- Mini carrito flotante global --}}
+    @livewire('tienda.mini-carrito')
+    @livewire('tienda.pedido-actual')
 
 
     <div id="preloader"></div>
@@ -87,67 +102,11 @@
 
     @stack('scripts')
 
-
-
-
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
-    <script>
-        $(document).ready(function() {
+    @livewireScripts
 
-            const modalElement = document.getElementById('modalProductoAjax');
-            const modal = new bootstrap.Modal(modalElement);
 
-            $('.btn-ver-producto').on('click', function() {
-                const id = $(this).data('id');
-
-                // Reset
-                $('#modalImg').addClass('d-none').attr('src', '');
-                $('#modalNombre, #modalMarca, #modalModelo, #modalDescripcion, #modalPrecio')
-                    .addClass('d-none').empty();
-                $('#pMarca, #pModelo').addClass('d-none');
-
-                $('#skeletonImg, #skeletonTitulo, #skeletonCat, #skeletonDesc, #skeletonPrecio')
-                    .removeClass('d-none');
-
-                modal.show();
-
-                $.get('/producto/' + id, function(data) {
-
-                    console.log(data); // verifica que traiga imagen_url, marca y modelo
-
-                    setTimeout(() => {
-                        $('#skeletonImg, #skeletonTitulo, #skeletonCat, #skeletonDesc, #skeletonPrecio')
-                            .addClass('d-none');
-
-                        $('#modalImg').attr('src', data.imagen_url).removeClass('d-none');
-                        $('#modalNombre').text(data.nombre).removeClass('d-none');
-
-                        if (data.marca) {
-                            $('#modalMarca').text(data.marca);
-                            $('#pMarca').removeClass('d-none');
-                        }
-
-                        if (data.modelo) {
-                            $('#modalModelo').text(data.modelo);
-                            $('#pModelo').removeClass('d-none');
-                        }
-
-                        $('#modalDescripcion').text(data.descripcion).removeClass('d-none');
-                        $('#modalPrecio').text('Bs. ' + parseFloat(data.precio).toFixed(2))
-                            .removeClass('d-none');
-
-                        $('#modalLink').attr('href', '/tienda/productos/' + data.id);
-
-                    }, 400);
-                }).fail(function() {
-                    modal.hide();
-                    alert('Error al cargar el producto');
-                });
-            });
-
-        });
-    </script>
 
 </body>
 

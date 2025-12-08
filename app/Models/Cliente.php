@@ -39,4 +39,11 @@ class Cliente extends Model
         $compras = $this->fidelidad?->compras_realizadas ?? 0;
         return "$compras de 10 compras";
     }
+    
+    public function pedidos()
+    {
+        return $this->hasMany(Pedido::class, 'cliente_id');
+    }
+
+
 }

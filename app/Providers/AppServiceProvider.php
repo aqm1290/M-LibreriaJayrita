@@ -31,5 +31,6 @@ class AppServiceProvider extends ServiceProvider
         Marca::observe(MarcaObserver::class);
         Categoria::observe(CategoriaObserver::class);
         Modelo::observe(ModeloObserver::class);   
+        
     }
 }
