@@ -25,7 +25,9 @@
     <link rel="stylesheet" href="{{ asset('shop/assets/vendor/glightbox/css/glightbox.min.css') }}">
 
     {{-- Main CSS --}}
-    <link rel="stylesheet" href="{{ asset('shop/assets/css/main.css') }}">
+    {{--     <link rel="stylesheet" href="{{ asset('shop/assets/css/main.css') }}">
+ --}}
+    <link rel="stylesheet" href="{{ asset('css/tienda-theme.css') }}">
 
 
     {{-- Livewire --}}
@@ -74,19 +76,23 @@
 
     @include('partials.tienda-footer')
 
-    {{-- Botón scroll top --}}
-    <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center">
-        <i class="bi bi-arrow-up-short"></i>
-    </a>
 
 
 
-    {{-- Mini carrito flotante global --}}
-    @livewire('tienda.mini-carrito')
+
     @livewire('tienda.pedido-actual')
 
 
-    <div id="preloader"></div>
+    {{-- Zona flotante: mini carrito + scroll top --}}
+    <div class="jayrita-floating-right">
+
+        {{-- Botón scroll top junto al carrito --}}
+        <button id="scroll-top" type="button"
+            class="jayrita-scroll-top d-flex align-items-center justify-content-center">
+            <i class="bi bi-arrow-up-short"></i>
+        </button>
+    </div>
+
 
     {{-- Vendor JS --}}
     <script src="{{ asset('shop/assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
@@ -97,15 +103,14 @@
     <script src="{{ asset('shop/assets/vendor/imagesloaded/imagesloaded.pkgd.min.js') }}"></script>
     <script src="{{ asset('shop/assets/vendor/isotope-layout/isotope.pkgd.min.js') }}"></script>
 
-    {{-- Main JS --}}
-    <script src="{{ asset('shop/assets/js/main.js') }}"></script>
+
+    <script src="{{ asset('js/tienda-theme.js') }}"></script>
 
     @stack('scripts')
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
     @livewireScripts
-
 
 
 </body>

@@ -1,4 +1,5 @@
 <?php
+use Illuminate\Support\Facades\Auth;
 
 use Illuminate\Support\Facades\Route;
 
@@ -44,8 +45,10 @@ use App\Http\Controllers\CierrePdfController;
 use App\Http\Controllers\TicketController;
 
 
-
+use App\Livewire\Tienda\CatalogoMarca;
+use App\Livewire\Tienda\ListaMarcas;
 use App\Livewire\Tienda\CatalogoProductos;
+
 
 
 
@@ -60,7 +63,6 @@ Route::get('/catalogo', CatalogoProductos::class)->name('tienda.catalogo');
 Route::get('/mi-perfil', \App\Livewire\Cliente\Perfil::class)
     ->name('cliente.perfil')
     ->middleware('auth:cliente');
-use Illuminate\Support\Facades\Auth;
 
 Route::post('/cliente/logout', function () {
     Auth::guard('cliente')->logout();
@@ -89,8 +91,13 @@ Route::middleware('auth:cliente')->group(function () {
         ->name('pedido.cliente');
 });
 
+Route::get('/tienda/marcas', ListaMarcas::class)
+    ->name('tienda.marcas');
 
+Route::get('/tienda/marca/{marca}', CatalogoMarca::class)
+    ->name('tienda.marca');
 
+    
 // ====================================================================
 // LOGIN ADMIN
 // ====================================================================

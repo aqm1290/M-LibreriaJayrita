@@ -3,6 +3,8 @@
 namespace App\Livewire\Tienda;
 
 use App\Models\Producto;
+use App\Models\Marca;
+use App\Models\Categoria;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -63,10 +65,14 @@ class CatalogoProductos extends Component
             $query->where('categoria_id', $this->categoriaId);
         }
 
-        $productos = $query->orderBy('nombre')->paginate($this->porPagina);
+        $productos   = $query->orderBy('nombre')->paginate($this->porPagina);
+        $marcas      = Marca::orderBy('nombre')->get();          // ← para filtros/pills
+        $categorias  = Categoria::orderBy('nombre')->get();      // ← si el Blade las usa
 
         return view('livewire.tienda.catalogo-productos', [
-            'productos' => $productos,
+            'productos'  => $productos,
+            'marcas'     => $marcas,
+            'categorias' => $categorias,
         ])->layout('layouts.shop');
     }
 }

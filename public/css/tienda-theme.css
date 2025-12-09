@@ -1,0 +1,1479 @@
+/* ====================== VARIABLES LIGHT/DARK ====================== */
+:root[data-theme="light"] {
+    --bg-glass: rgba(250, 250, 250, 0.25);
+    --border-glass: rgba(251, 191, 36, 0.3);
+    --text-nav: #1f2937;
+    --text-hero: #111827;
+    --bg-hero: linear-gradient(185deg, #fff5f5 0%, #d1d0d0 100%);
+    --surface-color: #ffffff;
+    --default-color: #111827;
+    --accent-color: #fbbf24;
+    --contrast-color: #0f172a;
+}
+
+:root[data-theme="dark"] {
+    --bg-glass: rgba(15, 23, 42, 0.85);
+    --border-glass: rgba(251, 191, 36, 0.2);
+    --text-nav: #f1f5f9;
+    --text-hero: #e7e7e7;
+    --bg-hero: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    --surface-color: #020617;
+    --default-color: #e5e7eb;
+    --accent-color: #fbbf24;
+    --contrast-color: #020617;
+}
+
+body {
+    background: var(--bg-hero);
+    color: var(--text-hero);
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* ====================== HEADER ====================== */
+.jayrita-header {
+    background: var(--bg-glass);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border-bottom: 1px solid var(--border-glass);
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1030;
+}
+
+.jayrita-header.scrolled {
+    background: rgba(255, 255, 255, 0.97);
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12);
+    border-radius: 0 0 18px 18px;
+    margin: 0 0.75rem;
+}
+
+[data-theme="dark"] .jayrita-header.scrolled {
+    background: rgba(15, 23, 42, 0.97);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
+}
+
+.jayrita-header__inner {
+    height: 70px;
+    align-items: center;
+}
+
+/* Logo */
+.jayrita-logo__img {
+    height: 38px;
+    width: auto;
+}
+
+.jayrita-logo__text {
+    font-size: 1.3rem;
+    font-weight: 800;
+    background: linear-gradient(90deg, #fbbf24, #f59e0b);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Nav */
+.jayrita-nav a {
+    color: var(--text-nav);
+    font-weight: 600;
+    margin: 0 0.9rem;
+    position: relative;
+    transition: color 0.3s;
+    text-decoration: none;
+    padding: 0.35rem 0;
+    font-size: 0.95rem;
+}
+
+.jayrita-nav a:hover,
+.jayrita-nav a.active {
+    color: #f59e0b;
+}
+
+.jayrita-nav a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #fbbf24, #f59e0b);
+    transition: width 0.3s;
+    transform: translateX(-50%);
+}
+
+.jayrita-nav a:hover::after,
+.jayrita-nav a.active::after {
+    width: 100%;
+}
+
+/* Acciones derecha */
+.jayrita-actions {
+    gap: 0.5rem;
+}
+
+/* ====================== TOGGLE TEMA ====================== */
+.jayrita-theme-toggle {
+    width: 46px;
+    height: 24px;
+    background: rgba(0, 0, 0, 0.18);
+    border-radius: 999px;
+    position: relative;
+    cursor: pointer;
+    border: 1px solid rgba(148, 163, 184, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 5px;
+    overflow: hidden;
+}
+
+.jayrita-theme-toggle::before {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    background: #ffffff;
+    border-radius: 50%;
+    transition: transform 0.25s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+[data-theme="dark"] .jayrita-theme-toggle::before {
+    transform: translateX(20px);
+    background: #1e293b;
+}
+
+.jayrita-theme-toggle .sun,
+.jayrita-theme-toggle .moon {
+    font-size: 0.8rem;
+    line-height: 1;
+    z-index: 1;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* estado light */
+:root[data-theme='light'] .jayrita-theme-toggle .sun {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+:root[data-theme='light'] .jayrita-theme-toggle .moon {
+    opacity: 0.35;
+    transform: translateX(3px);
+}
+
+/* estado dark */
+:root[data-theme='dark'] .jayrita-theme-toggle .sun {
+    opacity: 0.35;
+    transform: translateX(-3px);
+}
+
+:root[data-theme='dark'] .jayrita-theme-toggle .moon {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* ====================== MINI CARRITO EN HEADER ====================== */
+.tienda-mini-carrito button.btn.btn-warning.rounded-circle {
+    width: 44px !important;
+    height: 44px !important;
+    font-size: 0.9rem;
+}
+
+.jayrita-mini-carrito .btn.btn-warning.rounded-circle {
+    width: 40px !important;
+    height: 40px !important;
+    padding: 0 !important;
+    font-size: 0.9rem !important;
+}
+
+.jayrita-mini-carrito .badge {
+    min-width: 18px !important;
+    height: 18px !important;
+    font-size: 0.7rem !important;
+}
+
+/* ====================== BOTÓN LOGIN ====================== */
+.jayrita-btn--login {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: #000;
+    border: none;
+    padding: 0.4rem 1.3rem;
+    border-radius: 50px;
+    font-weight: 600;
+    transition: all 0.3s;
+    box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);
+    font-size: 0.9rem;
+}
+
+.jayrita-btn--login:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(251, 191, 36, 0.4);
+}
+
+/* ====================== MENÚ MÓVIL ====================== */
+.jayrita-mobile-menu {
+    position: fixed;
+    top: 56px;
+    left: 0;
+    right: 0;
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(20px);
+    transform: translateY(-100%);
+    opacity: 0;
+    transition: all 0.35s ease;
+    z-index: 1020;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    border-bottom: 1px solid rgba(251, 191, 36, 0.2);
+}
+
+.jayrita-mobile-menu.active {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.jayrita-mobile-menu__inner {
+    padding: 1.5rem 1.25rem;
+}
+
+.jayrita-mobile-menu__inner a {
+    display: block;
+    padding: 0.85rem 0.5rem;
+    color: #f9fafb;
+    font-size: 1rem;
+    border-bottom: 1px solid rgba(251, 191, 36, 0.1);
+    text-decoration: none;
+}
+
+.jayrita-mobile-menu__inner a:hover {
+    background: rgba(251, 191, 36, 0.15);
+    padding-left: 1rem;
+}
+
+/* Toggle icono en móvil */
+.jayrita-mobile-toggle {
+    background: transparent;
+    border: none;
+    color: var(--text-nav);
+}
+
+/* ====================== ANIMACIONES GENERALES ====================== */
+.animate-out {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animate-in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ====================== RESPONSIVO HEADER ====================== */
+@media (max-width: 992px) {
+    .jayrita-header__inner {
+        height: 54px;
+    }
+
+    .jayrita-nav {
+        display: none;
+    }
+
+    .jayrita-btn--login {
+        padding-inline: 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .jayrita-logo__text {
+        font-size: 1.1rem;
+    }
+}
+
+/* ====================== FOOTER ====================== */
+.jayrita-footer {
+    margin-top: 4rem;
+}
+
+.jayrita-footer-main {
+    background: #020617;
+    color: #e5e7eb;
+    padding: 3rem 0 2.5rem;
+    border-top: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+:root[data-theme="light"] .jayrita-footer-main {
+    background: #0b1120;
+}
+
+.jayrita-footer-logo {
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    background: linear-gradient(90deg, #fbbf24, #f59e0b);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.jayrita-footer-text {
+    font-size: 0.95rem;
+    color: #9ca3af;
+    max-width: 320px;
+}
+
+:root[data-theme="light"] .jayrita-footer-text {
+    color: #e5e7eb;
+}
+
+.jayrita-footer-social a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    margin-right: 0.4rem;
+    background: rgba(15, 23, 42, 0.7);
+    color: #e5e7eb;
+    font-size: 1rem;
+    transition: background 0.25s ease, transform 0.2s ease, color 0.25s ease;
+}
+
+.jayrita-footer-social a:hover {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: #111827;
+    transform: translateY(-2px);
+}
+
+.jayrita-footer-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #f9fafb;
+    margin-bottom: 1rem;
+}
+
+.jayrita-footer-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.jayrita-footer-list li {
+    margin-bottom: 0.45rem;
+}
+
+.jayrita-footer-list a {
+    font-size: 0.92rem;
+    color: #9ca3af;
+    text-decoration: none;
+    transition: color 0.2s ease, padding-left 0.2s ease;
+}
+
+.jayrita-footer-list a:hover {
+    color: #fbbf24;
+    padding-left: 0.2rem;
+}
+
+.jayrita-footer-contact {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 0.92rem;
+    color: #9ca3af;
+}
+
+.jayrita-footer-contact li {
+    margin-bottom: 0.4rem;
+    display: flex;
+    align-items: center;
+}
+
+.jayrita-footer-contact i {
+    color: #fbbf24;
+    margin-right: 0.45rem;
+}
+
+.jayrita-footer-bottom {
+    background: #020617;
+    border-top: 1px solid rgba(15, 23, 42, 0.9);
+    padding: 0.9rem 0;
+}
+
+.jayrita-footer-bottom p {
+    font-size: 0.9rem;
+    color: #9ca3af;
+    margin: 0;
+}
+
+.jayrita-footer-mini i {
+    color: #fbbf24;
+}
+
+@media (max-width: 768px) {
+    .jayrita-footer-main {
+        text-align: center;
+    }
+
+    .jayrita-footer-text {
+        max-width: 100%;
+        margin-inline: auto;
+    }
+
+    .jayrita-footer-contact li {
+        justify-content: center;
+    }
+}
+
+/*--------------------------------------------------------------
+# Portfolio (categorías)
+--------------------------------------------------------------*/
+/* Filtros */
+.portfolio .portfolio-filters {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    padding: 0;
+    margin: 0 0 40px;
+    list-style: none;
+}
+
+.portfolio .portfolio-filters li {
+    font-size: 15px;
+    font-weight: 500;
+    padding: 12px 25px;
+    cursor: pointer;
+    background: var(--surface-color);
+    color: var(--default-color);
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.portfolio .portfolio-filters li i {
+    font-size: 1.1em;
+    transition: transform 0.3s ease;
+}
+
+.portfolio .portfolio-filters li:hover {
+    color: var(--accent-color);
+    transform: translateY(-2px);
+    background: color-mix(in srgb, var(--accent-color), transparent 92%);
+}
+
+.portfolio .portfolio-filters li:hover i {
+    transform: scale(1.1);
+}
+
+.portfolio .portfolio-filters li.filter-active {
+    background: var(--accent-color);
+    color: var(--contrast-color);
+}
+
+@media (max-width: 768px) {
+    .portfolio .portfolio-filters {
+        gap: 10px;
+    }
+
+    .portfolio .portfolio-filters li {
+        padding: 8px 20px;
+        font-size: 14px;
+    }
+}
+
+/* Tarjeta tipo portfolio */
+.portfolio .portfolio-entry {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    background: var(--surface-color);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+}
+
+.portfolio .portfolio-entry .entry-image {
+    position: relative;
+    margin: 0;
+    overflow: hidden;
+    aspect-ratio: 4/3;
+}
+
+.portfolio .portfolio-entry .entry-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Overlay */
+.portfolio .portfolio-entry .entry-image .entry-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.8) 100%);
+    display: flex;
+    align-items: flex-end;
+    padding: 24px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.portfolio .portfolio-entry .entry-image .entry-overlay .overlay-content {
+    width: 100%;
+    transform: translateY(20px);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.portfolio .portfolio-entry .entry-image .entry-overlay .entry-meta {
+    color: var(--accent-color);
+    font-size: 14px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+}
+
+.portfolio .portfolio-entry .entry-image .entry-overlay .entry-title {
+    color: var(--contrast-color);
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0 0 16px;
+}
+
+/* Botones overlay */
+.portfolio .portfolio-entry .entry-image .entry-overlay .entry-links {
+    display: flex;
+    gap: 10px;
+}
+
+.portfolio .portfolio-entry .entry-image .entry-overlay .entry-links button {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface-color);
+    color: var(--accent-color);
+    border-radius: 12px;
+    font-size: 18px;
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: translateY(20px);
+    border: none;
+}
+
+.portfolio .portfolio-entry .entry-image .entry-overlay .entry-links button:hover {
+    background: var(--accent-color);
+    color: var(--contrast-color);
+    transform: translateY(-2px);
+}
+
+/* Hover general */
+.portfolio .portfolio-entry:hover .entry-image img {
+    transform: scale(1.05);
+}
+
+.portfolio .portfolio-entry:hover .entry-image .entry-overlay {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.portfolio .portfolio-entry:hover .entry-image .entry-overlay .overlay-content {
+    transform: translateY(0);
+}
+
+.portfolio .portfolio-entry:hover .entry-image .entry-overlay .entry-links button {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ====================== FLOTANTES: CARRITO + SCROLL TOP ====================== */
+.jayrita-floating-right {
+    position: fixed;
+    right: 18px;
+    bottom: 22px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.75rem;
+    z-index: 1050;
+}
+
+.jayrita-floating-cart .btn.btn-warning.rounded-circle {
+    width: 52px !important;
+    height: 52px !important;
+    padding: 0 !important;
+}
+
+/* Botón scroll-top */
+.jayrita-scroll-top {
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    border: none;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: #000;
+    box-shadow: 0 12px 30px rgba(251, 191, 36, 0.5);
+    cursor: pointer;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.25s ease;
+    opacity: 0.9;
+}
+
+.jayrita-scroll-top i {
+    font-size: 1.4rem;
+}
+
+.jayrita-scroll-top:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 40px rgba(251, 191, 36, 0.6);
+    opacity: 1;
+}
+
+:root[data-theme="dark"] .jayrita-scroll-top {
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8);
+}
+
+@media (max-width: 576px) {
+    .jayrita-floating-right {
+        right: 12px;
+        bottom: 16px;
+    }
+}
+
+/* ====================== HERO CON IMAGEN DE FONDO ====================== */
+.jayrita-hero {
+    position: relative;
+    background-color: #0f172a;
+    color: var(--text-hero);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    min-height: 85vh;
+}
+
+/* Imagen de fondo */
+.jayrita-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url("/images/hero-foto.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.35;
+    z-index: 0;
+}
+
+/* Capa de degradado para contraste */
+.jayrita-hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at top left, rgba(251, 191, 36, 0.45), transparent 55%),
+        linear-gradient(to right, rgba(15, 23, 42, 0.90), rgba(15, 23, 42, 0.35));
+    z-index: 1;
+}
+
+/* Ajuste light */
+:root[data-theme="light"] .jayrita-hero::after {
+    background:
+        radial-gradient(circle at top left, rgba(251, 191, 36, 0.45), transparent 55%),
+        linear-gradient(to right, rgba(248, 250, 252, 0.15), rgba(248, 250, 252, 0.0));
+}
+
+:root[data-theme="light"] .jayrita-hero-title {
+    color: #111827;
+}
+
+:root[data-theme="light"] .jayrita-hero-subtitle {
+    color: #cdddf7;
+}
+
+:root[data-theme="light"] .jayrita-hero-meta strong {
+    color: #b45309;
+}
+
+/* Contenido encima del fondo */
+.jayrita-hero .container,
+.jayrita-hero * {
+    position: relative;
+    z-index: 2;
+}
+
+/* Copia y tipografía */
+.jayrita-hero-copy {
+    max-width: 520px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.jayrita-hero-pill {
+    padding: 0.3rem 0.9rem;
+    border-radius: 999px;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(251, 191, 36, 0.5);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    font-weight: 600;
+    color: #fde68a;
+}
+
+.jayrita-hero-pill .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: #facc15;
+}
+
+.jayrita-hero-title {
+    font-size: 2.8rem;
+    line-height: 1.15;
+    font-weight: 800;
+    color: #f9fafb;
+}
+
+.jayrita-hero-title span {
+    display: block;
+    background: linear-gradient(90deg, #fbbf24, #f97316);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.jayrita-hero-subtitle {
+    font-size: 1rem;
+    color: #e5e7eb;
+}
+
+/* Botones hero */
+.jayrita-hero-btn {
+    border-radius: 999px;
+    padding: 0.7rem 2.6rem;
+    font-weight: 700;
+    box-shadow: 0 18px 45px rgba(251, 191, 36, 0.5);
+}
+
+.jayrita-hero-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 22px 55px rgba(251, 191, 36, 0.6);
+}
+
+/* Botón outline catálogo */
+.jayrita-hero-link-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.45rem 1.5rem;
+    border-radius: 999px;
+    border: 2px solid #fbbf24;
+    color: #fbbf24;
+    background: transparent;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+}
+
+.jayrita-hero-link-outline:hover {
+    background: rgba(251, 191, 36, 0.1);
+    color: #fbbf24;
+    box-shadow: 0 8px 20px rgba(251, 191, 36, 0.35);
+    transform: translateY(-1px);
+}
+
+:root[data-theme="light"] .jayrita-hero-link-outline {
+    color: #fbbf24;
+    border-color: #fbbf24;
+}
+
+:root[data-theme="light"] .jayrita-hero-link-outline:hover {
+    background: rgba(251, 191, 36, 0.08);
+    color: #807300;
+}
+
+/* Meta hero */
+.jayrita-hero-meta>div {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.85rem;
+    color: #e5e7eb;
+    align-items: center;
+    text-align: center;
+}
+
+.jayrita-hero-meta strong {
+    font-size: 1.1rem;
+    color: #facc15;
+}
+
+@media (max-width: 992px) {
+    .jayrita-hero {
+        text-align: center;
+    }
+}
+
+/* SECCIÓN MARCAS */
+.jayrita-marcas {
+    background: #f9fafb;
+}
+
+:root[data-theme="dark"] .jayrita-marcas {
+    background: #020617;
+}
+
+/* título */
+.jayrita-marcas h3 {
+    color: #111827;
+}
+
+:root[data-theme="dark"] .jayrita-marcas h3 {
+    color: #f9fafb;
+}
+
+/* Tarjeta de marca */
+.jayrita-marca-card {
+    background: #ffffff;
+    border-radius: 999px;
+    padding: 0.75rem 1.2rem;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+:root[data-theme="dark"] .jayrita-marca-card {
+    background: #020617;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+}
+
+.jayrita-marca-card img {
+    max-height: 32px;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+.jayrita-marca-card span {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #374151;
+}
+
+:root[data-theme="dark"] .jayrita-marca-card span {
+    color: #e5e7eb;
+}
+
+.jayrita-marca-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.16);
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+}
+
+.jayrita-marca-card:hover span {
+    color: #111827;
+}
+
+/* ====================== MODALES TEMA LIGHT/DARK ====================== */
+.jayrita-modal .modal-content {
+    border-radius: 1.5rem;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+}
+
+/* Light */
+:root[data-theme="light"] .jayrita-modal .modal-content {
+    background: rgba(255, 255, 255, 0.98);
+    color: #0f172a;
+}
+
+/* Dark */
+:root[data-theme="dark"] .jayrita-modal .modal-content {
+    background: rgba(15, 23, 42, 0.98);
+    color: #e5e7eb;
+}
+
+.jayrita-modal h1,
+.jayrita-modal h2,
+.jayrita-modal h3,
+.jayrita-modal h4 {
+    color: inherit;
+}
+
+.jayrita-modal .text-muted,
+.jayrita-modal .text-white-50 {
+    color: color-mix(in srgb, var(--default-color), transparent 35%);
+}
+
+.jayrita-modal .btn-close {
+    filter: none;
+}
+
+:root[data-theme="dark"] .jayrita-modal .btn-close {
+    filter: invert(1) grayscale(100%);
+}
+
+/* Animación de cards en carruseles */
+.carrusel-cards .card {
+    opacity: 0;
+    transform: translateY(15px) scale(0.98);
+    transition: all 0.4s ease;
+}
+
+.carrusel-cards .card.carrusel-show {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+
+
+/* Base modal */
+.jayrita-modal .modal-content {
+    border-radius: 1.5rem;
+}
+
+/* Light mode */
+:root[data-bs-theme="light"] .jayrita-modal .modal-content {
+    background-color: #ffffff;
+    color: #212529;
+}
+
+:root[data-bs-theme="light"] .jayrita-modal .modal-text-muted {
+    color: #6c757d;
+}
+
+:root[data-bs-theme="light"] .jayrita-modal .modal-text-body {
+    color: #212529;
+}
+
+:root[data-bs-theme="light"] .jayrita-modal .modal-desc-box {
+    background-color: #f8f9fa;
+}
+
+/* Dark mode */
+:root[data-bs-theme="dark"] .jayrita-modal .modal-content {
+    background-color: #121212;
+    color: #f8f9fa;
+}
+
+:root[data-bs-theme="dark"] .jayrita-modal .modal-text-muted {
+    color: #adb5bd;
+}
+
+:root[data-bs-theme="dark"] .jayrita-modal .modal-text-body {
+    color: #f8f9fa;
+}
+
+:root[data-bs-theme="dark"] .jayrita-modal .modal-desc-box {
+    background-color: rgba(255, 255, 255, 0.06);
+}
+
+
+
+
+
+
+
+
+
+/* base modal catálogo */
+.jayrita-modal .modal-content {
+    border-radius: 1.5rem;
+}
+
+/* LIGHT MODE */
+:root[data-bs-theme="light"] .jayrita-modal .modal-content {
+    background-color: #ffffff;
+    color: #111827;
+}
+
+:root[data-bs-theme="light"] .jayrita-modal h1,
+:root[data-bs-theme="light"] .jayrita-modal h2,
+:root[data-bs-theme="light"] .jayrita-modal h3 {
+    color: #111827;
+}
+
+:root[data-bs-theme="light"] .jayrita-modal .modal-text-muted {
+    color: #6b7280;
+}
+
+:root[data-bs-theme="light"] .jayrita-modal .modal-text-body {
+    color: #111827;
+}
+
+:root[data-bs-theme="light"] .jayrita-modal .modal-desc-box {
+    background-color: #f3f4f6;
+}
+
+/* DARK MODE */
+:root[data-bs-theme="dark"] .jayrita-modal .modal-content {
+    background-color: #020617;
+    color: #e5e7eb;
+}
+
+:root[data-bs-theme="dark"] .jayrita-modal h1,
+:root[data-bs-theme="dark"] .jayrita-modal h2,
+:root[data-bs-theme="dark"] .jayrita-modal h3 {
+    color: #f9fafb;
+}
+
+:root[data-bs-theme="dark"] .jayrita-modal .modal-text-muted {
+    color: #9ca3af;
+}
+
+:root[data-bs-theme="dark"] .jayrita-modal .modal-text-body {
+    color: #e5e7eb;
+}
+
+:root[data-bs-theme="dark"] .jayrita-modal .modal-desc-box {
+    background-color: rgba(15, 23, 42, 0.9);
+}
+
+.jayrita-pedido-page {
+    color: var(--default-color);
+}
+
+.jayrita-card-surface {
+    background: var(--surface-color);
+}
+
+.jayrita-card-border {
+    border: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+.jayrita-text-main {
+    color: var(--default-color);
+}
+
+.jayrita-text-soft {
+    color: color-mix(in srgb, var(--default-color), transparent 45%);
+}
+
+.jayrita-pedido-table thead {
+    background: color-mix(in srgb, var(--surface-color), transparent 5%);
+    color: var(--default-color);
+}
+
+.jayrita-pedido-table tbody tr {
+    background: var(--surface-color);
+}
+
+.jayrita-pedido-table tbody tr:nth-child(odd) {
+    background: color-mix(in srgb, var(--surface-color), transparent 4%);
+}
+
+.jayrita-pedido-table td,
+.jayrita-pedido-table th {
+    border-color: rgba(148, 163, 184, 0.25);
+}
+
+.jayrita-resumen-footer {
+    background: color-mix(in srgb, var(--surface-color), transparent 6%);
+    border-top: 1px solid rgba(148, 163, 184, 0.4);
+}
+
+.jayrita-welcome-alert {
+    background: color-mix(in srgb, #198754, transparent 70%);
+    color: var(--default-color);
+}
+
+.jayrita-reservar-btn {
+    font-size: 1.5rem;
+}
+
+/* Contact Section */
+.contact .contact-info-box {
+    background-color: var(--surface-color);
+    border-radius: 10px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.05);
+    padding: 25px;
+    height: 100%;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+.contact .contact-info-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+}
+
+.contact .contact-info-box .icon-box {
+    background-color: color-mix(in srgb, var(--accent-color), transparent 90%);
+    color: var(--accent-color);
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.contact .contact-info-box .icon-box i {
+    font-size: 24px;
+}
+
+.contact .contact-info-box .info-content h4 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.contact .contact-info-box .info-content p {
+    margin-bottom: 5px;
+    color: color-mix(in srgb, var(--default-color), transparent 20%);
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+.contact .contact-info-box .info-content p:last-child {
+    margin-bottom: 0;
+}
+
+.contact .map-section {
+    position: relative;
+    width: 100%;
+    height: 500px;
+    overflow: hidden;
+}
+
+.contact .map-section iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+.contact .form-container-overlap {
+    position: relative;
+    margin-top: -150px;
+    margin-bottom: 60px;
+    z-index: 10;
+}
+
+.contact .contact-form-wrapper {
+    background-color: var(--surface-color);
+    border-radius: 12px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.05);
+    padding: 40px;
+}
+
+.contact .contact-form-wrapper h2 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 30px;
+    position: relative;
+}
+
+.contact .contact-form-wrapper h2:after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -10px;
+    transform: translateX(-50%);
+    width: 50px;
+    height: 3px;
+    background-color: var(--accent-color);
+}
+
+.contact .contact-form-wrapper .form-group {
+    margin-bottom: 20px;
+}
+
+.contact .contact-form-wrapper .form-group .input-with-icon {
+    position: relative;
+}
+
+.contact .contact-form-wrapper .form-group .input-with-icon i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: color-mix(in srgb, var(--default-color), transparent 40%);
+    font-size: 18px;
+    z-index: 10;
+}
+
+.contact .contact-form-wrapper .form-group .input-with-icon i.message-icon {
+    top: 28px;
+}
+
+.contact .contact-form-wrapper .form-group .input-with-icon .form-control {
+    border-radius: 8px;
+    padding: 12px 15px 12px 45px;
+    height: 3.5rem;
+    color: var(--default-color);
+    background-color: var(--surface-color);
+    font-size: 15px;
+    border: 1px solid color-mix(in srgb, var(--default-color), transparent 80%);
+}
+
+.contact .contact-form-wrapper .form-group .input-with-icon .form-control:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--accent-color), transparent 90%);
+}
+
+.contact .contact-form-wrapper .form-group .input-with-icon .form-control::placeholder {
+    color: color-mix(in srgb, var(--default-color), transparent 40%);
+}
+
+.contact .contact-form-wrapper .form-group .input-with-icon textarea.form-control {
+    height: 180px;
+    resize: none;
+    padding-top: 15px;
+}
+
+.contact .contact-form-wrapper .btn-submit {
+    background-color: var(--accent-color);
+    border: none;
+    color: var(--contrast-color);
+    padding: 12px 30px;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px color-mix(in srgb, var(--accent-color), transparent 70%);
+}
+
+.contact .contact-form-wrapper .btn-submit:hover {
+    background-color: color-mix(in srgb, var(--accent-color), transparent 15%);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px color-mix(in srgb, var(--accent-color), transparent 60%);
+}
+
+.contact .contact-form-wrapper .btn-submit:active {
+    transform: translateY(0);
+    box-shadow: 0 3px 10px color-mix(in srgb, var(--accent-color), transparent 70%);
+}
+
+.contact .contact-form-wrapper .loading,
+.contact .contact-form-wrapper .error-message,
+.contact .contact-form-wrapper .sent-message {
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 992px) {
+    .contact .form-container-overlap {
+        margin-top: -120px;
+    }
+
+    .contact .contact-form-wrapper {
+        padding: 30px;
+    }
+}
+
+@media (max-width: 768px) {
+    .contact .contact-info-box {
+        margin-bottom: 20px;
+    }
+
+    .contact .form-container-overlap {
+        margin-top: -100px;
+    }
+
+    .contact .contact-form-wrapper {
+        padding: 25px;
+    }
+
+    .contact .contact-form-wrapper h2 {
+        font-size: 24px;
+    }
+
+    .contact .map-section {
+        height: 450px;
+    }
+}
+
+@media (max-width: 576px) {
+    .contact .form-container-overlap {
+        margin-top: -80px;
+    }
+
+    .contact .contact-form-wrapper {
+        padding: 20px;
+    }
+
+    .contact .btn-submit {
+        width: 100%;
+    }
+
+    .contact .map-section {
+        height: 400px;
+    }
+}
+
+.jayrita-pagination-pill {
+    background: #ffc107;
+    border-radius: 999px;
+    padding: 0.45rem 1.25rem;
+}
+
+.jayrita-pagination-pill .pagination {
+    margin-bottom: 0;
+}
+
+.jayrita-pagination-pill .page-link {
+    border: none;
+    color: #111827;
+    background: transparent;
+}
+
+.jayrita-pagination-pill .page-item.active .page-link {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 999px;
+    font-weight: 700;
+}
+
+.jayrita-user-toggle i {
+    color: var(--default-color);
+    /* negro en light, claro en dark */
+}
+
+[data-theme="dark"] .jayrita-user-toggle i {
+    color: #f9fafb;
+}
+
+/* Tarjetas auth adaptadas a tema */
+.jayrita-auth-card {
+    background-color: var(--surface-color);
+    border: 1px solid color-mix(in srgb, var(--accent-color), transparent 40%);
+}
+
+/* Badge dorado */
+.jayrita-auth-badge {
+    background-color: var(--accent-color);
+    color: var(--contrast-color);
+}
+
+/* Textos */
+.jayrita-auth-title {
+    color: var(--default-color);
+}
+
+.jayrita-auth-subtitle {
+    color: color-mix(in srgb, var(--default-color), transparent 45%);
+}
+
+.jayrita-auth-label {
+    color: color-mix(in srgb, var(--default-color), transparent 35%);
+}
+
+/* Inputs */
+.jayrita-auth-input,
+.jayrita-auth-input-secondary {
+    background-color: color-mix(in srgb, var(--surface-color), #000 5%);
+    color: var(--default-color);
+    border-radius: 0.5rem;
+    border: 1px solid color-mix(in srgb, var(--accent-color), transparent 40%);
+}
+
+.jayrita-auth-input-secondary {
+    border-color: color-mix(in srgb, var(--default-color), transparent 70%);
+}
+
+.jayrita-auth-input::placeholder,
+.jayrita-auth-input-secondary::placeholder {
+    color: color-mix(in srgb, var(--default-color), transparent 55%);
+}
+
+.jayrita-auth-input:focus,
+.jayrita-auth-input-secondary:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--accent-color), transparent 80%);
+}
+
+/* Botón principal */
+.jayrita-auth-btn {
+    background-color: var(--accent-color);
+    color: var(--contrast-color);
+    border: none;
+    border-radius: 0.75rem;
+    box-shadow: 0 8px 20px color-mix(in srgb, var(--accent-color), transparent 65%);
+    transition: all 0.2s ease;
+}
+
+.jayrita-auth-btn:hover {
+    background-color: color-mix(in srgb, var(--accent-color), transparent 15%);
+    transform: translateY(-1px);
+    box-shadow: 0 10px 24px color-mix(in srgb, var(--accent-color), transparent 55%);
+}
+
+.jayrita-auth-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--accent-color), transparent 70%);
+}
+
+/* Divider y links */
+.jayrita-auth-divider {
+    border-color: color-mix(in srgb, var(--default-color), transparent 75%);
+}
+
+.jayrita-auth-link {
+    color: var(--accent-color);
+}
+
+.jayrita-auth-link:hover {
+    color: color-mix(in srgb, var(--accent-color), transparent 10%);
+}
+
+.jayrita-profile-card {
+    background-color: var(--surface-color);
+    border: 1px solid color-mix(in srgb, var(--default-color), transparent 80%);
+}
+
+.jayrita-profile-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 999px;
+    background-color: var(--accent-color);
+    color: var(--contrast-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 2rem;
+}
+
+.jayrita-profile-name {
+    color: var(--default-color);
+}
+
+.jayrita-profile-email,
+.jayrita-profile-meta {
+    color: color-mix(in srgb, var(--default-color), transparent 45%);
+}
+
+/* Tarjeta del pedido (ya la tienes) */
+.jayrita-order-card {
+    background-color: color-mix(in srgb, var(--surface-color), #000 3%);
+    border: 1px solid color-mix(in srgb, var(--default-color), transparent 80%);
+}
+
+/* Título “Pedido”, “Estado”, “Productos” */
+.jayrita-order-card .small.text-muted {
+    color: color-mix(in srgb, var(--default-color), transparent 35%) !important;
+}
+
+/* Líneas de productos */
+.jayrita-order-card ul.small li span {
+    color: color-mix(in srgb, var(--default-color), transparent 10%);
+}
+
+/* Totales de cada línea si quieres un poco más suave */
+.jayrita-order-card ul.small li span:last-child {
+    color: color-mix(in srgb, var(--default-color), transparent 25%);
+}

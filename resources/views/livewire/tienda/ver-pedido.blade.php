@@ -1,13 +1,13 @@
-<div class="container py-5">
+<div class="container py-5 jayrita-pedido-page">
     <div class="row justify-content-center">
         <div class="col-lg-10">
 
             {{-- SI NO ESTÁ LOGUEADO → OBLIGA A REGISTRARSE --}}
             @guest('cliente')
-                <div class="text-center py-5">
+                <div class="text-center py-5 jayrita-card-surface rounded-4">
                     <i class="bi bi-person-lock display-1 text-warning mb-4"></i>
-                    <h2 class="text-white fw-black mb-4">Necesitas iniciar sesión</h2>
-                    <p class="lead text-white-50 mb-5">
+                    <h2 class="fw-black mb-4 jayrita-text-main">Necesitas iniciar sesión</h2>
+                    <p class="lead mb-5 jayrita-text-soft">
                         Para reservar tu pedido debes estar registrado
                     </p>
                     <div class="d-flex gap-3 justify-content-center flex-wrap">
@@ -23,7 +23,7 @@
                         </a>
                     </div>
                     <div class="mt-5">
-                        <a href="{{ url('/catalogo') }}" class="btn btn-link text-white-50">
+                        <a href="{{ url('/catalogo') }}" class="btn btn-link jayrita-text-soft">
                             ← Volver al catálogo
                         </a>
                     </div>
@@ -46,20 +46,21 @@
                         <i class="bi bi-bag-check-fill fs-3"></i>
                         <span class="fw-black fs-5 text-uppercase">Resumen de tu pedido</span>
                     </div>
-                    <h1 class="display-4 fw-black text-white mb-3">Tu Pedido</h1>
-                    <p class="lead text-white-50 mb-0">Revisa todo antes de reservar</p>
+                    <h1 class="display-4 fw-black mb-3 jayrita-text-main">Tu Pedido</h1>
+                    <p class="lead mb-0 jayrita-text-soft">Revisa todo antes de reservar</p>
                 </div>
 
                 @if ($pedido && $pedido->items->count() > 0)
                     {{-- TABLA DE PRODUCTOS --}}
-                    <div
-                        class="card bg-dark border border-warning border-opacity-50 rounded-4 shadow-2xl overflow-hidden mb-5">
+                    <div class="card rounded-4 shadow-2xl overflow-hidden mb-5 jayrita-card-surface jayrita-card-border">
                         <div class="bg-warning text-dark p-4">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
                                     <h2 class="fw-black mb-1">Detalle del pedido</h2>
-                                    <p class="mb-0 opacity-75">{{ $pedido->items->count() }}
-                                        producto{{ $pedido->items->count() > 1 ? 's' : '' }}</p>
+                                    <p class="mb-0 opacity-75">
+                                        {{ $pedido->items->count() }}
+                                        producto{{ $pedido->items->count() > 1 ? 's' : '' }}
+                                    </p>
                                 </div>
                                 <div class="text-end">
                                     <span class="fs-1 fw-black text-success">
@@ -70,8 +71,8 @@
                         </div>
 
                         <div class="table-responsive">
-                            <table class="table table-dark mb-0 align-middle">
-                                <thead class="bg-black text-warning">
+                            <table class="table mb-0 align-middle jayrita-pedido-table">
+                                <thead>
                                     <tr>
                                         <th class="ps-4">Producto</th>
                                         <th class="text-center" style="width: 170px;">Cantidad</th>
@@ -82,11 +83,14 @@
                                 </thead>
                                 <tbody>
                                     @foreach ($pedido->items as $item)
-                                        <tr class="border-bottom border-secondary">
+                                        <tr>
                                             <td class="ps-4 py-3">
-                                                <div class="fw-bold text-white">{{ $item->nombre_producto }}</div>
-                                                <small class="text-white-50">Código:
-                                                    {{ $item->producto?->codigo ?? '—' }}</small>
+                                                <div class="fw-bold jayrita-text-main">
+                                                    {{ $item->nombre_producto }}
+                                                </div>
+                                                <small class="jayrita-text-soft">
+                                                    Código: {{ $item->producto?->codigo ?? '—' }}
+                                                </small>
                                             </td>
                                             <td class="text-center py-3">
                                                 <div class="d-flex justify-content-center align-items-center gap-2">
@@ -106,7 +110,7 @@
                                                     </button>
                                                 </div>
                                             </td>
-                                            <td class="text-center text-white-50 py-3">
+                                            <td class="text-center jayrita-text-soft py-3">
                                                 Bs {{ number_format($item->precio_unitario, 2) }}
                                             </td>
                                             <td class="text-center text-warning fw-bold py-3 fs-5">
@@ -124,9 +128,9 @@
                             </table>
                         </div>
 
-                        <div class="bg-black p-4 border-top border-warning border-3">
+                        <div class="p-4 jayrita-resumen-footer">
                             <div class="d-flex justify-content-between align-items-center">
-                                <h3 class="text-white fw-black mb-0">Total a pagar</h3>
+                                <h3 class="fw-black mb-0 jayrita-text-main">Total a pagar</h3>
                                 <h2 class="text-warning fw-black mb-0">
                                     Bs {{ number_format($pedido->total, 2) }}
                                 </h2>
@@ -135,7 +139,7 @@
                     </div>
 
                     {{-- MENSAJE DE BIENVENIDA --}}
-                    <div class="alert alert-success rounded-4 shadow mb-5">
+                    <div class="alert alert-success rounded-4 shadow mb-5 jayrita-welcome-alert">
                         <div class="d-flex align-items-center gap-3">
                             <i class="bi bi-person-check-fill fs-1"></i>
                             <div>
@@ -148,8 +152,7 @@
                     {{-- BOTÓN RESERVAR --}}
                     <div class="text-center">
                         <button wire:click="confirmarPedido"
-                            class="btn btn-success btn-lg px-5 py-4 rounded-pill shadow-lg fw-black d-inline-flex align-items-center gap-4"
-                            style="font-size: 1.5rem;">
+                            class="btn btn-success btn-lg px-5 py-4 rounded-pill shadow-lg fw-black d-inline-flex align-items-center gap-4 jayrita-reservar-btn">
                             <i class="bi bi-check-circle-fill fs-1"></i>
                             <div class="text-start">
                                 <div>RESERVAR PEDIDO</div>
@@ -164,9 +167,9 @@
                         </div>
                     </div>
                 @else
-                    <div class="text-center py-5">
+                    <div class="text-center py-5 jayrita-card-surface rounded-4">
                         <i class="bi bi-cart-x display-1 text-warning mb-4"></i>
-                        <h2 class="text-white fw-black mb-3">Tu carrito está vacío</h2>
+                        <h2 class="fw-black mb-3 jayrita-text-main">Tu carrito está vacío</h2>
                         <a href="{{ url('/catalogo') }}" class="btn btn-warning btn-lg px-5 py-4 rounded-pill fw-bold">
                             <i class="bi bi-bag-plus fs-4 me-3"></i> Ir al catálogo
                         </a>
