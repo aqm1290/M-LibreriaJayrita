@@ -57,29 +57,56 @@
             </h2>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div
-                class="bg-gradient-to-br from-yellow-400 to-orange-500 p-8 rounded-3xl text-white shadow-2xl transform hover:scale-105 transition">
-                <p class="text-yellow-100 text-lg font-bold">Total Ventas Hoy</p>
-                <p class="text-4xl font-black mt-4">Bs {{ number_format($ventasHoy, 2, ',', '.') }}</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {{-- TURNO: MONTO --}}
+            <div class="bg-white p-8 rounded-3xl shadow-2xl border-4 border-green-200">
+                <p class="text-green-700 text-lg font-bold text-center">Ventas del turno actual</p>
+                <p class="text-3xl md:text-4xl font-black text-gray-900 mt-4 text-center">
+                    Bs {{ number_format($ventasTurno, 2, ',', '.') }}
+                </p>
             </div>
-            <div
-                class="bg-white p-8 rounded-3xl shadow-2xl border-4 border-gray-100 hover:shadow-3xl transition cursor-pointer">
-                <p class="text-gray-600 text-lg font-bold">Cantidad de Ventas</p>
-                <p class="text-4xl font-black text-gray-900 mt-4">{{ $cantidadVentasHoy }}</p>
-                <p class="text-gray-500 mt-2">transacciones hoy</p>
+
+            {{-- DÍA: MONTO --}}
+            <div class="bg-gradient-to-br from-yellow-400 to-orange-500 p-8 rounded-3xl text-white shadow-2xl">
+                <p class="text-yellow-100 text-lg font-bold text-center">Total ventas del día</p>
+                <p class="text-3xl md:text-4xl font-black mt-4 text-center">
+                    Bs {{ number_format($ventasHoy, 2, ',', '.') }}
+                </p>
             </div>
+
+            {{-- TURNO: CANTIDAD --}}
+            <div class="bg-white p-8 rounded-3xl shadow-2xl border-4 border-green-200">
+                <p class="text-green-700 text-lg font-bold text-center">Transacciones del turno</p>
+                <p class="text-3xl md:text-4xl font-black text-gray-900 mt-4 text-center">
+                    {{ $cantidadVentasTurno }}
+                </p>
+            </div>
+
+            {{-- DÍA: CANTIDAD --}}
+            <div class="bg-white p-8 rounded-3xl shadow-2xl border-4 border-gray-100">
+                <p class="text-gray-600 text-lg font-bold text-center">Transacciones del día</p>
+                <p class="text-3xl md:text-4xl font-black text-gray-900 mt-4 text-center">
+                    {{ $cantidadVentasHoy }}
+                </p>
+            </div>
+        </div>
+
+        <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {{-- EFECTIVO --}}
             <div
                 class="bg-gradient-to-br from-green-400 to-emerald-600 p-8 rounded-3xl text-white shadow-2xl transform hover:scale-105 transition">
                 <p class="text-green-100 text-lg font-bold">Efectivo</p>
                 <p class="text-4xl font-black mt-4">Bs {{ number_format($efectivoHoy, 2, ',', '.') }}</p>
             </div>
+
+            {{-- QR --}}
             <div
                 class="bg-gradient-to-br from-blue-500 to-indigo-800 p-8 rounded-3xl text-white shadow-2xl transform hover:scale-105 transition">
-                <p class="text-blue-100 text-lg font-bold">Pagos Electrónicos - QR</p>
+                <p class="text-blue-100 text-lg font-bold">Pagos electrónicos - QR</p>
                 <p class="text-4xl font-black mt-4">Bs {{ number_format($qrHoy, 2, ',', '.') }}</p>
             </div>
         </div>
+
     </div>
 
     <!-- ALERTAS DE STOCK -->

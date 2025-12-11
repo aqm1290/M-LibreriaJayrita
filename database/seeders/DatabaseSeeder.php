@@ -15,12 +15,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-         $this->call([
-            CategoriaSeeder::class,
-            MarcaSeeder::class,
-            ModeloSeeder::class,
-            ProductoSeeder::class,
-        ]);
+         
         \App\Models\User::create([
             'name' => 'Admin Jayra',
             'email' => 'admin@jayra.com',
@@ -35,12 +30,7 @@ class DatabaseSeeder extends Seeder
             'rol' => 'cajero'
         ]);
 
-        \App\Models\User::create([
-            'name' => 'Juan Vendedor',
-            'email' => 'vendedor@jayra.com',
-            'password' => bcrypt('123456'),
-            'rol' => 'vendedor'
-        ]);
+        
     }
     
 }

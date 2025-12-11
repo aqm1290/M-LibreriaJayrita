@@ -14,6 +14,7 @@ return new class extends Migration
             $table->foreign('turno_id')
                 ->references('id')->on('turnos_caja')
                 ->onDelete('set null');
+                
         });
     }
 
