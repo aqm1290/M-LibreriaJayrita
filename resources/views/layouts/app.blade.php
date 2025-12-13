@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Librería Jayrita</title>
 
+    <link rel="icon" type="image/png" href="{{ asset('images/burbuja.png') }}">
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 </head>
@@ -117,6 +119,10 @@
                                 <i data-lucide="history" class="w-4 h-4"></i>
                                 Historial
                             </a>
+                            <a href="{{ route('historial.pdfs') }}"
+                                class="flex items-center gap-3 px-4 py-2.5 rounded-lg font-semibold transition-all {{ request()->routeIs('historial.pdfs') ? 'bg-yellow-300 text-gray-900 shadow-md' : 'text-gray-700 hover:bg-yellow-100' }}">
+                                <i data-lucide="file-text" class="w-5 h-5"></i> PDFs de tickets y cierres
+                            </a>
                         </div>
                     </div>
 
@@ -168,10 +174,7 @@
                                     class="flex items-center gap-3 px-4 py-2 rounded-lg text-sm {{ request()->routeIs('admin.crear-personal*') ? 'bg-yellow-300 text-gray-900 font-bold' : 'text-gray-600 hover:bg-yellow-50' }}">
                                     <i data-lucide="user-plus" class="w-4 h-4"></i> Crear Personal
                                 </a>
-                                <a href="{{ route('historial.pdfs') }}"
-                                    class="flex items-center gap-3 px-4 py-2.5 rounded-lg font-semibold transition-all {{ request()->routeIs('historial.pdfs') ? 'bg-yellow-300 text-gray-900 shadow-md' : 'text-gray-700 hover:bg-yellow-100' }}">
-                                    <i data-lucide="file-text" class="w-5 h-5"></i> PDFs de tickets y cierres
-                                </a>
+
                                 <a href="{{ route('productos.vendidos') }}"
                                     class="flex items-center gap-3 px-4 py-2.5 rounded-lg font-semibold transition-all {{ request()->routeIs('productos.vendidos') ? 'bg-yellow-300 text-gray-900 shadow-md' : 'text-gray-700 hover:bg-yellow-100' }}">
                                     <i data-lucide="bar-chart-3" class="w-5 h-5"></i> Productos vendidos
