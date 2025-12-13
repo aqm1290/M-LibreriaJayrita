@@ -57,7 +57,7 @@ class HomeProductos extends Component
             return;
         }
 
-        return redirect()->route('catalogo.marca', ['marca' => $this->marcaSeleccionada->id]);
+        return redirect()->route('tienda.marca', ['marca' => $this->marcaSeleccionada->id]);
     }
 
     public function agregarAlPedido(int $productoId): void

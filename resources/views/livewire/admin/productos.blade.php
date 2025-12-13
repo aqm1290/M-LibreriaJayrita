@@ -104,11 +104,24 @@
                                         class="w-14 h-14 rounded-xl object-cover shadow border border-yellow-200">
                                 </td>
                                 <td class="px-6 py-4">
-                                    <div class="font-semibold text-slate-900">{{ $p->nombre }}</div>
+                                    <div class="flex items-center gap-2">
+                                        <div class="font-semibold text-slate-900">{{ $p->nombre }}</div>
+
+                                        @if ($p->promo)
+                                            <span
+                                                class="px-2 py-0.5 rounded-full text-[0.65rem] font-bold bg-pink-100 text-pink-700">
+                                                {{ $p->promo->nombre }}
+                                            </span>
+                                        @endif
+                                    </div>
+
                                     @if ($p->descripcion)
-                                        <div class="text-xs text-slate-500">{{ Str::limit($p->descripcion, 45) }}</div>
+                                        <div class="text-xs text-slate-500">
+                                            {{ Str::limit($p->descripcion, 45) }}
+                                        </div>
                                     @endif
                                 </td>
+
                                 <td class="px-6 py-4 font-mono text-xs text-slate-600">{{ $p->codigo }}</td>
                                 <td class="px-6 py-4">
                                     <span
@@ -213,7 +226,16 @@
                                 class="w-20 h-20 rounded-xl object-cover shadow border border-yellow-200 flex-shrink-0">
 
                             <div class="flex-1 min-w-0">
-                                <h3 class="font-bold text-slate-900 truncate">{{ $p->nombre }}</h3>
+                                <h3 class="font-bold text-slate-900 truncate flex items-center gap-2">
+                                    {{ $p->nombre }}
+
+                                    @if ($p->promo)
+                                        <span
+                                            class="px-2 py-0.5 rounded-full text-[0.65rem] font-bold bg-pink-100 text-pink-700">
+                                            {{ $p->promo->nombre }}
+                                        </span>
+                                    @endif
+                                </h3>
                                 <p class="text-xs text-slate-600 mt-1">
                                     {{ $p->marca->nombre ?? '-' }} • {{ $p->codigo }}
                                 </p>
@@ -321,7 +343,7 @@
                             </label>
                             <input type="text" wire:model="nombre"
                                 class="w-full px-4 py-2.5 border border-yellow-300 rounded-xl text-sm bg-white/90
-                                       focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:border-yellow-500">
+                                      focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:border-yellow-500">
                             @error('nombre')
                                 <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
                             @enderror
@@ -333,7 +355,7 @@
                             </label>
                             <input type="text" wire:model="codigo"
                                 class="w-full px-4 py-2.5 border border-yellow-300 rounded-xl text-sm bg-white/90
-                                       focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:border-yellow-500">
+                                      focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:border-yellow-500">
                             @error('codigo')
                                 <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
                             @enderror
@@ -345,7 +367,7 @@
                             </label>
                             <input type="number" step="0.01" wire:model="precio"
                                 class="w-full px-4 py-2.5 border border-yellow-300 rounded-xl text-sm bg-white/90
-                                       focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:border-yellow-500">
+                                      focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:border-yellow-500">
                             @error('precio')
                                 <p class="mt-1 text-xs text-rose-600">{{ $message }}</p>
                             @enderror
@@ -357,7 +379,7 @@
                             </label>
                             <input type="number" step="0.01" wire:model="costo_compra"
                                 class="w-full px-4 py-2.5 border border-yellow-300 rounded-xl text-sm bg-white/90
-                                       focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:border-yellow-500">
+                                      focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:border-yellow-500">
                         </div>
 
                         <div>
@@ -366,7 +388,7 @@
                             </label>
                             <input type="number" wire:model="stock"
                                 class="w-full px-4 py-2.5 border border-yellow-300 rounded-xl text-sm bg-white/90
-                                       focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:border-yellow-500">
+                                      focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:border-yellow-500">
                         </div>
 
                         <div>
@@ -419,7 +441,7 @@
                             </label>
                             <input type="text" wire:model="color"
                                 class="w-full px-4 py-2.5 border border-yellow-300 rounded-xl text-sm bg-white/90
-                                       focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:border-yellow-500">
+                                      focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:border-yellow-500">
                         </div>
 
                         <div>
@@ -428,7 +450,7 @@
                             </label>
                             <input type="text" wire:model="tipo"
                                 class="w-full px-4 py-2.5 border border-yellow-300 rounded-xl text-sm bg-white/90
-                                       focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:border-yellow-500">
+                                      focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:border-yellow-500">
                         </div>
                     </div>
 
@@ -438,10 +460,10 @@
                         </label>
                         <textarea wire:model="descripcion" rows="3"
                             class="w-full px-4 py-3 border border-yellow-300 rounded-xl text-sm bg-white/90
-                                   focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:border-yellow-500 resize-none"></textarea>
+                                     focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:border-yellow-500 resize-none"></textarea>
                     </div>
 
-                    <!-- IMAGEN -->
+                    {{-- IMAGEN --}}
                     <div x-data="{ uploading: false, progress: 0 }" x-on:livewire-upload-start.window="uploading = true; progress = 0"
                         x-on:livewire-upload-finish.window="uploading = false"
                         x-on:livewire-upload-error.window="uploading = false"
@@ -452,36 +474,38 @@
 
                         <input type="file" wire:model="imagen" accept="image/*"
                             class="block w-full text-sm text-slate-700 border-2 border-dashed border-yellow-300 rounded-xl cursor-pointer bg-yellow-50/70 p-4
-                                   file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold
-                                   file:bg-yellow-500 file:text-white hover:file:bg-yellow-600">
+                                  file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold
+                                  file:bg-yellow-500 file:text-white hover:file:bg-yellow-600">
 
                         <div class="mt-6 flex justify-center">
                             @if ($imagen)
-                                <div x-show="uploading"
-                                    class="w-72 h-72 bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-3xl border-4 border-dashed border-yellow-300 flex flex-col items-center justify-center space-y-6 shadow-2xl">
-                                    <div class="relative">
-                                        <div
-                                            class="animate-spin rounded-full h-24 w-24 border-12 border-yellow-200 border-t-orange-500">
-                                        </div>
-                                        <div class="absolute inset-0 flex items-center justify-center">
-                                            <span class="text-5xl font-black text-orange-600"
-                                                x-text="progress + '%'"></span>
-                                        </div>
-                                    </div>
-                                    <div class="text-center">
-                                        <p class="text-2xl font-bold text-orange-700">Subiendo imagen...</p>
-                                        <p class="text-orange-700/80 text-sm">No cierres esta ventana</p>
-                                    </div>
-                                </div>
-
-                                <div x-show="!uploading" class="w-72 h-72">
+                                {{-- Contenedor con imagen + overlay de carga encima --}}
+                                <div class="relative w-72 h-72">
                                     <img src="{{ $imagen->temporaryUrl() }}"
                                         class="w-full h-full object-cover rounded-3xl shadow-2xl border-8 border-white ring-8 ring-emerald-400/80">
+
+                                    <div x-show="uploading"
+                                        class="absolute inset-0 flex flex-col items-center justify-center
+                                            bg-yellow-50/90 rounded-3xl border-4 border-dashed border-yellow-300 space-y-6">
+                                        <div class="relative">
+                                            <div
+                                                class="animate-spin rounded-full h-24 w-24 border-12 border-yellow-200 border-t-orange-500">
+                                            </div>
+                                            <div class="absolute inset-0 flex items-center justify-center">
+                                                <span class="text-5xl font-black text-orange-600"
+                                                    x-text="progress + '%'"></span>
+                                            </div>
+                                        </div>
+                                        <div class="text-center">
+                                            <p class="text-2xl font-bold text-orange-700">Subiendo imagen...</p>
+                                            <p class="text-orange-700/80 text-sm">No cierres esta ventana</p>
+                                        </div>
+                                    </div>
                                 </div>
                             @elseif($url_imagen ?? false)
-                                <div class="relative group">
+                                <div class="relative group w-72 h-72">
                                     <img src="{{ $productoSeleccionado?->imagen_url ?? asset('storage/' . $url_imagen) }}"
-                                        class="w-72 h-72 object-cover rounded-3xl shadow-2xl border-8 border-white ring-4 ring-yellow-200">
+                                        class="w-full h-full object-cover rounded-3xl shadow-2xl border-8 border-white ring-4 ring-yellow-200">
                                     <div
                                         class="absolute inset-0 bg-black/45 opacity-0 group-hover:opacity-100 transition rounded-3xl flex items-center justify-center">
                                         <p class="text-white font-bold text-xl">Imagen actual</p>
@@ -521,6 +545,7 @@
             </div>
         </div>
     @endif
+
 
     <!-- MODAL VER -->
     @if ($modalVer && $productoSeleccionado)

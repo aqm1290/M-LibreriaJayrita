@@ -139,8 +139,13 @@
                                     class="flex items-center gap-3 px-4 py-2 rounded-lg text-sm {{ request()->routeIs('productos*') ? 'bg-yellow-300 text-gray-900 font-bold' : 'text-gray-600 hover:bg-yellow-50' }}">
                                     <i data-lucide="package" class="w-4 h-4"></i> Productos
                                 </a>
+                                {{-- <a href="{{ route('categorias.mayores') }}"
+                                    class="flex items-center gap-3 px-4 py-2 rounded-lg text-sm {{ request()->routeIs('categorias.mayores') ? 'bg-yellow-300 text-gray-900 font-bold' : 'text-gray-600 hover:bg-yellow-50' }}">
+                                    <i data-lucide="split-square-horizontal" class="w-4 h-4"></i> Categorías mayores
+                                </a> --}}
+
                                 <a href="{{ route('categorias') }}"
-                                    class="flex items-center gap-3 px-4 py-2 rounded-lg text-sm {{ request()->routeIs('categorias*') ? 'bg-yellow-300 text-gray-900 font-bold' : 'text-gray-600 hover:bg-yellow-50' }}">
+                                    class="flex items-center gap-3 px-4 py-2 rounded-lg text-sm {{ request()->routeIs('categorias') ? 'bg-yellow-300 text-gray-900 font-bold' : 'text-gray-600 hover:bg-yellow-50' }}">
                                     <i data-lucide="layers" class="w-4 h-4"></i> Categorías
                                 </a>
                                 <a href="{{ route('marcas') }}"
@@ -220,6 +225,7 @@
                                     'entrada-inventario' => 'Nueva Entrada',
                                     'entradas.index' => 'Historial de Entradas',
                                     'productos' => 'Productos',
+                                    'categorias.mayores' => 'Categorías mayores',
                                     'categorias' => 'Categorías',
                                     'marcas' => 'Marcas',
                                     'modelos' => 'Modelos',
@@ -412,6 +418,14 @@
             });
         });
     </script>
+
+    @auth
+        @if (auth()->user()->rol === 'admin')
+            {{-- ajusta según tu campo real --}}
+            <livewire:admin-chatbot />
+        @endif
+    @endauth
+
 </body>
 
 </html>

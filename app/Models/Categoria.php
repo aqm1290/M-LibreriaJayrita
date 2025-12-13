@@ -13,6 +13,7 @@ class Categoria extends Model
    
 
     protected $fillable = [
+         'categoria_mayor_id', 
         'nombre',
         'descripcion',
         'activo',
@@ -20,6 +21,10 @@ class Categoria extends Model
     protected $casts = [
         'activo' => 'boolean',
     ];
+    public function categoriaMayor()
+    {
+        return $this->belongsTo(CategoriaMayor::class, 'categoria_mayor_id');
+    }
 
     public function productos()
     {

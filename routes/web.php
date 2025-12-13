@@ -1,6 +1,6 @@
 <?php
-use Illuminate\Support\Facades\Auth;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 // === COMPONENTES LIVEWIRE: ADMIN ===
@@ -10,7 +10,8 @@ use App\Livewire\Admin\Proveedores;
 use App\Livewire\Admin\Promociones;
 use App\Livewire\Admin\CrearPersonal;
 use App\Livewire\Admin\PedidosWeb;
-
+/* use App\Livewire\Admin\CategoriasMayores; // ← NUEVO
+ */
 // === COMPONENTES LIVEWIRE: INVENTARIO ===
 use App\Livewire\Inventario\CreateEntradaInventario;
 use App\Livewire\Inventario\IndexEntradaInventario;
@@ -32,6 +33,9 @@ use App\Livewire\Tienda\PedidoActual;
 use App\Livewire\Tienda\VerPedido;
 use App\Livewire\Auth\ClienteLogin;
 use App\Livewire\Auth\ClienteRegister;
+use App\Livewire\Tienda\CatalogoMarca;
+use App\Livewire\Tienda\ListaMarcas;
+use App\Livewire\Tienda\CatalogoProductos;
 
 // === OTROS COMPONENTES LIVEWIRE ===
 use App\Livewire\CategoriaManager;
@@ -45,21 +49,18 @@ use App\Http\Controllers\CierrePdfController;
 use App\Http\Controllers\TicketController;
 
 
-use App\Livewire\Tienda\CatalogoMarca;
-use App\Livewire\Tienda\ListaMarcas;
-use App\Livewire\Tienda\CatalogoProductos;
-
-
-
-
 // ====================================================================
 // TIENDA PÚBLICA
 // ====================================================================
+
 Route::get('/tienda', HomeProductos::class)->name('tienda.home');
-
 Route::get('/pedido', VerPedido::class)->name('tienda.pedido');
-
 Route::get('/catalogo', CatalogoProductos::class)->name('tienda.catalogo');
+
+Route::get('/tienda/marcas', ListaMarcas::class)->name('tienda.marcas');
+Route::get('/tienda/marca/{marca}', CatalogoMarca::class)->name('tienda.marca');
+
+// Perfil cliente (tienda)
 Route::get('/mi-perfil', \App\Livewire\Cliente\Perfil::class)
     ->name('cliente.perfil')
     ->middleware('auth:cliente');
@@ -71,6 +72,7 @@ Route::post('/cliente/logout', function () {
 
     return redirect()->route('tienda.home');
 })->middleware('auth:cliente')->name('cliente.logout');
+
 
 // ====================================================================
 // AUTENTICACIÓN CLIENTE (TIENDA WEB)
@@ -85,27 +87,23 @@ Route::get('/cliente/registro', ClienteRegister::class)
     ->middleware('guest:cliente')
     ->name('cliente.register');
 
-// Zona cliente: requiere estar autenticado con guard "cliente"
+// Zona cliente autenticada
 Route::middleware('auth:cliente')->group(function () {
-    Route::get('/cliente/pedido', PedidoActual::class)
-        ->name('pedido.cliente');
+    Route::get('/cliente/pedido', PedidoActual::class)->name('pedido.cliente');
 });
 
-Route::get('/tienda/marcas', ListaMarcas::class)
-    ->name('tienda.marcas');
 
-Route::get('/tienda/marca/{marca}', CatalogoMarca::class)
-    ->name('tienda.marca');
-
-    
 // ====================================================================
 // LOGIN ADMIN
 // ====================================================================
+
 Route::get('/login', Login::class)->name('login');
+
 
 // ====================================================================
 // RUTAS PROTEGIDAS POR AUTENTICACIÓN ADMIN (guard web)
 // ====================================================================
+
 Route::middleware(['auth'])->group(function () {
 
     // Dashboard
@@ -143,6 +141,10 @@ Route::middleware(['auth'])->group(function () {
     // ====================================================================
     Route::middleware('rol:admin')->group(function () {
         Route::get('/productos', Productos::class)->name('productos');
+
+        // NUEVO: categorías mayores
+/*         Route::get('/categorias-mayores', CategoriasMayores::class)->name('categorias.mayores');
+ */
         Route::get('/categorias', CategoriaManager::class)->name('categorias');
         Route::get('/marcas', MarcasComponent::class)->name('marcas');
         Route::get('/modelos', ModeloComponent::class)->name('modelos');
@@ -163,11 +165,11 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/venta/descargar/{id}', [VentaPdfController::class, 'descargar'])
         ->name('venta.descargar');
+
     Route::get('/ticket/web/{venta}', [TicketController::class, 'imprimirWeb'])
-    ->name('ticket.web');
+        ->name('ticket.web');
 
-
-        // ====================================================================
+    // ====================================================================
     // PDFS: CIERRE DE TURNO
     // ====================================================================
     Route::middleware('rol:admin,cajero')->group(function () {
@@ -180,14 +182,10 @@ Route::middleware(['auth'])->group(function () {
 });
 
 
-
-
-
-
-
-
-
+// ====================================================================
 // CAMPANITA - PEDIDOS RESERVADOS (FUNCIONA EN CUALQUIER LUGAR)
+// ====================================================================
+
 Route::get('/campanita-pedidos', function () {
     $pedidos = \App\Models\Pedido::where('estado', 'reservado')
         ->select('id', 'cliente_nombre', 'total', 'expira_en', 'created_at')
@@ -204,12 +202,12 @@ Route::get('/campanita-pedidos', function () {
                 'cliente_nombre' => $p->cliente_nombre ?? 'Sin nombre',
                 'total' => number_format($p->total, 2),
                 'created_at' => $p->created_at->format('d/m H:i'),
-                'tiempo_restante' => $tiempo
+                'tiempo_restante' => $tiempo,
             ];
         });
 
     return response()->json([
-        'count' => $pedidos->count(),
-        'pedidos' => $pedidos
+        'count'   => $pedidos->count(),
+        'pedidos' => $pedidos,
     ]);
 });

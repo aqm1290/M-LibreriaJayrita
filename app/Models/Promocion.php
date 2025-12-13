@@ -4,9 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Carbon\Carbon;
 
 class Promocion extends Model
 {
@@ -31,10 +29,7 @@ class Promocion extends Model
         'limite_usos'             => 'integer',
     ];
 
-    // ===================================================================
     // RELACIONES
-    // ===================================================================
-
     public function categoria(): BelongsTo
     {
         return $this->belongsTo(Categoria::class);
@@ -50,89 +45,24 @@ class Promocion extends Model
         return $this->belongsTo(Modelo::class);
     }
 
-    public function productos(): BelongsToMany
-    {
-        return $this->belongsToMany(Producto::class, 'promo_producto', 'promo_id', 'producto_id');
-    }
-
     public function usos(): HasMany
     {
         return $this->hasMany(PromocionUso::class, 'promocion_id');
     }
 
-    // ===================================================================
-    // ACCESORS
-    // ===================================================================
-
-    public function getProducts2x1Attribute()
+    // Accessor SOLO para mostrar nombres en la tabla
+    public function getProductosSeleccionadosModelsAttribute()
     {
-        return Producto::whereIn('id', $this->products_2x1 ?? [])->get();
-    }
+        $ids = $this->productos_seleccionados ?? [];
 
-    public function getProductsCompraAttribute()
-    {
-        return Producto::whereIn('id', $this->products_compra ?? [])->get();
-    }
-
-    public function getProductsRegaloAttribute()
-    {
-        return Producto::whereIn('id', $this->products_regalo ?? [])->get();
-    }
-
-    public function getProductosSeleccionadosAttribute()
-    {
-        return Producto::whereIn('id', $this->productos_seleccionados ?? [])->get();
-    }
-
-    // ===================================================================
-    // MÉTODOS DE USOS POR CLIENTE
-    // ===================================================================
-
-    public function usosPorCliente($clienteId): int
-    {
-        return $this->usos()->where('cliente_id', $clienteId)->count();
-    }
-
-    public function clienteAlcanzoLimite($clienteId): bool
-    {
-        if (is_null($this->limite_usos)) {
-            return false; // ilimitado
+        if (empty($ids)) {
+            return collect();
         }
 
-        return $this->usosPorCliente($clienteId) >= $this->limite_usos;
+        return Producto::whereIn('id', $ids)->get();
     }
 
-    public function puedeSerUsadaPorCliente($clienteId): bool
-    {
-        return !$this->clienteAlcanzoLimite($clienteId);
-    }
-
-    // ===================================================================
-    // SCOPES
-    // ===================================================================
-
-    public function scopeActivas($query)
-    {
-        return $query->where('activa', true)
-                     ->where('inicia_en', '<=', now())
-                     ->where(function ($q) {
-                         $q->whereNull('termina_en')
-                           ->orWhere('termina_en', '>=', now());
-                     });
-    }
-
-    public function scopeVigentes($query)
-    {
-        return $query->where('inicia_en', '<=', now())
-                     ->where(function ($q) {
-                         $q->whereNull('termina_en')
-                           ->orWhere('termina_en', '>=', now());
-                     });
-    }
-
-    // ===================================================================
     // HELPERS
-    // ===================================================================
 
     public function aplicaAProducto(Producto $producto): bool
     {
@@ -144,22 +74,5 @@ class Promocion extends Model
         if (in_array($producto->id, $this->productos_seleccionados ?? [])) return true;
 
         return false;
-    }
-
-    public function generarDescripcion(): string
-    {
-        $ambito = $this->aplica_todo ? 'Toda la tienda'
-            : ($this->categoria?->nombre
-                ?? $this->marca?->nombre
-                ?? $this->modelo?->nombre
-                ?? (count($this->productos_seleccionados ?? []) . ' producto(s)'));
-
-        return match ($this->tipo) {
-            'descuento_porcentaje' => "{$this->valor_descuento}% OFF en {$ambito}",
-            'descuento_monto'      => "Bs " . number_format($this->valor_descuento, 2) . " OFF en {$ambito}",
-            '2x1'                  => "2x1 en {$ambito}",
-            'compra_lleva'         => "Compra y lleva gratis en {$ambito}",
-            default                => $this->nombre,
-        };
     }
 }

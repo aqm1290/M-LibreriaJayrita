@@ -17,7 +17,8 @@ import {
     ShoppingCart, Home, Wallet, DoorOpen, DoorClosed, Menu, ChevronDown,
     Tag, Percent, History, FolderTree, Layers, FilePlus, Boxes, Truck,
     FileText, Edit, X, AlertCircle,
-    UserPlus, LogOut, Lock, AlarmCheck, Download, Unlock
+    ArrowRight,
+    UserPlus, LogOut, Lock, AlarmCheck, Download, Unlock, BarChart3, Bell,
 } from 'lucide';
 
 // Inicializar iconos Lucide
@@ -27,8 +28,8 @@ function initLucideIcons() {
             Eye, Pencil, XCircle, CheckCircle, Search, Plus, Trash2, Package,
             ShoppingCart, Home, Wallet, DoorOpen, DoorClosed, Menu, ChevronDown,
             Tag, Percent, History, FolderTree, Layers, FilePlus, Boxes, Truck,
-            FileText, Edit, X, AlertCircle, Unlock,
-            UserPlus, LogOut, Lock, AlarmCheck, Download
+            FileText, Edit, X, AlertCircle, Unlock, ArrowRight,
+            UserPlus, LogOut, Lock, AlarmCheck, Download, BarChart3, Bell,
         }
     });
 }

@@ -14,6 +14,7 @@ class Modelo extends Model
 
     protected $fillable = [
         'marca_id',
+        'categoria_id',
         'nombre',
         'descripcion',
         'activo',
@@ -26,6 +27,7 @@ class Modelo extends Model
     {
         return $this->belongsTo(Marca::class, 'marca_id');
     }
+     
 
     public function productos()
     {

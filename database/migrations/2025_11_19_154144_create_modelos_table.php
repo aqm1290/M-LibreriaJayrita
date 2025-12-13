@@ -9,12 +9,22 @@ return new class extends Migration {
     {
         Schema::create('modelos', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('marca_id')->constrained('marcas')->onDelete('cascade');
+
+            $table->foreignId('marca_id')
+                ->constrained('marcas')
+                ->onDelete('cascade');
+
+            $table->foreignId('categoria_id')
+                ->nullable() // al inicio, para no romper datos
+                ->constrained('categorias')
+                ->nullOnDelete();
+
             $table->string('nombre');
             $table->text('descripcion')->nullable();
             $table->boolean('activo')->default(true);
             $table->timestamps();
         });
+
     }
 
     public function down(): void

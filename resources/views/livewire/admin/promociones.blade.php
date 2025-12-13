@@ -58,6 +58,7 @@
                         @forelse($promos as $promo)
                             <tr
                                 class="{{ $promo->activa ? 'hover:bg-yellow-50/80' : 'bg-rose-50/40 hover:bg-rose-50/80' }} transition-colors">
+                                <!-- Columna: Promoción -->
                                 <td class="px-6 py-5 align-top">
                                     <div class="font-semibold text-slate-900">{{ $promo->nombre }}</div>
                                     @if ($promo->descripcion)
@@ -72,6 +73,8 @@
                                         </span>
                                     @endif
                                 </td>
+
+                                <!-- Columna: Tipo -->
                                 <td class="px-6 py-5 align-top">
                                     <span
                                         class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold
@@ -98,6 +101,8 @@
                                         @endswitch
                                     </span>
                                 </td>
+
+                                <!-- Columna: Límite -->
                                 <td class="px-6 py-5 align-top">
                                     @if (is_null($promo->limite_usos))
                                         <span
@@ -111,6 +116,8 @@
                                         </span>
                                     @endif
                                 </td>
+
+                                <!-- Columna: Ámbito (con nombres de productos) -->
                                 <td class="px-6 py-5 align-top text-xs text-slate-700">
                                     @if ($promo->aplica_todo)
                                         Toda la tienda
@@ -124,17 +131,29 @@
                                         @if ($promo->modelo)
                                             <div>Modelo: {{ $promo->modelo->nombre }}</div>
                                         @endif
-                                        @if (is_array($promo->productos_seleccionados) && count($promo->productos_seleccionados))
+
+                                        @php
+                                            $prods = $promo->productos_seleccionados_models;
+                                        @endphp
+
+                                        @if ($prods && $prods->count())
                                             <div class="mt-1 text-[0.7rem]">
-                                                {{ count($promo->productos_seleccionados) }} producto(s) específicos
+                                                Productos:
+                                                {{ $prods->pluck('nombre')->join(', ') }}
                                             </div>
                                         @endif
                                     @endif
                                 </td>
+
+
+
+                                <!-- Columna: Vigencia -->
                                 <td class="px-6 py-5 align-top text-xs text-slate-600">
                                     <div>Desde: {{ $promo->inicia_en?->format('d/m/Y H:i') }}</div>
                                     <div>Hasta: {{ $promo->termina_en?->format('d/m/Y H:i') ?? 'Sin límite' }}</div>
                                 </td>
+
+                                <!-- Columna: Estado -->
                                 <td class="px-6 py-5 align-top">
                                     <span
                                         class="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold
@@ -142,6 +161,8 @@
                                         {{ $promo->activa ? 'ACTIVA' : 'INACTIVA' }}
                                     </span>
                                 </td>
+
+                                <!-- Columna: Acciones -->
                                 <td class="px-6 py-5 align-top">
                                     <div class="flex justify-end gap-2">
                                         <button wire:click="editar({{ $promo->id }})"
@@ -167,7 +188,6 @@
                         </tbody>
                     </table>
                 </div>
-
                 <!-- MÓVIL -->
                 <div class="lg:hidden divide-y divide-yellow-50">
                     @forelse($promos as $promo)
@@ -256,7 +276,7 @@
                                         </label>
                                         <input type="text" wire:model="nombre"
                                             class="w-full px-4 py-2.5 rounded-2xl border border-yellow-200 bg-white/90 text-sm
-                                           focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:border-yellow-500 transition">
+                                       focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:border-yellow-500 transition">
                                         @error('nombre')
                                             <p class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</p>
                                         @enderror
@@ -267,7 +287,7 @@
                                         </label>
                                         <input type="text" wire:model="codigo"
                                             class="w-full px-4 py-2.5 rounded-2xl border border-yellow-200 bg-white/90 text-sm
-                                           focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:border-yellow-500 transition">
+                                       focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:border-yellow-500 transition">
                                         @error('codigo')
                                             <p class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</p>
                                         @enderror
@@ -278,7 +298,7 @@
                                         </label>
                                         <textarea wire:model="descripcion" rows="3"
                                             class="w-full px-4 py-3 rounded-2xl border border-yellow-200 bg-white/90 text-sm
-                                           focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:border-yellow-500 transition resize-none"></textarea>
+                                       focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:border-yellow-500 transition resize-none"></textarea>
                                     </div>
                                 </div>
 
@@ -316,7 +336,7 @@
                                             <input type="number" wire:model="valor_descuento"
                                                 step="{{ $tipo === 'descuento_porcentaje' ? 1 : 0.01 }}"
                                                 class="w-full px-4 py-2.5 rounded-2xl border border-yellow-200 bg-white/90 text-sm
-                                               focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:border-yellow-500 transition">
+                                           focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:border-yellow-500 transition">
                                             @error('valor_descuento')
                                                 <p class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</p>
                                             @enderror
@@ -339,7 +359,7 @@
                                             <input type="text" wire:model.live.debounce.300ms="query_compra"
                                                 placeholder="Buscar producto para comprar..."
                                                 class="w-full px-4 py-2.5 rounded-2xl border border-yellow-200 bg-white/90 text-sm
-                                               focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:border-yellow-500 transition">
+                                           focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:border-yellow-500 transition">
 
                                             @if ($query_compra !== '' && !empty($resultados_compra))
                                                 <div
@@ -384,7 +404,7 @@
                                             <input type="text" wire:model.live.debounce.300ms="query_regalo"
                                                 placeholder="Buscar producto de regalo..."
                                                 class="w-full px-4 py-2.5 rounded-2xl border border-yellow-200 bg-white/90 text-sm
-                                               focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:border-yellow-500 transition">
+                                           focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:border-yellow-500 transition">
 
                                             @if ($query_regalo !== '' && !empty($resultados_regalo))
                                                 <div
@@ -477,7 +497,7 @@
                                                     </label>
                                                     <select wire:model="categoria_id"
                                                         class="w-full px-4 py-2.5 rounded-2xl border border-yellow-200 bg-white/90 text-sm
-                                                       focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:border-yellow-500 transition">
+                                                   focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:border-yellow-500 transition">
                                                         <option value="">Ninguna categoría</option>
                                                         @foreach ($categorias as $cat)
                                                             <option value="{{ $cat->id }}">{{ $cat->nombre }}</option>
@@ -491,7 +511,7 @@
                                                     </label>
                                                     <select wire:model="marca_id"
                                                         class="w-full px-4 py-2.5 rounded-2xl border border-yellow-200 bg-white/90 text-sm
-                                                       focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:border-yellow-500 transition">
+                                                   focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:border-yellow-500 transition">
                                                         <option value="">Ninguna marca</option>
                                                         @foreach ($marcas as $m)
                                                             <option value="{{ $m->id }}">{{ $m->nombre }}</option>
@@ -505,7 +525,7 @@
                                                     </label>
                                                     <select wire:model="modelo_id"
                                                         class="w-full px-4 py-2.5 rounded-2xl border border-yellow-200 bg-white/90 text-sm
-                                                       focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:border-yellow-500 transition">
+                                                   focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:border-yellow-500 transition">
                                                         <option value="">Ningún modelo</option>
                                                         @foreach ($modelos as $mod)
                                                             <option value="{{ $mod->id }}">{{ $mod->nombre }}</option>
@@ -523,7 +543,7 @@
                                                 <input type="text" wire:model.live.debounce.300ms="query"
                                                     placeholder="Buscar producto por nombre o código..."
                                                     class="w-full px-4 py-2.5 rounded-2xl border border-yellow-200 bg-white/90 text-sm
-                                                   focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:border-yellow-500 transition">
+                                               focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:border-yellow-500 transition">
 
                                                 @if ($query !== '' && !empty($resultados))
                                                     <div
@@ -585,14 +605,14 @@
                                 class="px-8 py-5 bg-yellow-50/80 border-t border-yellow-200 rounded-b-3xl flex justify-end gap-3">
                                 <button wire:click="cerrarModal"
                                     class="px-5 py-2.5 rounded-xl border border-yellow-200 bg-white text-slate-800 text-sm font-medium
-                                   hover:bg-yellow-50 hover:border-yellow-300 transition">
+                               hover:bg-yellow-50 hover:border-yellow-300 transition">
                                     Cancelar
                                 </button>
                                 <button wire:click="guardar"
                                     class="px-7 py-2.5 rounded-xl bg-gradient-to-r from-yellow-500 via-orange-500 to-orange-600
-                                   text-white text-sm font-semibold
-                                   hover:from-yellow-600 hover:via-orange-600 hover:to-orange-700
-                                   shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition">
+                               text-white text-sm font-semibold
+                               hover:from-yellow-600 hover:via-orange-600 hover:to-orange-700
+                               shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition">
                                     {{ $promoId ? 'Actualizar promoción' : 'Crear promoción' }}
                                 </button>
                             </div>

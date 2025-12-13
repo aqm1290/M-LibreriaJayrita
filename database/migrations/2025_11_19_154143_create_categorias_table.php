@@ -9,6 +9,13 @@ return new class extends Migration {
     {
         Schema::create('categorias', function (Blueprint $table) {
             $table->id();
+
+            // relación con CategoriaMayor (puede ser null al inicio)
+            $table->foreignId('categoria_mayor_id')
+                ->nullable()
+                ->constrained('categoria_mayors')
+                ->nullOnDelete();
+
             $table->string('nombre')->unique();
             $table->text('descripcion')->nullable();
             $table->boolean('activo')->default(true);
