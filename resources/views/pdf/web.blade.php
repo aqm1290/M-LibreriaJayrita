@@ -77,19 +77,25 @@
     <div class="info">
         Fecha: {{ $venta->created_at->format('d/m/Y H:i') }}<br>
         Cajero: {{ $venta->usuario->name }}<br>
-        Cliente: {{ $venta->notas }}
+        Cliente: {{ $venta->cliente_nombre ?? 'Cliente Web' }}
     </div>
 
     <table class="items">
         <tbody>
             @foreach ($venta->detalles as $item)
                 <tr>
-                    <td colspan="3">{{ $item->nombre_producto }}</td>
+                    <td colspan="3">
+                        {{ $item->producto->nombre ?? 'Producto ' . $item->producto_id }}
+                    </td>
                 </tr>
                 <tr>
-                    <td>{{ $item->cantidad }} × {{ number_format($item->precio_unitario, 2) }}</td>
+                    <td>
+                        {{ $item->cantidad }} × {{ number_format($item->precio, 2) }}
+                    </td>
                     <td></td>
-                    <td align="right">Bs {{ number_format($item->subtotal, 2) }}</td>
+                    <td align="right">
+                        Bs {{ number_format($item->subtotal, 2) }}
+                    </td>
                 </tr>
             @endforeach
         </tbody>

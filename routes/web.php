@@ -3,6 +3,9 @@
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
+// === MIDDLEWARES PERSONALIZADOS ===
+use App\Http\Middleware\CheckCajeroActivo;
+
 // === COMPONENTES LIVEWIRE: ADMIN ===
 use App\Livewire\Admin\Dashboard;
 use App\Livewire\Admin\Productos;
@@ -10,8 +13,7 @@ use App\Livewire\Admin\Proveedores;
 use App\Livewire\Admin\Promociones;
 use App\Livewire\Admin\CrearPersonal;
 use App\Livewire\Admin\PedidosWeb;
-/* use App\Livewire\Admin\CategoriasMayores; // ← NUEVO
- */
+
 // === COMPONENTES LIVEWIRE: INVENTARIO ===
 use App\Livewire\Inventario\CreateEntradaInventario;
 use App\Livewire\Inventario\IndexEntradaInventario;
@@ -48,7 +50,6 @@ use App\Http\Controllers\VentaPdfController;
 use App\Http\Controllers\CierrePdfController;
 use App\Http\Controllers\TicketController;
 
-
 // ====================================================================
 // TIENDA PÚBLICA
 // ====================================================================
@@ -73,7 +74,6 @@ Route::post('/cliente/logout', function () {
     return redirect()->route('tienda.home');
 })->middleware('auth:cliente')->name('cliente.logout');
 
-
 // ====================================================================
 // AUTENTICACIÓN CLIENTE (TIENDA WEB)
 // ====================================================================
@@ -92,13 +92,11 @@ Route::middleware('auth:cliente')->group(function () {
     Route::get('/cliente/pedido', PedidoActual::class)->name('pedido.cliente');
 });
 
-
 // ====================================================================
 // LOGIN ADMIN
 // ====================================================================
 
 Route::get('/login', Login::class)->name('login');
-
 
 // ====================================================================
 // RUTAS PROTEGIDAS POR AUTENTICACIÓN ADMIN (guard web)
@@ -111,16 +109,16 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', Dashboard::class)->name('dashboard');
 
     // ====================================================================
-    // POS - REQUIERE CAJA ABIERTA
+    // POS - REQUIERE CAJA ABIERTA (solo cajero activo)
     // ====================================================================
-    Route::middleware('caja.abierta')->group(function () {
+    Route::middleware(['rol:cajero', 'caja.abierta', 'cajero.activo'])->group(function () {
         Route::get('/caja/pos', VentaPos::class)->name('caja.pos');
     });
 
     // ====================================================================
-    // APERTURA Y CIERRE DE CAJA (solo admin y cajero)
+    // APERTURA Y CIERRE DE CAJA (admin y cajero activo)
     // ====================================================================
-    Route::middleware('rol:admin,cajero')->group(function () {
+    Route::middleware(['rol:admin,cajero', 'cajero.activo'])->group(function () {
         Route::get('/caja/apertura', AperturaCaja::class)->name('caja.apertura');
         Route::get('/caja/cierre', CierreDiario::class)->name('caja.cierre');
         Route::get('/caja/buscar', BuscadorProductos::class)->name('caja.buscar');
@@ -128,9 +126,9 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // ====================================================================
-    // INVENTARIO (admin y cajero)
+    // INVENTARIO (admin y cajero activo)
     // ====================================================================
-    Route::middleware('rol:admin,cajero')->group(function () {
+    Route::middleware(['rol:admin,cajero', 'cajero.activo'])->group(function () {
         Route::get('/entrada-inventario', CreateEntradaInventario::class)->name('entrada-inventario');
         Route::get('/entradas', IndexEntradaInventario::class)->name('entradas.index');
         Route::get('/entradas/{id}/edit', EditEntradaInventario::class)->name('entradas.edit');
@@ -141,10 +139,6 @@ Route::middleware(['auth'])->group(function () {
     // ====================================================================
     Route::middleware('rol:admin')->group(function () {
         Route::get('/productos', Productos::class)->name('productos');
-
-        // NUEVO: categorías mayores
-/*         Route::get('/categorias-mayores', CategoriasMayores::class)->name('categorias.mayores');
- */
         Route::get('/categorias', CategoriaManager::class)->name('categorias');
         Route::get('/marcas', MarcasComponent::class)->name('marcas');
         Route::get('/modelos', ModeloComponent::class)->name('modelos');
@@ -170,9 +164,9 @@ Route::middleware(['auth'])->group(function () {
         ->name('ticket.web');
 
     // ====================================================================
-    // PDFS: CIERRE DE TURNO
+    // PDFS: CIERRE DE TURNO (admin y cajero activo)
     // ====================================================================
-    Route::middleware('rol:admin,cajero')->group(function () {
+    Route::middleware(['rol:admin,cajero', 'cajero.activo'])->group(function () {
         Route::get('/cierre/{id}/pdf', [CierrePdfController::class, 'generar'])
             ->name('cierre.pdf');
 
@@ -180,7 +174,6 @@ Route::middleware(['auth'])->group(function () {
             ->name('cierre.descargar');
     });
 });
-
 
 // ====================================================================
 // CAMPANITA - PEDIDOS RESERVADOS (FUNCIONA EN CUALQUIER LUGAR)
@@ -199,10 +192,10 @@ Route::get('/campanita-pedidos', function () {
 
             return [
                 'id' => $p->id,
-                'cliente_nombre' => $p->cliente_nombre ?? 'Sin nombre',
-                'total' => number_format($p->total, 2),
-                'created_at' => $p->created_at->format('d/m H:i'),
-                'tiempo_restante' => $tiempo,
+                'cliente_nombre'   => $p->cliente_nombre ?? 'Sin nombre',
+                'total'            => number_format($p->total, 2),
+                'created_at'       => $p->created_at->format('d/m H:i'),
+                'tiempo_restante'  => $tiempo,
             ];
         });
 

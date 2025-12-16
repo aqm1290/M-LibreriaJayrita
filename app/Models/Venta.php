@@ -39,4 +39,8 @@ class Venta extends Model
     {
         return $this->belongsTo(User::class, 'usuario_id');
     }
+    public function pedido()
+    {
+        return $this->belongsTo(Pedido::class, 'pedido_id');
+    }
 }

@@ -10,7 +10,6 @@
                 <p class="mt-2 text-base md:text-lg text-orange-700/90">
                     Organiza tu catálogo de productos.
                 </p>
-
             </div>
             <button wire:click="crear"
                 class="inline-flex items-center gap-3 px-6 py-3 md:px-8 md:py-4

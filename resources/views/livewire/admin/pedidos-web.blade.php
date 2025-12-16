@@ -334,7 +334,9 @@
             });
 
             Livewire.on('imprimir-ticket', e => {
-                const win = window.open(`/imprimir-ticket/${e.ventaId}`, '_blank', 'width=400,height=700');
+                const url = `{{ route('ticket.web', ['venta' => 'ID_VENTA']) }}`.replace('ID_VENTA', e
+                    .ventaId);
+                const win = window.open(url, '_blank', 'width=400,height=700');
                 if (win) win.focus();
             });
         });

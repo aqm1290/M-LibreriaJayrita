@@ -153,7 +153,8 @@ class PedidosWeb extends Component
             DB::rollBack();
             \Log::error('Error al procesar entrega de pedido web: '.$e->getMessage(), ['exception' => $e]);
             $this->dispatch('mostrar-toast', mensaje: 'Error al procesar la entrega del pedido');
-            $this->dispatch('descargar-ticket', ventaId: $venta->id);
+            $this->dispatch('imprimir-ticket', ventaId: $venta->id);
+
         }
     }
 

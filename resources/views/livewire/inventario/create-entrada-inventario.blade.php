@@ -193,9 +193,9 @@
                         </div>
 
                         <div class="text-center mt-10">
-                            <button type="submit"
+                            <button type="submit" wire:loading.attr="disabled" wire:target="submit,guardarConfirmado"
                                 class="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800
-                                       text-white font-bold text-2xl py-6 px-32 rounded-3xl shadow-2xl transition transform hover:scale-105">
+                                text-white font-bold text-2xl py-6 px-32 rounded-3xl shadow-2xl transition transform hover:scale-105">
                                 Guardar Entrada
                             </button>
                         </div>

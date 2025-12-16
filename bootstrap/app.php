@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use App\Http\Middleware\CheckCajeroActivo;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -14,6 +15,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'rol' => \App\Http\Middleware\VerificarRol::class,
             'caja.abierta' => \App\Http\Middleware\CheckCajaAbierta::class,
+            'cajero.activo'=> CheckCajeroActivo::class, // ← aquí lo agregas
+
 
         ]);
     })

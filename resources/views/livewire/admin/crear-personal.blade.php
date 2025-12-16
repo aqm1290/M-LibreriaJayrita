@@ -1,128 +1,374 @@
-<div class="min-h-screen bg-gradient-to-br from-yellow-50 via-amber-50 to-orange-100 py-12 px-6">
-    <div class="max-w-3xl mx-auto">
+<div class="min-h-screen bg-gradient-to-br from-yellow-100 via-yellow-50 to-orange-100 py-12 px-6">
+    <div class="max-w-7xl mx-auto space-y-8">
 
-        <!-- CARD -->
-        <div class="bg-white rounded-3xl shadow-xl border border-amber-100 px-6 md:px-8 py-8 md:py-10 space-y-8">
-            <div class="text-center space-y-2">
-                <p class="text-xs font-semibold tracking-[0.25em] text-amber-500 uppercase">
-                    Personal
-                </p>
-                <h2 class="text-3xl md:text-4xl font-black text-slate-900">
-                    Crear cajero
-                </h2>
-                <p class="text-sm text-slate-500">
-                    Registra un nuevo usuario con rol de cajero y su horario de trabajo.
+        <!-- CABECERA -->
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+            <div>
+                <h1 class="text-4xl md:text-5xl font-black text-slate-900 tracking-tight">
+                    Gestión de cajeros
+                </h1>
+                <p class="mt-2 text-base md:text-lg text-orange-700/90">
+                    Administra el personal de caja.
                 </p>
             </div>
+            <button wire:click="crear"
+                class="inline-flex items-center gap-3 px-6 py-3 md:px-8 md:py-4
+                       bg-gradient-to-r from-yellow-400 via-yellow-500 to-orange-500
+                       hover:from-yellow-500 hover:via-yellow-600 hover:to-orange-600
+                       text-white font-semibold md:font-black text-sm md:text-lg
+                       rounded-2xl shadow-[0_14px_40px_rgba(249,115,22,0.65)]
+                       transform hover:-translate-y-0.5 hover:scale-[1.02]
+                       transition">
+                <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
+                </svg>
+                NUEVO CAJERO
+            </button>
+        </div>
 
-            @if (session('success'))
-                <div
-                    class="bg-emerald-50 border border-emerald-200 text-emerald-800 px-5 py-3 rounded-2xl text-sm flex items-center gap-3">
-                    <span
-                        class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-600 text-white text-xs font-bold">
-                        ✓
+        <!-- FILTROS -->
+        <div class="bg-white rounded-2xl shadow-xl border border-yellow-200 p-5 md:p-6">
+            <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
+                <input type="text" wire:model.live.debounce.500ms="search" placeholder="Buscar cajero..."
+                    class="w-full md:flex-1 px-5 md:px-6 py-3.5 md:py-4 text-sm md:text-base
+                           border border-yellow-300 rounded-2xl bg-white/80
+                           focus:border-yellow-500 focus:ring-2 focus:ring-yellow-200 outline-none transition">
+
+                <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+                    <input type="checkbox" wire:model.live="mostrarInactivos"
+                        class="w-5 h-5 rounded border-yellow-300 text-rose-600 focus:ring-rose-500">
+                    <span class="text-sm md:text-base font-semibold text-rose-600">
+                        Mostrar inactivos
                     </span>
-                    <span>{{ session('success') }}</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- LISTADO -->
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-yellow-200">
+            <!-- ESCRITORIO -->
+            <div class="hidden lg:block overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead class="bg-gradient-to-r from-yellow-400 via-yellow-500 to-orange-500 text-white">
+                        <tr>
+                            <th class="px-8 py-4 text-left font-semibold">Nombre</th>
+                            <th class="px-8 py-4 text-left font-semibold">Email</th>
+                            <th class="px-8 py-4 text-left font-semibold">Horario / Turno</th>
+                            <th class="px-8 py-4 text-left font-semibold">Teléfono</th>
+                            <th class="px-8 py-4 text-left font-semibold">Estado</th>
+                            <th class="px-8 py-4 text-right font-semibold">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-yellow-50">
+                        @forelse($cajeros as $c)
+                            <tr
+                                class="{{ $c->activo ? 'hover:bg-yellow-50/70' : 'bg-rose-50/30 hover:bg-rose-50/60' }} transition-colors">
+                                <td class="px-8 py-5 align-top">
+                                    <div class="font-semibold text-slate-900">
+                                        {{ $c->name }}
+                                    </div>
+                                    @if (!$c->activo)
+                                        <span
+                                            class="mt-1 inline-flex items-center px-3 py-1 text-[0.65rem] font-bold
+                                                   text-rose-700 bg-rose-100 rounded-full">
+                                            INACTIVO
+                                        </span>
+                                    @endif
+                                </td>
+                                <td class="px-8 py-5 align-top text-slate-600">
+                                    {{ $c->email }}
+                                </td>
+                                <td class="px-8 py-5 align-top">
+                                    <span
+                                        class="inline-flex items-center px-4 py-1.5 rounded-full bg-yellow-100 text-yellow-800 font-semibold text-xs">
+                                        {{ $c->horario }} ({{ $c->turno }})
+                                    </span>
+                                </td>
+                                <td class="px-8 py-5 align-top">
+                                    {{ $c->telefono ?? '—' }}
+                                </td>
+                                <td class="px-8 py-5 align-top">
+                                    <span
+                                        class="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-bold
+                                        {{ $c->activo ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800' }}">
+                                        {{ $c->activo ? 'ACTIVO' : 'INACTIVO' }}
+                                    </span>
+                                </td>
+                                <td class="px-8 py-5 align-top">
+                                    <div class="flex justify-end gap-2">
+                                        <button wire:click="editar({{ $c->id }})"
+                                            class="p-2.5 rounded-lg bg-yellow-100 text-yellow-800 hover:bg-yellow-200
+                                                   border border-yellow-200 shadow-sm transition"
+                                            title="Editar cajero">
+                                            <i data-lucide="pencil" class="w-4 h-4"></i>
+                                        </button>
+                                        <button wire:click="confirmarEliminar({{ $c->id }})"
+                                            class="p-2.5 rounded-lg {{ $c->activo ? 'bg-rose-600 hover:bg-rose-700' : 'bg-emerald-600 hover:bg-emerald-700' }} text-white shadow-sm transition"
+                                            title="{{ $c->activo ? 'Desactivar' : 'Reactivar' }}">
+                                            @if ($c->activo)
+                                                <i data-lucide="x-circle" class="w-4 h-4"></i>
+                                            @else
+                                                <i data-lucide="check-circle" class="w-4 h-4"></i>
+                                            @endif
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="py-16 text-center text-slate-500 text-base">
+                                    No se encontraron cajeros
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- MÓVIL -->
+            <div class="lg:hidden divide-y divide-yellow-50">
+                @forelse($cajeros as $c)
+                    <div class="{{ $c->activo ? 'bg-white' : 'bg-rose-50/40' }} p-5">
+                        <div class="flex items-start gap-4">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2">
+                                    <h3 class="font-semibold text-slate-900 text-base">
+                                        {{ $c->name }}
+                                    </h3>
+                                    @if (!$c->activo)
+                                        <span
+                                            class="px-2.5 py-0.5 text-[0.65rem] font-bold text-rose-700 bg-rose-100 rounded-full">
+                                            INACTIVO
+                                        </span>
+                                    @endif
+                                </div>
+
+                                <p class="mt-1 text-sm text-slate-600">
+                                    {{ $c->email }}
+                                </p>
+
+                                <div class="mt-3 flex flex-wrap items-center gap-2">
+                                    <span
+                                        class="px-4 py-1.5 rounded-full bg-yellow-100 text-yellow-800 font-semibold text-xs">
+                                        {{ $c->horario }} ({{ $c->turno }})
+                                    </span>
+                                    <span
+                                        class="px-4 py-1.5 rounded-full text-xs font-bold
+                                        {{ $c->activo ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800' }}">
+                                        {{ $c->activo ? 'ACTIVO' : 'INACTIVO' }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col gap-2">
+                                <button wire:click="editar({{ $c->id }})"
+                                    class="p-2.5 rounded-lg bg-yellow-100 text-yellow-800 hover:bg-yellow-200 transition"
+                                    title="Editar cajero">
+                                    <i data-lucide="pencil" class="w-4 h-4"></i>
+                                </button>
+                                <button wire:click="confirmarEliminar({{ $c->id }})"
+                                    class="p-2.5 rounded-lg {{ $c->activo ? 'bg-rose-600 hover:bg-rose-700' : 'bg-emerald-600 hover:bg-emerald-700' }} text-white transition"
+                                    title="{{ $c->activo ? 'Desactivar' : 'Reactivar' }}">
+                                    @if ($c->activo)
+                                        <i data-lucide="x-circle" class="w-4 h-4"></i>
+                                    @else
+                                        <i data-lucide="check-circle" class="w-4 h-4"></i>
+                                    @endif
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                @empty
+                    <div class="p-10 text-center text-slate-500 text-base">
+                        No se encontraron cajeros
+                    </div>
+                @endforelse
+            </div>
+        </div>
+
+        <!-- PAGINACIÓN -->
+        <div class="px-6 py-5 bg-white border-t border-yellow-200 rounded-2xl shadow-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div class="text-sm text-slate-600">
+                    Mostrando
+                    <span class="font-bold text-slate-900">{{ $cajeros->firstItem() }}</span>
+                    al
+                    <span class="font-bold text-slate-900">{{ $cajeros->lastItem() }}</span>
+                    de
+                    <span class="font-bold text-slate-900">{{ $cajeros->total() }}</span>
+                    resultados
                 </div>
-            @endif
 
-            <form wire:submit.prevent="crear" class="space-y-7">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Nombre -->
-                    <div>
-                        <label
-                            class="flex items-center mb-2 text-xs font-semibold text-slate-600 uppercase tracking-wide">
-                            Nombre completo
-                        </label>
-                        <input type="text" wire:model="name"
-                            class="w-full px-4 py-2.5 rounded-2xl border border-amber-200 bg-white/80 text-sm
-                                   focus:outline-none focus:ring-2 focus:ring-amber-200 focus:border-amber-500 transition">
-                        @error('name')
-                            <p class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- Email -->
-                    <div>
-                        <label
-                            class="flex items-center mb-2 text-xs font-semibold text-slate-600 uppercase tracking-wide">
-                            Correo electrónico
-                        </label>
-                        <input type="email" wire:model="email"
-                            class="w-full px-4 py-2.5 rounded-2xl border border-amber-200 bg-white/80 text-sm
-                                   focus:outline-none focus:ring-2 focus:ring-amber-200 focus:border-amber-500 transition">
-                        @error('email')
-                            <p class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- Password -->
-                    <div>
-                        <label
-                            class="flex items-center mb-2 text-xs font-semibold text-slate-600 uppercase tracking-wide">
-                            Contraseña
-                        </label>
-                        <input type="password" wire:model="password"
-                            class="w-full px-4 py-2.5 rounded-2xl border border-amber-200 bg-white/80 text-sm
-                                   focus:outline-none focus:ring-2 focus:ring-amber-200 focus:border-amber-500 transition">
-                        @error('password')
-                            <p class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- Teléfono -->
-                    <div>
-                        <label
-                            class="flex items-center mb-2 text-xs font-semibold text-slate-600 uppercase tracking-wide">
-                            Teléfono (opcional)
-                        </label>
-                        <input type="text" wire:model="telefono"
-                            class="w-full px-4 py-2.5 rounded-2xl border border-amber-200 bg-white/80 text-sm
-                                   focus:outline-none focus:ring-2 focus:ring-amber-200 focus:border-amber-500 transition">
-                    </div>
-
-                    <!-- Turno -->
-                    <div>
-                        <label
-                            class="flex items-center mb-2 text-xs font-semibold text-slate-600 uppercase tracking-wide">
-                            Turno
-                        </label>
-                        <select wire:model="turno"
-                            class="w-full px-4 py-2.5 rounded-2xl border border-amber-200 bg-white/80 text-sm
-                                   focus:outline-none focus:ring-2 focus:ring-amber-200 focus:border-amber-500 transition">
-                            <option value="mañana">Mañana</option>
-                            <option value="tarde">Tarde</option>
-                            <option value="noche">Noche</option>
-                        </select>
-                        @error('turno')
-                            <p class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    <!-- Horario -->
-                    <div>
-                        <label
-                            class="flex items-center mb-2 text-xs font-semibold text-slate-600 uppercase tracking-wide">
-                            Horario (rango)
-                        </label>
-                        <input type="text" wire:model="horario" placeholder="Ej: 08:00 - 16:00"
-                            class="w-full px-4 py-2.5 rounded-2xl border border-amber-200 bg-white/80 text-sm
-                                   focus:outline-none focus:ring-2 focus:ring-amber-200 focus:border-amber-500 transition">
-                        @error('horario')
-                            <p class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</p>
-                        @enderror
-                    </div>
+                <div class="flex items-center gap-2">
+                    {{ $cajeros->onEachSide(1)->links('vendor.pagination.tailwind-espanol') }}
                 </div>
-
-                <div class="pt-4 border-t border-amber-100 flex justify-center">
-                    <button type="submit"
-                        class="inline-flex items-center justify-center px-10 py-3.5 rounded-2xl
-                               bg-gradient-to-r from-amber-600 to-yellow-500 text-white text-sm md:text-base font-semibold
-                               hover:from-amber-700 hover:to-yellow-600 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition">
-                        CREAR CAJERO
-                    </button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
+
+    <!-- MODAL CREAR / EDITAR -->
+    @if ($modal)
+        <div class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-6">
+            <div class="bg-white rounded-3xl shadow-3xl w-full max-w-2xl overflow-hidden border border-yellow-200">
+                <div
+                    class="bg-gradient-to-r from-yellow-400 via-yellow-500 to-orange-500 text-white px-8 py-6 text-center rounded-t-3xl">
+                    <h2 class="text-2xl md:text-3xl font-black">
+                        {{ $cajeroId ? 'Editar cajero' : 'Nuevo cajero' }}
+                    </h2>
+                </div>
+
+                <div class="px-8 py-7 space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-800 mb-2 uppercase tracking-wide">
+                                Nombre *
+                            </label>
+                            <input type="text" wire:model="nombre"
+                                class="w-full px-5 py-3 rounded-2xl border border-yellow-300 bg-white/90 text-sm
+                                       focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:border-yellow-500 transition">
+                            @error('nombre')
+                                <p class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-800 mb-2 uppercase tracking-wide">
+                                Correo *
+                            </label>
+                            <input type="email" wire:model="email"
+                                class="w-full px-5 py-3 rounded-2xl border border-yellow-300 bg-white/90 text-sm
+                                       focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:border-yellow-500 transition">
+                            @error('email')
+                                <p class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-800 mb-2 uppercase tracking-wide">
+                                {{ $cajeroId ? 'Nueva contraseña (opcional)' : 'Contraseña *' }}
+                            </label>
+                            <input type="password" wire:model="password"
+                                class="w-full px-5 py-3 rounded-2xl border border-yellow-300 bg-white/90 text-sm
+                                       focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:border-yellow-500 transition">
+                            @error('password')
+                                <p class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-800 mb-2 uppercase tracking-wide">
+                                Teléfono
+                            </label>
+                            <input type="text" wire:model="telefono"
+                                class="w-full px-5 py-3 rounded-2xl border border-yellow-300 bg-white/90 text-sm
+                                       focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:border-yellow-500 transition">
+                            @error('telefono')
+                                <p class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-800 mb-2 uppercase tracking-wide">
+                                Turno *
+                            </label>
+                            <select wire:model="turno"
+                                class="w-full px-5 py-3 rounded-2xl border border-yellow-300 bg-white/90 text-sm
+                                       focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:border-yellow-500 transition">
+                                <option value="mañana">Mañana</option>
+                                <option value="tarde">Tarde</option>
+                                <option value="noche">Noche</option>
+                            </select>
+                            @error('turno')
+                                <p class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-800 mb-2 uppercase tracking-wide">
+                                Horario (rango) *
+                            </label>
+                            <input type="text" wire:model="horario"
+                                class="w-full px-5 py-3 rounded-2xl border border-yellow-300 bg-white/90 text-sm
+                                       focus:outline-none focus:ring-2 focus:ring-yellow-200 focus:border-yellow-500 transition"
+                                placeholder="Ej: 08:00 - 16:00">
+                            @error('horario')
+                                <p class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+
+                <div class="px-8 py-5 bg-yellow-50/80 border-t border-yellow-200 rounded-b-3xl flex justify-end gap-3">
+                    <button wire:click="cerrarModal"
+                        class="px-5 py-2.5 rounded-xl border border-yellow-300 bg-white text-slate-700 text-sm font-medium
+                               hover:bg-yellow-50 hover:border-yellow-400 transition">
+                        Cancelar
+                    </button>
+                    <button wire:click="guardar"
+                        class="px-7 py-2.5 rounded-xl bg-gradient-to-r from-yellow-500 via-orange-500 to-orange-600 text-white text-sm font-semibold
+                               hover:from-yellow-600 hover:via-orange-600 hover:to-orange-700
+                               shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition">
+                        Guardar
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- MODAL CONFIRMAR -->
+    @if ($confirmDelete && $cajero)
+        <div class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-6">
+            <div
+                class="bg-white rounded-3xl shadow-3xl max-w-md w-full px-8 py-7 text-center border border-yellow-200">
+                <div
+                    class="w-20 h-20 mx-auto mb-5 rounded-2xl flex items-center justify-center
+                    {{ $cajero->activo ? 'bg-rose-100' : 'bg-emerald-100' }}">
+                    <svg class="w-10 h-10 {{ $cajero->activo ? 'text-rose-600' : 'text-emerald-600' }}"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="{{ $cajero->activo
+                                ? 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z'
+                                : 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' }}" />
+                    </svg>
+                </div>
+
+                <h3 class="text-xl font-black text-slate-900 mb-3">
+                    {{ $cajero->activo ? '¿Desactivar cajero?' : '¿Reactivar cajero?' }}
+                </h3>
+                <p class="text-sm text-slate-600 mb-7">
+                    {{ $cajero->activo
+                        ? 'Este cajero no podrá usar el sistema mientras esté inactivo.'
+                        : 'Este cajero volverá a estar habilitado para usar el sistema.' }}
+                </p>
+
+                <div class="flex justify-center gap-3">
+                    <button wire:click="$set('confirmDelete', false)"
+                        class="px-6 py-2.5 rounded-xl border border-slate-300 bg-white text-slate-700 text-sm font-medium
+                               hover:bg-slate-100 hover:border-slate-400 transition">
+                        Cancelar
+                    </button>
+                    <button wire:click="eliminar"
+                        class="px-7 py-2.5 rounded-xl text-sm font-semibold text-white shadow-md hover:shadow-lg
+                               transform hover:-translate-y-0.5 transition
+                               {{ $cajero->activo ? 'bg-rose-600 hover:bg-rose-700' : 'bg-emerald-600 hover:bg-emerald-700' }}">
+                        {{ $cajero->activo ? 'Desactivar' : 'Reactivar' }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>
+
+<script>
+    window.addEventListener('toast', event => {
+        Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'success',
+            title: event.detail,
+            timer: 3000,
+            showConfirmButton: false,
+            timerProgressBar: true,
+        });
+    });
+</script>
