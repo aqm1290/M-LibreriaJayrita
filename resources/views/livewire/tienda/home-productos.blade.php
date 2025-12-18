@@ -1,5 +1,5 @@
 <div>
-    {{-- 2. HERO --}}
+    {{-- HERO --}}
     <section id="hero" class="jayrita-hero section py-5 py-lg-6">
         <div class="container">
             <div class="row justify-content-center">
@@ -7,7 +7,7 @@
                     <div class="jayrita-hero-copy text-center">
                         <span class="jayrita-hero-pill mb-3 d-inline-flex align-items-center gap-2 mx-auto">
                             <span class="dot"></span>
-                            Librería y papelería en Bolivia
+                            Librería y Bazar en Bolivia
                         </span>
 
                         <h1 class="jayrita-hero-title mb-3">
@@ -15,9 +15,9 @@
                             <span>clases y oficina</span>
                         </h1>
 
-                        <p class="jayrita-hero-subtitle mb-4">
-                            Libros, papelería escolar y accesorios de oficina, encontraras de todo en Libreria Jayrita
-                            ubicado en Sacaba.
+                        <p class="jayrita-hero-subtitle mb-4 ">
+                            Cuadernos, lapiceros, papelería escolar y accesorios de oficina, encontrarás de todo en
+                            Librería Jayrita ubicada en Sacaba.
                         </p>
 
                         <div class="d-flex flex-wrap gap-3 justify-content-center align-items-center mt-2">
@@ -34,7 +34,7 @@
         </div>
     </section>
 
-    {{-- 3. CATEGORÍAS + PRODUCTOS FILTRADOS --}}
+    {{-- CATEGORÍAS --}}
     <section id="categorias" class="portfolio section py-5">
         <div class="container section-title mb-4">
             <h2>Categorías</h2>
@@ -45,7 +45,6 @@
         </div>
 
         <div class="container">
-            {{-- Filtros --}}
             <ul class="portfolio-filters">
                 <li wire:click="setCategoria('todas')"
                     class="{{ $categoriaActiva === 'todas' ? 'filter-active' : '' }}">
@@ -60,18 +59,30 @@
                 @endforeach
             </ul>
 
-            {{-- Grid de productos --}}
             <div class="row g-4 portfolio-grid">
                 @foreach ($productosFiltrados as $producto)
                     <div class="col-xl-3 col-lg-4 col-md-6 portfolio-item">
-                        <article class="portfolio-entry">
-                            <figure class="entry-image">
+                        <article class="portfolio-entry {{ ($producto->stock ?? 0) <= 0 ? 'agotado' : '' }}">
+                            <figure class="entry-image position-relative">
+
+                                {{-- CINTA AGOTADO --}}
+                                @if (($producto->stock ?? 0) <= 0)
+                                    <div class="agotado-badge">Agotado</div>
+                                @endif
+
                                 <img src="{{ $producto->imagen_url ?? asset('images/no-image.png') }}" class="img-fluid"
                                     alt="{{ $producto->nombre }}" loading="lazy">
+
                                 <div class="entry-overlay">
                                     <div class="overlay-content">
                                         <div class="entry-meta">
                                             {{ $producto->categoria?->nombre ?? 'Sin categoría' }}
+                                            ·
+                                            @if (($producto->stock ?? 0) > 0)
+                                                Stock: <strong>{{ $producto->stock ?? 0 }}</strong>
+                                            @else
+                                                <strong>Sin stock</strong>
+                                            @endif
                                         </div>
                                         <h3 class="entry-title">
                                             {{ $producto->nombre }}
@@ -82,10 +93,11 @@
                                                 <i class="bi bi-eye"></i>
                                             </button>
                                             <button type="button"
-                                                class="btn p-0 border-0 bg-transparent agregar-carrito"
+                                                class="btn p-0 border-0 bg-transparent agregar-carrito {{ ($producto->stock ?? 0) <= 0 ? 'btn-agregar-disabled' : '' }}"
                                                 data-producto-id="{{ $producto->id }}"
                                                 data-imagen="{{ $producto->imagen_url ?? asset('images/no-image.png') }}"
-                                                wire:click="agregarAlPedido({{ $producto->id }})">
+                                                wire:click="agregarAlPedido({{ $producto->id }})"
+                                                @if (($producto->stock ?? 0) <= 0) disabled aria-disabled="true" @endif>
                                                 <i class="bi bi-cart-plus"></i>
                                             </button>
                                         </div>
@@ -97,7 +109,6 @@
                 @endforeach
             </div>
 
-            {{-- paginación productos random --}}
             @if ($productosFiltrados->hasPages())
                 <div class="mt-4 d-flex justify-content-center">
                     <div class="jayrita-pagination-pill d-inline-flex align-items-center">
@@ -105,12 +116,10 @@
                     </div>
                 </div>
             @endif
-
-
         </div>
     </section>
 
-    {{-- 4. MARCAS --}}
+    {{-- MARCAS --}}
     @if ($marcas->count())
         <section class="section py-5 jayrita-marcas">
             <div class="container">
@@ -137,7 +146,7 @@
         </section>
     @endif
 
-    {{-- 3.b PRODUCTOS NUEVOS --}}
+    {{-- PRODUCTOS NUEVOS --}}
     <section class="section py-5">
         <div class="container mb-4">
             <div
@@ -160,11 +169,18 @@
             <div class="row g-4">
                 @foreach ($productosNuevos as $producto)
                     <div class="col-xl-3 col-lg-4 col-md-6">
-                        <div class="card hover-card h-100 position-relative overflow-hidden">
+                        <div
+                            class="card hover-card h-100 position-relative overflow-hidden {{ ($producto->stock ?? 0) <= 0 ? 'agotado' : '' }}">
+
+                            {{-- CINTA AGOTADO --}}
+                            @if (($producto->stock ?? 0) <= 0)
+                                <div class="agotado-badge">Agotado</div>
+                            @endif
+
                             <div class="position-relative overflow-hidden">
                                 <img src="{{ $producto->imagen_url ?? asset('images/no-image.png') }}"
                                     class="card-img-top producto-imagen" alt="{{ $producto->nombre }}"
-                                    style="height: 220px; object-fit: cover; transition: all 0.4s;">
+                                    style="height: 220px; object-fit: contain; transition: all 0.4s;">
                                 <div
                                     class="overlay-buttons position-absolute top-50 start-50 translate-middle opacity-0">
                                     <button type="button" class="btn btn-warning btn-lg rounded-circle shadow-lg"
@@ -176,19 +192,28 @@
 
                             <div class="card-body d-flex flex-column p-4">
                                 <h5 class="card-title fw-bold mb-1">{{ $producto->nombre }}</h5>
-                                <p class="text-muted small mb-2">
+                                <p class="text-muted small mb-1">
                                     {{ $producto->categoria?->nombre ?? 'Sin categoría' }}
+                                </p>
+                                <p class="text-muted small mb-2">
+                                    @if (($producto->stock ?? 0) > 0)
+                                        Stock: <strong>{{ $producto->stock ?? 0 }}</strong> uds.
+                                    @else
+                                        <strong>Sin stock</strong>
+                                    @endif
                                 </p>
                                 <p class="fw-bold text-warning fs-5 mb-4">
                                     Bs. {{ number_format($producto->precio ?? 0, 2) }}
                                 </p>
                                 <div class="mt-auto d-grid gap-2">
-                                    <button type="button" class="btn btn-warning fw-bold agregar-carrito"
+                                    <button type="button"
+                                        class="btn btn-warning fw-bold agregar-carrito {{ ($producto->stock ?? 0) <= 0 ? 'btn-agregar-disabled' : '' }}"
                                         data-producto-id="{{ $producto->id }}"
                                         data-imagen="{{ $producto->imagen_url ?? asset('images/no-image.png') }}"
-                                        wire:click="agregarAlPedido({{ $producto->id }})">
+                                        wire:click="agregarAlPedido({{ $producto->id }})"
+                                        @if (($producto->stock ?? 0) <= 0) disabled aria-disabled="true" @endif>
                                         <i class="bi bi-cart-plus me-2"></i>
-                                        Agregar al carrito
+                                        {{ ($producto->stock ?? 0) > 0 ? 'Agregar al carrito' : 'Sin stock' }}
                                     </button>
                                 </div>
                             </div>
@@ -197,7 +222,6 @@
                 @endforeach
             </div>
 
-            {{-- Productos nuevos --}}
             @if ($productosNuevos->hasPages())
                 <div class="mt-5 d-flex justify-content-center">
                     <div class="jayrita-pagination-pill d-inline-flex align-items-center">
@@ -205,65 +229,149 @@
                     </div>
                 </div>
             @endif
-
-
-
-
-
         </div>
     </section>
 
-    {{-- 5. PROMOCIONES EN CARRUSEL --}}
+    {{-- OFERTAS DESTACADAS (CARRUSEL ALTERNATIVO) --}}
     <section class="section py-5">
         <div class="container">
 
-            @forelse ($promociones as $promoDummy)
-                @if ($loop->first)
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h3 class="fw-bold mb-0">Promociones</h3>
+            @if ($promosHome && $promosHome->count())
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h3 class="fw-bold mb-1">Ofertas destacadas</h3>
+                        <p class="text-muted mb-0">
+                            Elige entre nuestros productos con descuento exclusivo.
+                        </p>
                     </div>
+                    <div class="d-flex align-items-center gap-2 small text-muted">
+                        <span class="rounded-circle bg-success" style="width: 10px; height: 10px;"></span>
+                        En stock inmediato
+                    </div>
+                </div>
 
-                    <div id="promoCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel"
-                        data-bs-interval="4500">
-                        <div class="carousel-inner">
-                            @foreach ($promociones->chunk(4) as $chunkIndex => $grupo)
-                                <div class="carousel-item {{ $chunkIndex === 0 ? 'active' : '' }}">
-                                    <div class="row g-3 carrusel-cards">
-                                        @foreach ($grupo as $promo)
-                                            <div class="col-md-3">
-                                                <div class="card h-100 border-warning">
-                                                    <div class="card-body">
-                                                        <h6 class="fw-bold mb-1">{{ $promo->titulo ?? 'Promo' }}</h6>
-                                                        <p class="small text-muted mb-2">
-                                                            {{ $promo->descripcion_corta ?? '' }}
-                                                        </p>
-                                                        @if ($promo->descuento_porcentaje)
-                                                            <span class="badge bg-warning text-dark">
-                                                                -{{ $promo->descuento_porcentaje }}%
-                                                            </span>
+                <div id="promoCarouselAlt" class="carousel slide" data-bs-ride="carousel" data-bs-interval="6000">
+                    <div class="carousel-inner">
+                        @foreach ($promosHome->chunk(3) as $chunkIndex => $grupo)
+                            <div class="carousel-item {{ $chunkIndex === 0 ? 'active' : '' }}">
+                                <div class="row g-3 carrusel-cards">
+                                    @foreach ($grupo as $item)
+                                        @php
+                                            $producto = $item->producto;
+                                            $promo = $item->promo;
+                                            $precioOriginal = $item->precio_original;
+                                            $precioPromo = $item->precio_promo;
+                                            $descuentoPct =
+                                                $precioOriginal > 0
+                                                    ? round(100 - ($precioPromo * 100) / $precioOriginal)
+                                                    : 0;
+                                        @endphp
+
+                                        <div class="col-lg-4">
+                                            <div
+                                                class="card h-100 border-0 shadow-sm overflow-hidden promo-card-alt {{ ($producto->stock ?? 0) <= 0 ? 'agotado' : '' }}">
+                                                <div class="row g-0 h-100">
+                                                    <div class="col-4 col-md-5 position-relative">
+
+                                                        {{-- CINTA AGOTADO --}}
+                                                        @if (($producto->stock ?? 0) <= 0)
+                                                            <div class="agotado-badge">Agotado</div>
                                                         @endif
+
+                                                        <img src="{{ $producto->imagen_url ?? asset('images/no-image.png') }}"
+                                                            alt="{{ $producto->nombre }}"
+                                                            class="w-100 h-100 promo-img-alt">
+
+                                                        @if ($descuentoPct > 0)
+                                                            <div class="promo-pill-discount">
+                                                                -{{ $descuentoPct }}%
+                                                            </div>
+                                                        @endif
+                                                    </div>
+                                                    <div class="col-8 col-md-7 d-flex">
+                                                        <div class="card-body d-flex flex-column p-3">
+                                                            <span
+                                                                class="badge bg-warning text-dark mb-2 align-self-start">
+                                                                {{ $promo->nombre ?? 'Promoción' }}
+                                                            </span>
+
+                                                            <h6 class="fw-bold mb-1 text-truncate"
+                                                                title="{{ $producto->nombre }}">
+                                                                {{ $producto->nombre }}
+                                                            </h6>
+                                                            <p class="small text-muted mb-1 text-truncate">
+                                                                {{ $producto->categoria?->nombre ?? 'Sin categoría' }}
+                                                            </p>
+                                                            <p class="small text-muted mb-1">
+                                                                Color: <strong>{{ $producto->color ?? 'N/E' }}</strong>
+                                                            </p>
+                                                            <p class="small text-muted mb-1">
+                                                                Color: <strong>{{ $producto->tipo ?? 'N/E' }}</strong>
+                                                            </p>
+                                                            <p class="small text-muted mb-1">
+                                                                Modelo:
+                                                                <strong>{{ $producto->modelo?->nombre ?? 'N/E' }}</strong>
+                                                            </p>
+                                                            <p class="small text-muted mb-2">
+                                                                @if (($producto->stock ?? 0) > 0)
+                                                                    Stock: <strong>{{ $producto->stock ?? 0 }}</strong>
+                                                                    uds.
+                                                                @else
+                                                                    <strong>Sin stock</strong>
+                                                                @endif
+                                                            </p>
+
+                                                            <div class="mb-2">
+                                                                @if ($precioPromo < $precioOriginal)
+                                                                    <div
+                                                                        class="small text-muted text-decoration-line-through">
+                                                                        Bs. {{ number_format($precioOriginal, 2) }}
+                                                                    </div>
+                                                                @endif
+                                                                <div class="fw-bold text-success fs-5">
+                                                                    Bs. {{ number_format($precioPromo, 2) }}
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="mt-auto d-flex flex-wrap gap-2">
+                                                                <button type="button"
+                                                                    class="btn btn-outline-secondary btn-sm"
+                                                                    wire:click="seleccionarProducto({{ $producto->id }})">
+                                                                    <i class="bi bi-eye me-1"></i> Ver
+                                                                </button>
+                                                                <button type="button"
+                                                                    class="btn btn-success btn-sm fw-bold agregar-carrito {{ ($producto->stock ?? 0) <= 0 ? 'btn-agregar-disabled' : '' }}"
+                                                                    data-producto-id="{{ $producto->id }}"
+                                                                    data-imagen="{{ $producto->imagen_url ?? asset('images/no-image.png') }}"
+                                                                    wire:click="agregarAlPedido({{ $producto->id }})"
+                                                                    @if (($producto->stock ?? 0) <= 0) disabled aria-disabled="true" @endif>
+                                                                    <i class="bi bi-cart-plus me-1"></i>
+                                                                    {{ ($producto->stock ?? 0) > 0 ? 'Añadir' : 'Sin stock' }}
+                                                                </button>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        @endforeach
-                                    </div>
+                                        </div>
+                                    @endforeach
                                 </div>
-                            @endforeach
-                        </div>
-
-                        <button class="carousel-control-prev" type="button" data-bs-target="#promoCarousel"
-                            data-bs-slide="prev">
-                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                            <span class="visually-hidden">Anterior</span>
-                        </button>
-                        <button class="carousel-control-next" type="button" data-bs-target="#promoCarousel"
-                            data-bs-slide="next">
-                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                            <span class="visually-hidden">Siguiente</span>
-                        </button>
+                            </div>
+                        @endforeach
                     </div>
-                @endif
-            @empty
+
+                    <div class="d-flex justify-content-center mt-3">
+                        @foreach ($promosHome->chunk(3) as $chunkIndex => $grupo)
+                            <button type="button" data-bs-target="#promoCarouselAlt"
+                                data-bs-slide-to="{{ $chunkIndex }}"
+                                class="promo-dot {{ $chunkIndex === 0 ? 'active' : '' }}"
+                                aria-current="{{ $chunkIndex === 0 ? 'true' : 'false' }}"
+                                aria-label="Slide {{ $chunkIndex + 1 }}">
+                            </button>
+                        @endforeach
+                    </div>
+                </div>
+            @else
                 <div class="text-center py-5">
                     <i class="bi bi-ticket-perforated text-warning" style="font-size: 3rem;"></i>
                     <h4 class="fw-bold mt-3" style="color: var(--default-color);">
@@ -273,11 +381,10 @@
                         Vuelve pronto, estamos preparando nuevas ofertas.
                     </p>
                 </div>
-            @endforelse
+            @endif
 
         </div>
     </section>
-
 
     @include('partials.contacto')
 
@@ -305,10 +412,20 @@
                                 </p>
 
                                 @if ($productoSeleccionado->marca)
-                                    <p class="mb-3 modal-text-muted">
+                                    <p class="mb-2 modal-text-muted">
                                         <strong>Marca:</strong> {{ $productoSeleccionado->marca->nombre }}
                                     </p>
                                 @endif
+
+                                <p class="mb-2 modal-text-muted">
+                                    <strong>Color:</strong>
+                                    {{ $productoSeleccionado->color ?? 'No especificado' }}
+                                </p>
+
+                                <p class="mb-3 modal-text-muted">
+                                    <strong>Modelo:</strong>
+                                    {{ $productoSeleccionado->modelo?->nombre ?? 'No especificado' }}
+                                </p>
 
                                 <div class="rounded-3 p-3 p-lg-4 mb-4 modal-desc-box">
                                     <p class="mb-0 modal-text-body">
@@ -316,20 +433,34 @@
                                     </p>
                                 </div>
 
+                                @php
+                                    $stockModal = $productoSeleccionado->stock ?? 0;
+                                @endphp
+
                                 <div class="d-flex align-items-center gap-4 mb-4">
                                     <h1 class="text-warning fw-black mb-0">
                                         Bs. {{ number_format($productoSeleccionado->precio ?? 0, 2) }}
                                     </h1>
-                                    <span class="badge bg-success fs-6 px-3 py-2">Stock disponible</span>
+                                    @if ($stockModal > 0)
+                                        <span class="badge bg-success fs-6 px-3 py-2">
+                                            Stock: {{ $stockModal }} {{ $stockModal === 1 ? 'unidad' : 'unidades' }}
+                                        </span>
+                                    @else
+                                        <span class="badge bg-danger fs-6 px-3 py-2">
+                                            Sin stock
+                                        </span>
+                                    @endif
                                 </div>
 
                                 <div class="d-flex flex-wrap gap-3">
-                                    <button type="button" class="btn btn-warning btn-lg px-5 fw-bold agregar-carrito"
+                                    <button type="button"
+                                        class="btn btn-warning btn-lg px-5 fw-bold agregar-carrito {{ ($stockModal ?? 0) <= 0 ? 'btn-agregar-disabled' : '' }}"
                                         data-producto-id="{{ $productoSeleccionado->id }}"
                                         data-imagen="{{ $productoSeleccionado->imagen_url ?? asset('images/no-image.png') }}"
-                                        wire:click="agregarAlPedido({{ $productoSeleccionado->id }})">
+                                        wire:click="agregarAlPedido({{ $productoSeleccionado->id }})"
+                                        @if (($stockModal ?? 0) <= 0) disabled aria-disabled="true" @endif>
                                         <i class="bi bi-cart-plus me-2"></i>
-                                        Agregar al carrito
+                                        {{ ($stockModal ?? 0) > 0 ? 'Agregar al carrito' : 'Sin stock' }}
                                     </button>
                                     <button type="button" class="btn btn-outline-secondary btn-lg px-5"
                                         wire:click="cerrarModal">
@@ -343,7 +474,6 @@
             </div>
         </div>
     @endif
-
 
     {{-- MODAL MARCA --}}
     @if ($marcaSeleccionada)
@@ -396,7 +526,6 @@
         </div>
     @endif
 
-
     {{-- ANIMACIÓN VOLAR AL CARRITO + TOAST --}}
     <div id="fly-to-cart"></div>
 
@@ -412,37 +541,8 @@
         </div>
     </div>
 
-    {{-- CSS rápido para hover en cards --}}
-    <style>
-        .hover-card:hover .overlay-buttons {
-            opacity: 1 !important;
-            transition: all 0.4s;
-        }
-
-        .hover-card:hover .producto-imagen {
-            transform: scale(1.1);
-        }
-
-        .overlay-buttons {
-            transition: all 0.4s;
-        }
-
-        /* animación en carruseles */
-        .carrusel-cards .card {
-            opacity: 0;
-            transform: translateY(15px) scale(0.98);
-            transition: all 0.4s ease;
-        }
-
-        .carrusel-cards .card.carrusel-show {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-        }
-    </style>
-
     {{-- JS ANIMACIONES --}}
     <script>
-        // Volar al carrito: compatible con Livewire 3
         function inicializarFlyToCart() {
             document.querySelectorAll('.agregar-carrito').forEach(btn => {
                 if (btn.dataset.flyBound === '1') return;
@@ -463,8 +563,8 @@
                         border: 4px solid #ffc107;
                         box-shadow: 0 10px 30px rgba(0,0,0,0.5);
                         z-index: 9999;
-                        left: ${rect.left + rect.width/2 - 40}px;
-                        top: ${rect.top + rect.height/2 - 40}px;
+                        left: ${rect.left + rect.width / 2 - 40}px;
+                        top: ${rect.top + rect.height / 2 - 40}px;
                         transition: all 1s cubic-bezier(0.2, 0.8, 0.2, 1);
                         pointer-events: none;
                     `;
@@ -488,7 +588,6 @@
             });
         }
 
-        // Animar grid categorías
         function animarGridCategorias() {
             const grid = document.querySelector('#categorias .portfolio-grid');
             if (!grid) return;
@@ -507,7 +606,6 @@
             });
         }
 
-        // Animar carrusel de promociones
         function animarCarrusel(id) {
             const carrusel = document.getElementById(id);
             if (!carrusel) return;
@@ -530,11 +628,12 @@
         document.addEventListener('livewire:initialized', () => {
             inicializarFlyToCart();
             animarGridCategorias();
-            animarCarrusel('promoCarousel');
+            animarCarrusel('promoCarouselAlt');
 
             Livewire.hook('message.processed', () => {
                 inicializarFlyToCart();
                 animarGridCategorias();
+                animarCarrusel('promoCarouselAlt');
             });
         });
     </script>

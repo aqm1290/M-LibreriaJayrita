@@ -432,7 +432,6 @@ body {
 /*--------------------------------------------------------------
 # Portfolio (categorías)
 --------------------------------------------------------------*/
-/* Filtros */
 .portfolio .portfolio-filters {
     display: flex;
     justify-content: center;
@@ -507,7 +506,8 @@ body {
 .portfolio .portfolio-entry .entry-image img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
+    padding: 10px;
     transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -540,7 +540,7 @@ body {
 }
 
 .portfolio .portfolio-entry .entry-image .entry-overlay .entry-title {
-    color: var(--contrast-color);
+    color: #f9fafb;
     font-size: 20px;
     font-weight: 600;
     margin: 0 0 16px;
@@ -576,7 +576,7 @@ body {
 
 /* Hover general */
 .portfolio .portfolio-entry:hover .entry-image img {
-    transform: scale(1.05);
+    transform: scale(1.03);
 }
 
 .portfolio .portfolio-entry:hover .entry-image .entry-overlay {
@@ -593,7 +593,7 @@ body {
     transform: translateY(0);
 }
 
-/* ====================== FLOTANTES: CARRITO + SCROLL TOP ====================== */
+/* ====================== FLOTANTES: CARRITO + SCROLL TOP + WHATSAPP ====================== */
 .jayrita-floating-right {
     position: fixed;
     right: 18px;
@@ -639,6 +639,29 @@ body {
     box-shadow: 0 16px 40px rgba(0, 0, 0, 0.8);
 }
 
+/* Botón flotante WhatsApp */
+.jayrita-whatsapp-btn {
+    width: 52px;
+    height: 52px;
+    border-radius: 999px;
+    background: #22c55e;
+    color: #ffffff;
+    font-size: 1.6rem;
+    box-shadow: 0 15px 35px rgba(22, 163, 74, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+.jayrita-whatsapp-btn:hover {
+    background: #16a34a;
+    color: #ffffff;
+    text-decoration: none;
+    transform: translateY(-2px);
+    transition: all 0.2s ease;
+}
+
 @media (max-width: 576px) {
     .jayrita-floating-right {
         right: 12px;
@@ -657,7 +680,6 @@ body {
     min-height: 85vh;
 }
 
-/* Imagen de fondo */
 .jayrita-hero::before {
     content: "";
     position: absolute;
@@ -670,7 +692,6 @@ body {
     z-index: 0;
 }
 
-/* Capa de degradado para contraste */
 .jayrita-hero::after {
     content: "";
     position: absolute;
@@ -681,7 +702,6 @@ body {
     z-index: 1;
 }
 
-/* Ajuste light */
 :root[data-theme="light"] .jayrita-hero::after {
     background:
         radial-gradient(circle at top left, rgba(251, 191, 36, 0.45), transparent 55%),
@@ -689,25 +709,23 @@ body {
 }
 
 :root[data-theme="light"] .jayrita-hero-title {
-    color: #111827;
+    color: #eeeeee;
 }
 
 :root[data-theme="light"] .jayrita-hero-subtitle {
-    color: #cdddf7;
+    color: #f0f0f0;
 }
 
 :root[data-theme="light"] .jayrita-hero-meta strong {
     color: #b45309;
 }
 
-/* Contenido encima del fondo */
 .jayrita-hero .container,
 .jayrita-hero * {
     position: relative;
     z-index: 2;
 }
 
-/* Copia y tipografía */
 .jayrita-hero-copy {
     max-width: 520px;
     margin: 0 auto;
@@ -753,7 +771,6 @@ body {
     color: #e5e7eb;
 }
 
-/* Botones hero */
 .jayrita-hero-btn {
     border-radius: 999px;
     padding: 0.7rem 2.6rem;
@@ -766,7 +783,6 @@ body {
     box-shadow: 0 22px 55px rgba(251, 191, 36, 0.6);
 }
 
-/* Botón outline catálogo */
 .jayrita-hero-link-outline {
     display: inline-flex;
     align-items: center;
@@ -799,7 +815,6 @@ body {
     color: #807300;
 }
 
-/* Meta hero */
 .jayrita-hero-meta>div {
     display: flex;
     flex-direction: column;
@@ -829,7 +844,6 @@ body {
     background: #020617;
 }
 
-/* título */
 .jayrita-marcas h3 {
     color: #111827;
 }
@@ -838,7 +852,6 @@ body {
     color: #f9fafb;
 }
 
-/* Tarjeta de marca */
 .jayrita-marca-card {
     background: #ffffff;
     border-radius: 999px;
@@ -882,7 +895,7 @@ body {
     color: #111827;
 }
 
-/* ====================== MODALES TEMA LIGHT/DARK ====================== */
+/* ====================== MODALES ====================== */
 .jayrita-modal .modal-content {
     border-radius: 1.5rem;
     border: 1px solid rgba(148, 163, 184, 0.35);
@@ -891,36 +904,26 @@ body {
     transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
 }
 
-/* Light */
 :root[data-theme="light"] .jayrita-modal .modal-content {
     background: rgba(255, 255, 255, 0.98);
     color: #0f172a;
 }
 
-/* Dark */
 :root[data-theme="dark"] .jayrita-modal .modal-content {
     background: rgba(15, 23, 42, 0.98);
     color: #e5e7eb;
 }
 
-.jayrita-modal h1,
-.jayrita-modal h2,
-.jayrita-modal h3,
-.jayrita-modal h4 {
-    color: inherit;
-}
-
-.jayrita-modal .text-muted,
-.jayrita-modal .text-white-50 {
+.jayrita-modal .modal-text-muted {
     color: color-mix(in srgb, var(--default-color), transparent 35%);
 }
 
-.jayrita-modal .btn-close {
-    filter: none;
+.jayrita-modal .modal-text-body {
+    color: color-mix(in srgb, var(--default-color), transparent 10%);
 }
 
-:root[data-theme="dark"] .jayrita-modal .btn-close {
-    filter: invert(1) grayscale(100%);
+.jayrita-modal .modal-desc-box {
+    background-color: color-mix(in srgb, var(--surface-color), transparent 10%);
 }
 
 /* Animación de cards en carruseles */
@@ -935,387 +938,7 @@ body {
     transform: translateY(0) scale(1);
 }
 
-
-
-/* Base modal */
-.jayrita-modal .modal-content {
-    border-radius: 1.5rem;
-}
-
-/* Light mode */
-:root[data-bs-theme="light"] .jayrita-modal .modal-content {
-    background-color: #ffffff;
-    color: #212529;
-}
-
-:root[data-bs-theme="light"] .jayrita-modal .modal-text-muted {
-    color: #6c757d;
-}
-
-:root[data-bs-theme="light"] .jayrita-modal .modal-text-body {
-    color: #212529;
-}
-
-:root[data-bs-theme="light"] .jayrita-modal .modal-desc-box {
-    background-color: #f8f9fa;
-}
-
-/* Dark mode */
-:root[data-bs-theme="dark"] .jayrita-modal .modal-content {
-    background-color: #121212;
-    color: #f8f9fa;
-}
-
-:root[data-bs-theme="dark"] .jayrita-modal .modal-text-muted {
-    color: #adb5bd;
-}
-
-:root[data-bs-theme="dark"] .jayrita-modal .modal-text-body {
-    color: #f8f9fa;
-}
-
-:root[data-bs-theme="dark"] .jayrita-modal .modal-desc-box {
-    background-color: rgba(255, 255, 255, 0.06);
-}
-
-
-
-
-
-
-
-
-
-/* base modal catálogo */
-.jayrita-modal .modal-content {
-    border-radius: 1.5rem;
-}
-
-/* LIGHT MODE */
-:root[data-bs-theme="light"] .jayrita-modal .modal-content {
-    background-color: #ffffff;
-    color: #111827;
-}
-
-:root[data-bs-theme="light"] .jayrita-modal h1,
-:root[data-bs-theme="light"] .jayrita-modal h2,
-:root[data-bs-theme="light"] .jayrita-modal h3 {
-    color: #111827;
-}
-
-:root[data-bs-theme="light"] .jayrita-modal .modal-text-muted {
-    color: #6b7280;
-}
-
-:root[data-bs-theme="light"] .jayrita-modal .modal-text-body {
-    color: #111827;
-}
-
-:root[data-bs-theme="light"] .jayrita-modal .modal-desc-box {
-    background-color: #f3f4f6;
-}
-
-/* DARK MODE */
-:root[data-bs-theme="dark"] .jayrita-modal .modal-content {
-    background-color: #020617;
-    color: #e5e7eb;
-}
-
-:root[data-bs-theme="dark"] .jayrita-modal h1,
-:root[data-bs-theme="dark"] .jayrita-modal h2,
-:root[data-bs-theme="dark"] .jayrita-modal h3 {
-    color: #f9fafb;
-}
-
-:root[data-bs-theme="dark"] .jayrita-modal .modal-text-muted {
-    color: #9ca3af;
-}
-
-:root[data-bs-theme="dark"] .jayrita-modal .modal-text-body {
-    color: #e5e7eb;
-}
-
-:root[data-bs-theme="dark"] .jayrita-modal .modal-desc-box {
-    background-color: rgba(15, 23, 42, 0.9);
-}
-
-.jayrita-pedido-page {
-    color: var(--default-color);
-}
-
-.jayrita-card-surface {
-    background: var(--surface-color);
-}
-
-.jayrita-card-border {
-    border: 1px solid rgba(148, 163, 184, 0.35);
-}
-
-.jayrita-text-main {
-    color: var(--default-color);
-}
-
-.jayrita-text-soft {
-    color: color-mix(in srgb, var(--default-color), transparent 45%);
-}
-
-.jayrita-pedido-table thead {
-    background: color-mix(in srgb, var(--surface-color), transparent 5%);
-    color: var(--default-color);
-}
-
-.jayrita-pedido-table tbody tr {
-    background: var(--surface-color);
-}
-
-.jayrita-pedido-table tbody tr:nth-child(odd) {
-    background: color-mix(in srgb, var(--surface-color), transparent 4%);
-}
-
-.jayrita-pedido-table td,
-.jayrita-pedido-table th {
-    border-color: rgba(148, 163, 184, 0.25);
-}
-
-.jayrita-resumen-footer {
-    background: color-mix(in srgb, var(--surface-color), transparent 6%);
-    border-top: 1px solid rgba(148, 163, 184, 0.4);
-}
-
-.jayrita-welcome-alert {
-    background: color-mix(in srgb, #198754, transparent 70%);
-    color: var(--default-color);
-}
-
-.jayrita-reservar-btn {
-    font-size: 1.5rem;
-}
-
-/* Contact Section */
-.contact .contact-info-box {
-    background-color: var(--surface-color);
-    border-radius: 10px;
-    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.05);
-    padding: 25px;
-    height: 100%;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    display: flex;
-    align-items: flex-start;
-    gap: 15px;
-}
-
-.contact .contact-info-box:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-}
-
-.contact .contact-info-box .icon-box {
-    background-color: color-mix(in srgb, var(--accent-color), transparent 90%);
-    color: var(--accent-color);
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.contact .contact-info-box .icon-box i {
-    font-size: 24px;
-}
-
-.contact .contact-info-box .info-content h4 {
-    font-size: 18px;
-    font-weight: 600;
-    margin-bottom: 10px;
-}
-
-.contact .contact-info-box .info-content p {
-    margin-bottom: 5px;
-    color: color-mix(in srgb, var(--default-color), transparent 20%);
-    font-size: 15px;
-    line-height: 1.5;
-}
-
-.contact .contact-info-box .info-content p:last-child {
-    margin-bottom: 0;
-}
-
-.contact .map-section {
-    position: relative;
-    width: 100%;
-    height: 500px;
-    overflow: hidden;
-}
-
-.contact .map-section iframe {
-    display: block;
-    width: 100%;
-    height: 100%;
-    border: 0;
-}
-
-.contact .form-container-overlap {
-    position: relative;
-    margin-top: -150px;
-    margin-bottom: 60px;
-    z-index: 10;
-}
-
-.contact .contact-form-wrapper {
-    background-color: var(--surface-color);
-    border-radius: 12px;
-    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.05);
-    padding: 40px;
-}
-
-.contact .contact-form-wrapper h2 {
-    font-size: 28px;
-    font-weight: 700;
-    margin-bottom: 30px;
-    position: relative;
-}
-
-.contact .contact-form-wrapper h2:after {
-    content: "";
-    position: absolute;
-    left: 50%;
-    bottom: -10px;
-    transform: translateX(-50%);
-    width: 50px;
-    height: 3px;
-    background-color: var(--accent-color);
-}
-
-.contact .contact-form-wrapper .form-group {
-    margin-bottom: 20px;
-}
-
-.contact .contact-form-wrapper .form-group .input-with-icon {
-    position: relative;
-}
-
-.contact .contact-form-wrapper .form-group .input-with-icon i {
-    position: absolute;
-    left: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: color-mix(in srgb, var(--default-color), transparent 40%);
-    font-size: 18px;
-    z-index: 10;
-}
-
-.contact .contact-form-wrapper .form-group .input-with-icon i.message-icon {
-    top: 28px;
-}
-
-.contact .contact-form-wrapper .form-group .input-with-icon .form-control {
-    border-radius: 8px;
-    padding: 12px 15px 12px 45px;
-    height: 3.5rem;
-    color: var(--default-color);
-    background-color: var(--surface-color);
-    font-size: 15px;
-    border: 1px solid color-mix(in srgb, var(--default-color), transparent 80%);
-}
-
-.contact .contact-form-wrapper .form-group .input-with-icon .form-control:focus {
-    border-color: var(--accent-color);
-    box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--accent-color), transparent 90%);
-}
-
-.contact .contact-form-wrapper .form-group .input-with-icon .form-control::placeholder {
-    color: color-mix(in srgb, var(--default-color), transparent 40%);
-}
-
-.contact .contact-form-wrapper .form-group .input-with-icon textarea.form-control {
-    height: 180px;
-    resize: none;
-    padding-top: 15px;
-}
-
-.contact .contact-form-wrapper .btn-submit {
-    background-color: var(--accent-color);
-    border: none;
-    color: var(--contrast-color);
-    padding: 12px 30px;
-    font-size: 16px;
-    font-weight: 600;
-    letter-spacing: 1px;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-    box-shadow: 0 5px 15px color-mix(in srgb, var(--accent-color), transparent 70%);
-}
-
-.contact .contact-form-wrapper .btn-submit:hover {
-    background-color: color-mix(in srgb, var(--accent-color), transparent 15%);
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px color-mix(in srgb, var(--accent-color), transparent 60%);
-}
-
-.contact .contact-form-wrapper .btn-submit:active {
-    transform: translateY(0);
-    box-shadow: 0 3px 10px color-mix(in srgb, var(--accent-color), transparent 70%);
-}
-
-.contact .contact-form-wrapper .loading,
-.contact .contact-form-wrapper .error-message,
-.contact .contact-form-wrapper .sent-message {
-    margin-top: 10px;
-    margin-bottom: 20px;
-}
-
-@media (max-width: 992px) {
-    .contact .form-container-overlap {
-        margin-top: -120px;
-    }
-
-    .contact .contact-form-wrapper {
-        padding: 30px;
-    }
-}
-
-@media (max-width: 768px) {
-    .contact .contact-info-box {
-        margin-bottom: 20px;
-    }
-
-    .contact .form-container-overlap {
-        margin-top: -100px;
-    }
-
-    .contact .contact-form-wrapper {
-        padding: 25px;
-    }
-
-    .contact .contact-form-wrapper h2 {
-        font-size: 24px;
-    }
-
-    .contact .map-section {
-        height: 450px;
-    }
-}
-
-@media (max-width: 576px) {
-    .contact .form-container-overlap {
-        margin-top: -80px;
-    }
-
-    .contact .contact-form-wrapper {
-        padding: 20px;
-    }
-
-    .contact .btn-submit {
-        width: 100%;
-    }
-
-    .contact .map-section {
-        height: 400px;
-    }
-}
-
+/* ====================== PAGINACIÓN ====================== */
 .jayrita-pagination-pill {
     background: #ffc107;
     border-radius: 999px;
@@ -1338,142 +961,1308 @@ body {
     font-weight: 700;
 }
 
-.jayrita-user-toggle i {
+/* ====================== CONTACTO ====================== */
+.contact {
+    padding-top: 3rem;
+    padding-bottom: 4rem;
+}
+
+.contact .section-title h2 {
     color: var(--default-color);
-    /* negro en light, claro en dark */
 }
 
-[data-theme="dark"] .jayrita-user-toggle i {
-    color: #f9fafb;
+.contact .section-title p {
+    color: color-mix(in srgb, var(--default-color), transparent 30%);
 }
 
-/* Tarjetas auth adaptadas a tema */
-.jayrita-auth-card {
+/* Tarjetas de info */
+.contact .contact-info-box {
     background-color: var(--surface-color);
-    border: 1px solid color-mix(in srgb, var(--accent-color), transparent 40%);
+    border-radius: 12px;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.12);
+    padding: 22px;
+    height: 100%;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
 }
 
-/* Badge dorado */
-.jayrita-auth-badge {
-    background-color: var(--accent-color);
-    color: var(--contrast-color);
+.contact .contact-info-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.16);
 }
 
-/* Textos */
-.jayrita-auth-title {
-    color: var(--default-color);
-}
-
-.jayrita-auth-subtitle {
-    color: color-mix(in srgb, var(--default-color), transparent 45%);
-}
-
-.jayrita-auth-label {
-    color: color-mix(in srgb, var(--default-color), transparent 35%);
-}
-
-/* Inputs */
-.jayrita-auth-input,
-.jayrita-auth-input-secondary {
-    background-color: color-mix(in srgb, var(--surface-color), #000 5%);
-    color: var(--default-color);
-    border-radius: 0.5rem;
-    border: 1px solid color-mix(in srgb, var(--accent-color), transparent 40%);
-}
-
-.jayrita-auth-input-secondary {
-    border-color: color-mix(in srgb, var(--default-color), transparent 70%);
-}
-
-.jayrita-auth-input::placeholder,
-.jayrita-auth-input-secondary::placeholder {
-    color: color-mix(in srgb, var(--default-color), transparent 55%);
-}
-
-.jayrita-auth-input:focus,
-.jayrita-auth-input-secondary:focus {
-    border-color: var(--accent-color);
-    box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--accent-color), transparent 80%);
-}
-
-/* Botón principal */
-.jayrita-auth-btn {
-    background-color: var(--accent-color);
-    color: var(--contrast-color);
-    border: none;
-    border-radius: 0.75rem;
-    box-shadow: 0 8px 20px color-mix(in srgb, var(--accent-color), transparent 65%);
-    transition: all 0.2s ease;
-}
-
-.jayrita-auth-btn:hover {
-    background-color: color-mix(in srgb, var(--accent-color), transparent 15%);
-    transform: translateY(-1px);
-    box-shadow: 0 10px 24px color-mix(in srgb, var(--accent-color), transparent 55%);
-}
-
-.jayrita-auth-btn:active {
-    transform: translateY(0);
-    box-shadow: 0 4px 12px color-mix(in srgb, var(--accent-color), transparent 70%);
-}
-
-/* Divider y links */
-.jayrita-auth-divider {
-    border-color: color-mix(in srgb, var(--default-color), transparent 75%);
-}
-
-.jayrita-auth-link {
+.contact .contact-info-box .icon-box {
+    background-color: color-mix(in srgb, var(--accent-color), transparent 90%);
     color: var(--accent-color);
-}
-
-.jayrita-auth-link:hover {
-    color: color-mix(in srgb, var(--accent-color), transparent 10%);
-}
-
-.jayrita-profile-card {
-    background-color: var(--surface-color);
-    border: 1px solid color-mix(in srgb, var(--default-color), transparent 80%);
-}
-
-.jayrita-profile-avatar {
-    width: 80px;
-    height: 80px;
-    border-radius: 999px;
-    background-color: var(--accent-color);
-    color: var(--contrast-color);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 800;
-    font-size: 2rem;
+    flex-shrink: 0;
 }
 
-.jayrita-profile-name {
+.contact .contact-info-box .icon-box i {
+    font-size: 22px;
+}
+
+.contact .contact-info-box .info-content h4 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
     color: var(--default-color);
 }
 
-.jayrita-profile-email,
-.jayrita-profile-meta {
+.contact .contact-info-box .info-content p {
+    margin-bottom: 4px;
+    color: color-mix(in srgb, var(--default-color), transparent 20%);
+    font-size: 15px;
+}
+
+.contact .contact-info-box .info-content p:last-child {
+    margin-bottom: 0;
+}
+
+/* Mapa y formulario */
+.contact .map-section {
+    position: relative;
+    width: 100%;
+    height: 420px;
+    overflow: hidden;
+    border-radius: 18px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.35);
+}
+
+.contact .map-section iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+.contact .form-container-overlap {
+    position: relative;
+    margin-top: -120px;
+    margin-bottom: 60px;
+    z-index: 10;
+}
+
+.contact .contact-form-wrapper {
+    background-color: var(--surface-color);
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.25);
+    padding: 38px;
+}
+
+.contact .contact-form-wrapper h2 {
+    font-size: 26px;
+    font-weight: 800;
+    margin-bottom: 24px;
+    text-align: center;
+    color: var(--default-color);
+    position: relative;
+}
+
+.contact .contact-form-wrapper h2::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -10px;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    border-radius: 999px;
+    background-color: var(--accent-color);
+}
+
+/* Inputs del formulario */
+.contact .contact-form-wrapper .form-group {
+    margin-bottom: 18px;
+}
+
+.contact .contact-form-wrapper .form-group .input-with-icon {
+    position: relative;
+}
+
+.contact .contact-form-wrapper .form-group .input-with-icon i {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: color-mix(in srgb, var(--default-color), transparent 40%);
+    font-size: 18px;
+    z-index: 10;
+}
+
+.contact .contact-form-wrapper .form-group .input-with-icon i.message-icon {
+    top: 28px;
+}
+
+.contact .contact-form-wrapper .form-group .input-with-icon .form-control {
+    border-radius: 10px;
+    padding: 12px 15px 12px 44px;
+    height: 3.2rem;
+    color: var(--default-color);
+    background-color: color-mix(in srgb, var(--surface-color), #000 3%);
+    font-size: 15px;
+    border: 1px solid color-mix(in srgb, var(--default-color), transparent 78%);
+}
+
+.contact .contact-form-wrapper .form-group .input-with-icon .form-control::placeholder {
     color: color-mix(in srgb, var(--default-color), transparent 45%);
 }
 
-/* Tarjeta del pedido (ya la tienes) */
-.jayrita-order-card {
-    background-color: color-mix(in srgb, var(--surface-color), #000 3%);
-    border: 1px solid color-mix(in srgb, var(--default-color), transparent 80%);
+.contact .contact-form-wrapper .form-group .input-with-icon .form-control:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 0.18rem color-mix(in srgb, var(--accent-color), transparent 82%);
 }
 
-/* Título “Pedido”, “Estado”, “Productos” */
-.jayrita-order-card .small.text-muted {
-    color: color-mix(in srgb, var(--default-color), transparent 35%) !important;
+.contact .contact-form-wrapper .form-group .input-with-icon textarea.form-control {
+    height: 180px;
+    resize: none;
+    padding-top: 15px;
 }
 
-/* Líneas de productos */
-.jayrita-order-card ul.small li span {
-    color: color-mix(in srgb, var(--default-color), transparent 10%);
+/* Botón enviar */
+.contact .contact-form-wrapper .btn-submit {
+    background-color: var(--accent-color);
+    border: none;
+    color: var(--contrast-color);
+    padding: 12px 30px;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    border-radius: 999px;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 24px color-mix(in srgb, var(--accent-color), transparent 60%);
 }
 
-/* Totales de cada línea si quieres un poco más suave */
-.jayrita-order-card ul.small li span:last-child {
-    color: color-mix(in srgb, var(--default-color), transparent 25%);
+.contact .contact-form-wrapper .btn-submit:hover {
+    background-color: color-mix(in srgb, var(--accent-color), transparent 15%);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px color-mix(in srgb, var(--accent-color), transparent 55%);
+}
+
+/* Responsivo contacto */
+@media (max-width: 992px) {
+    .contact .form-container-overlap {
+        margin-top: -90px;
+    }
+
+    .contact .contact-form-wrapper {
+        padding: 28px;
+    }
+}
+
+@media (max-width: 768px) {
+    .contact .map-section {
+        height: 380px;
+    }
+
+    .contact .form-container-overlap {
+        margin-top: -80px;
+    }
+
+    .contact .contact-form-wrapper {
+        padding: 24px;
+    }
+}
+
+@media (max-width: 576px) {
+    .contact .form-container-overlap {
+        margin-top: -70px;
+    }
+
+    .contact .contact-form-wrapper {
+        padding: 20px;
+    }
+
+    .contact .contact-form-wrapper .btn-submit {
+        width: 100%;
+    }
+}
+
+/* ====================== AJUSTES DARK EN PRODUCTOS ====================== */
+:root[data-theme="dark"] .card {
+    background-color: #020617;
+    color: #e5e7eb;
+}
+
+:root[data-theme="dark"] .card .card-title {
+    color: #f9fafb;
+}
+
+:root[data-theme="dark"] .card .text-muted {
+    color: color-mix(in srgb, #e5e7eb, transparent 40%);
+}
+
+/* precio en cards */
+:root[data-theme="dark"] .card .text-warning {
+    color: #facc15 !important;
+}
+
+/* textos de sección (h2, h3) en dark */
+:root[data-theme="dark"] h2,
+:root[data-theme="dark"] h3,
+:root[data-theme="dark"] h4 {
+    color: #f9fafb;
+}
+
+/* texto de descripción bajo títulos de sección */
+:root[data-theme="dark"] .section-title p,
+:root[data-theme="dark"] .section-title span,
+:root[data-theme="dark"] p.text-muted {
+    color: color-mix(in srgb, #e5e7eb, transparent 35%);
+}
+
+/* ====================== CARDS, CARRUSEL Y AGOTADO ====================== */
+.hover-card:hover .overlay-buttons {
+    opacity: 1 !important;
+    transition: all 0.4s;
+}
+
+.hover-card:hover .producto-imagen {
+    transform: scale(1.05);
+}
+
+.overlay-buttons {
+    transition: all 0.4s;
+}
+
+.promo-card-alt {
+    border-radius: 1rem;
+    background: rgba(15, 23, 42, 0.96);
+    color: #f9fafb;
+}
+
+:root[data-theme="light"] .promo-card-alt {
+    background: #ffffff;
+    color: #111827;
+    box-shadow: 0 15px 40px rgba(15, 23, 42, 0.08);
+}
+
+.promo-img-alt {
+    object-fit: contain;
+    padding: 8px;
+    transition: transform 0.35s ease;
+}
+
+.promo-card-alt:hover .promo-img-alt {
+    transform: scale(1.08);
+}
+
+.promo-pill-discount {
+    position: absolute;
+    top: 0.75rem;
+    left: 0.75rem;
+    background: #ef4444;
+    color: #fff;
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
+}
+
+.promo-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    border: none;
+    margin: 0 4px;
+    background: rgba(148, 163, 184, 0.6);
+}
+
+.promo-dot.active {
+    width: 24px;
+    background: #facc15;
+}
+
+/* CINTA AGOTADO (única versión, centrada un poco más abajo del medio) */
+.agotado-badge {
+    position: absolute;
+    top: 60%;
+    /* ajusta 55–70% según qué tan abajo la quieras */
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-12deg);
+    background: #ef4444;
+    color: #fff;
+    padding: 8px 26px;
+    font-weight: 800;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border-radius: 999px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+    z-index: 5;
+    pointer-events: none;
+}
+
+.card.agotado,
+.portfolio-entry.agotado {
+    filter: grayscale(0.3);
+    opacity: 0.85;
+}
+
+.btn-agregar-disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* ====================== TIENDA: TARJETAS CATÁLOGO ====================== */
+
+.product-card-modern {
+    border-radius: 1.25rem;
+    background:
+        radial-gradient(circle at top left, rgba(251, 191, 36, 0.12), transparent 55%),
+        #020617;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.product-card-modern:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 22px 45px rgba(15, 23, 42, 0.8);
+}
+
+.product-thumb {
+    height: 190px;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+    overflow: hidden;
+    position: relative;
+}
+
+.product-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: transform 0.4s ease, opacity 0.3s ease;
+}
+
+.product-card-modern:hover .product-thumb img {
+    transform: scale(1.05);
+}
+
+.product-quick-actions {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    opacity: 0;
+    transform: translateY(5px);
+    transition: all 0.25s ease;
+    z-index: 5;
+}
+
+.product-card-modern:hover .product-quick-actions {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.product-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #f9fafb;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+
+
+/* Línea "Stock: X uds." también más legible en light */
+:root[data-theme="light"] .product-card-modern .text-white-50 {
+    color: #6b7280 !important;
+}
+
+
+.product-price {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #facc15;
+}
+
+.product-badge-promo {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: linear-gradient(135deg, #f97316, #ef4444);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.6);
+    z-index: 6;
+}
+
+/* Botón moderno "Añadir al carrito" */
+
+.btn-add-cart-modern {
+    border-radius: 999px;
+    border: none;
+    background: linear-gradient(135deg, #facc15, #f97316);
+    color: #111827;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.45rem 0.9rem;
+    font-weight: 700;
+    font-size: 0.9rem;
+    box-shadow: 0 12px 25px rgba(248, 181, 0, 0.45);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+}
+
+.btn-add-cart-modern .icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-add-cart-modern:hover:not(.btn-add-cart-disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 40px rgba(248, 181, 0, 0.6);
+    filter: brightness(1.05);
+}
+
+.btn-add-cart-disabled {
+    background: #4b5563 !important;
+    color: #d1d5db !important;
+    box-shadow: none !important;
+    cursor: not-allowed !important;
+}
+
+/* Cinta AGOTADO */
+
+.agotado-badge {
+    position: absolute;
+    top: 12px;
+    right: -40px;
+    transform: rotate(40deg);
+    background: #ef4444;
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.25rem 2.5rem;
+    z-index: 5;
+    box-shadow: 0 8px 20px rgba(239, 68, 68, 0.5);
+}
+
+/* ================== CATÁLOGO: SIDEBAR FILTROS ================== */
+
+.catalogo-filtros {
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+    border: 1px solid rgba(15, 23, 42, 0.7);
+    background: radial-gradient(circle at top left, rgba(251, 191, 36, 0.16), transparent 55%),
+        rgba(15, 23, 42, 0.97);
+}
+
+/* Light mode */
+:root[data-theme="light"] .catalogo-filtros {
+    background: radial-gradient(circle at top left, rgba(251, 191, 36, 0.18), transparent 55%),
+        #f9fafb;
+    color: #0f172a;
+    border-color: rgba(148, 163, 184, 0.5);
+}
+
+.filtros-input {
+    background: #020617;
+    color: #e5e7eb;
+    border-color: rgba(148, 163, 184, 0.7);
+}
+
+.filtros-input:focus {
+    border-color: #fbbf24;
+    box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.6);
+}
+
+/* Light mode */
+:root[data-theme="light"] .filtros-input {
+    background: #ffffff;
+    color: #111827;
+}
+
+.filtros-input-icon {
+    background: #020617;
+    border-color: rgba(148, 163, 184, 0.7);
+    color: #9ca3af;
+}
+
+:root[data-theme="light"] .filtros-input-icon {
+    background: #ffffff;
+    color: #6b7280;
+}
+
+/* Radios/checkbox list */
+.filtros-list-group {
+    border-radius: 0.75rem;
+}
+
+.filtros-list-item {
+    background: transparent;
+    color: #e5e7eb;
+    border: 0;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.filtros-list-item:hover {
+    background: rgba(15, 23, 42, 0.7);
+}
+
+/* Light */
+:root[data-theme="light"] .filtros-list-item {
+    color: #111827;
+}
+
+:root[data-theme="light"] .filtros-list-item:hover {
+    background: rgba(248, 250, 252, 0.9);
+}
+
+.filtros-scroll {
+    max-height: 240px;
+    overflow-y: auto;
+}
+
+/* ================== CATÁLOGO: TARJETAS ================== */
+
+.product-card-modern {
+    border-radius: 1.25rem;
+    background:
+        radial-gradient(circle at top left, rgba(251, 191, 36, 0.15), transparent 55%),
+        #020617;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* Light */
+:root[data-theme="light"] .product-card-modern {
+    background:
+        radial-gradient(circle at top left, rgba(251, 191, 36, 0.12), transparent 55%),
+        #ffffff;
+}
+
+.product-card-modern:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 22px 45px rgba(15, 23, 42, 0.75);
+}
+
+.product-thumb {
+    height: 190px;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+    overflow: hidden;
+}
+
+.product-thumb img {
+    object-fit: contain;
+    transition: transform 0.4s ease, opacity 0.3s ease;
+}
+
+.product-card-modern:hover .product-thumb img {
+    transform: scale(1.05);
+}
+
+.product-quick-actions {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    opacity: 0;
+    transform: translateY(5px);
+    transition: all 0.25s ease;
+    z-index: 5;
+}
+
+.product-card-modern:hover .product-quick-actions {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.product-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #f9fafb;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Light */
+:root[data-theme="light"] .product-title {
+    color: #111827;
+}
+
+/* Mejor contraste para subtítulos en cards */
+
+.product-meta {
+    color: #4b5563;
+    /* gris más oscuro */
+}
+
+/* Dark mode */
+:root[data-theme="dark"] .product-meta {
+    color: #9ca3af;
+}
+
+/* Línea "Stock: X uds." también más legible en light */
+:root[data-theme="light"] .product-card-modern .text-white-50 {
+    color: #6b7280 !important;
+}
+
+/* ==== Mejorar contraste de textos en modo light ==== */
+
+/* Etiquetas del sidebar: BUSCAR, PRECIO, Marca, Categoría */
+:root[data-theme="light"] .catalogo-filtros .form-label,
+:root[data-theme="light"] .catalogo-filtros .form-label.text-white-50 {
+    color: #374151;
+    /* gris oscuro */
+}
+
+/* Texto "Resultados: X" debajo de Catálogo de productos */
+:root[data-theme="light"] .col-lg-9 .small.text-white-50 {
+    color: #6b7280 !important;
+}
+
+/* Radios del sidebar (Cualquier precio, menos de Bs. 5.00, etc.) */
+:root[data-theme="light"] .catalogo-filtros .filtros-list-item {
+    color: #374151;
+}
+
+/* Texto gris dentro de las cards (Stock, meta) */
+:root[data-theme="light"] .product-card-modern .text-white-50 {
+    color: #6b7280 !important;
+}
+
+:root[data-theme="light"] .product-meta {
+    color: #4b5563;
+}
+
+.product-price {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #facc15;
+}
+
+/* Badge promo */
+.product-badge-promo {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: linear-gradient(135deg, #f97316, #ef4444);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.6);
+    z-index: 6;
+}
+
+/* Botón añadir al carrito */
+.btn-add-cart-modern {
+    border-radius: 999px;
+    border: none;
+    background: linear-gradient(135deg, #facc15, #f97316);
+    color: #111827;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.45rem 0.9rem;
+    font-weight: 700;
+    font-size: 0.9rem;
+    box-shadow: 0 12px 25px rgba(248, 181, 0, 0.45);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+}
+
+.btn-add-cart-modern .icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-add-cart-modern:hover:not(.btn-add-cart-disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 40px rgba(248, 181, 0, 0.6);
+    filter: brightness(1.05);
+}
+
+.btn-add-cart-disabled {
+    background: #4b5563 !important;
+    color: #d1d5db !important;
+    box-shadow: none !important;
+    cursor: not-allowed !important;
+}
+
+/* Cintas de stock */
+.agotado-badge {
+    position: absolute;
+    top: 12px;
+    right: -40px;
+    transform: rotate(40deg);
+    background: #ef4444;
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.25rem 2.5rem;
+    z-index: 5;
+    box-shadow: 0 8px 20px rgba(239, 68, 68, 0.5);
+}
+
+.agotado-badge--warning {
+    background: #f97316;
+    transform: rotate(30deg);
+}
+
+/* Modal texto */
+.modal-desc-box {
+    background: rgba(15, 23, 42, 0.9);
+    border: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+:root[data-theme="light"] .modal-desc-box {
+    background: #f9fafb;
+}
+
+.modal-text-body {
+    color: #e5e7eb;
+}
+
+:root[data-theme="light"] .modal-text-body {
+    color: #111827;
+}
+
+/* Forzar colores legibles en modo light */
+
+/* Labels del sidebar (BUSCAR, PRECIO, etc.) */
+:root[data-theme="light"] .catalogo-filtros label.form-label,
+:root[data-theme="light"] .catalogo-filtros label.form-label.text-white-50 {
+    color: #374151 !important;
+}
+
+/* Texto pequeño junto al título "Catálogo de productos" */
+:root[data-theme="light"] .catalogo-filtros~.col-lg-9 p.small.text-white-50,
+:root[data-theme="light"] .col-lg-9 p.small.text-white-50 {
+    color: #6b7280 !important;
+}
+
+/* Cualquier .text-white-50 dentro del sidebar en light */
+:root[data-theme="light"] .catalogo-filtros .text-white-50 {
+    color: #6b7280 !important;
+}
+
+/* Cualquier .text-white-50 dentro de las cards en light (Stock:) */
+:root[data-theme="light"] .product-card-modern .text-white-50 {
+    color: #6b7280 !important;
+}
+
+/* Catálogo: ajustar ancho del sidebar y separación */
+.catalogo-filtros {
+    max-width: 260px;
+}
+
+/* Botón LIMPIAR de filtros en negro */
+
+.catalogo-filtros .btn.btn-sm.btn-outline-light.rounded-pill {
+    border-color: #111827;
+    color: #111827;
+    background-color: transparent;
+}
+
+.catalogo-filtros .btn.btn-sm.btn-outline-light.rounded-pill:hover {
+    background-color: #111827;
+    color: #ffffff;
+}
+
+
+/* En pantallas grandes, pegar un poco más el contenido al borde izquierdo */
+@media (min-width: 1200px) {
+    .catalogo-filtros {
+        margin-left: 0;
+    }
+
+    .catalogo-filtros+.col-lg-9 {
+        padding-left: 1.5rem;
+    }
+}
+
+
+/* ===== Sidebar de filtros elegante ===== */
+
+.catalogo-filtros-elegante {
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    background:
+        radial-gradient(circle at top left, rgba(251, 191, 36, 0.18), transparent 55%),
+        rgba(15, 23, 42, 0.97);
+}
+
+/* Light mode */
+:root[data-theme="light"] .catalogo-filtros-elegante {
+    background:
+        radial-gradient(circle at top left, rgba(251, 191, 36, 0.10), transparent 55%),
+        #ffffff;
+    border-color: rgba(148, 163, 184, 0.4);
+}
+
+.filtros-title {
+    color: #f9fafb;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.filtros-title i {
+    color: #facc15;
+}
+
+/* Botón limpiar */
+.filtros-btn-limpiar {
+    border-color: #4b5563;
+    color: #e5e7eb;
+    font-weight: 600;
+    font-size: 0.75rem;
+    padding-block: 0.2rem;
+}
+
+.filtros-btn-limpiar:hover {
+    background-color: #111827;
+    border-color: #111827;
+    color: #f9fafb;
+}
+
+/* Light */
+:root[data-theme="light"] .filtros-btn-limpiar {
+    border-color: #9ca3af;
+    color: #374151;
+}
+
+:root[data-theme="light"] .filtros-btn-limpiar:hover {
+    background-color: #111827;
+    border-color: #111827;
+    color: #f9fafb;
+}
+
+/* Labels y textos */
+.filtros-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(249, 250, 251, 0.7);
+    margin-bottom: 0.45rem;
+}
+
+/* Light */
+:root[data-theme="light"] .filtros-label {
+    color: #6b7280;
+}
+
+/* Input group búsqueda */
+.filtros-input-group .input-group-text {
+    background: rgba(15, 23, 42, 0.9);
+    border-color: rgba(148, 163, 184, 0.4);
+    color: #9ca3af;
+}
+
+.filtros-input-group .form-control {
+    background: rgba(15, 23, 42, 0.85);
+    border-color: rgba(148, 163, 184, 0.4);
+    color: #e5e7eb;
+    font-size: 0.9rem;
+}
+
+.filtros-input-group .form-control::placeholder {
+    color: #9ca3af;
+}
+
+.filtros-input-group .form-control:focus {
+    border-color: #fbbf24;
+    box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.55);
+}
+
+/* Light */
+:root[data-theme="light"] .filtros-input-group .input-group-text {
+    background: #ffffff;
+    color: #6b7280;
+}
+
+:root[data-theme="light"] .filtros-input-group .form-control {
+    background: #ffffff;
+    color: #111827;
+}
+
+/* Rango de precio */
+.filtros-precio-box {
+    padding-inline: 0.25rem;
+}
+
+.filtros-precio-range-labels span {
+    font-size: 0.8rem;
+    color: #facc15;
+}
+
+/* Chips de marca/categoría/modelo */
+.filtros-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.filtro-chip {
+    border-radius: 999px;
+    border: 1px solid rgba(148, 163, 184, 0.55);
+    padding: 0.25rem 0.9rem;
+    font-size: 0.8rem;
+    color: #e5e7eb;
+    background: rgba(15, 23, 42, 0.85);
+    cursor: pointer;
+    transition: all 0.18s ease;
+}
+
+.filtro-chip-text {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.filtro-chip-count {
+    opacity: 0.7;
+    font-size: 0.75rem;
+}
+
+.filtro-chip:hover {
+    border-color: #fbbf24;
+    background: rgba(251, 191, 36, 0.1);
+}
+
+.filtro-chip--active {
+    background: linear-gradient(135deg, #facc15, #f97316);
+    border-color: transparent;
+    color: #111827;
+}
+
+/* Light */
+:root[data-theme="light"] .filtro-chip {
+    background: #f9fafb;
+    color: #111827;
+}
+
+:root[data-theme="light"] .filtro-chip--active {
+    color: #111827;
+}
+
+/* Radios disponibilidad */
+.filtros-radio-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.filtros-radio-item {
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+    color: #e5e7eb;
+}
+
+/* Light */
+:root[data-theme="light"] .filtros-radio-item {
+    color: #374151;
+}
+
+/* Switch ofertas */
+.filtros-switch .form-check-input {
+    cursor: pointer;
+}
+
+.filtros-switch .form-check-label {
+    font-size: 0.9rem;
+    color: #e5e7eb;
+}
+
+/* Light */
+:root[data-theme="light"] .filtros-switch .form-check-label {
+    color: #374151;
+}
+
+
+/* Slider de precio con color amarillo */
+.accent-warning::-webkit-slider-thumb {
+    background: #fbbf24;
+    border: 2px solid #fff;
+    box-shadow: 0 0 10px rgba(251, 191, 36, 0.6);
+}
+
+.accent-warning::-moz-range-thumb {
+    background: #fbbf24;
+    border: 2px solid #fff;
+    box-shadow: 0 0 10px rgba(251, 191, 36, 0.6);
+}
+
+/* Switch más grande y bonito */
+.form-check-input:checked {
+    background-color: #fbbf24;
+    border-color: #fbbf24;
+}
+
+/* Hover en pills */
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+/* Scroll suave en filtros largos */
+.catalogo-filtros {
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+}
+
+/* MODAL PRODUCTO DETALLE */
+
+.jayrita-modal .modal-dialog {
+    max-width: 1100px;
+}
+
+.jayrita-modal .modal-content {
+    border-radius: 1.75rem;
+    border: 1px solid rgba(148, 163, 184, 0.4);
+    background:
+        radial-gradient(circle at top left, rgba(251, 191, 36, 0.16), transparent 55%),
+        rgba(15, 23, 42, 0.98);
+    color: #e5e7eb;
+    box-shadow: 0 28px 70px rgba(0, 0, 0, 0.75);
+}
+
+/* Light mode */
+:root[data-theme="light"] .jayrita-modal .modal-content {
+    background:
+        radial-gradient(circle at top left, rgba(251, 191, 36, 0.10), transparent 55%),
+        #ffffff;
+    color: #0f172a;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.25);
+}
+
+.jayrita-modal .modal-header {
+    padding: 1.25rem 1.75rem 0 1.75rem;
+}
+
+.jayrita-modal .btn-close {
+    background-color: rgba(15, 23, 42, 0.75);
+    border-radius: 999px;
+    opacity: 0.85;
+}
+
+:root[data-theme="light"] .jayrita-modal .btn-close {
+    background-color: rgba(148, 163, 184, 0.35);
+}
+
+/* Texto dentro del modal */
+.jayrita-modal h1,
+.jayrita-modal h2,
+.jayrita-modal h3 {
+    color: #facc15;
+}
+
+:root[data-theme="light"] .jayrita-modal h1,
+:root[data-theme="light"] .jayrita-modal h2,
+:root[data-theme="light"] .jayrita-modal h3 {
+    color: #f59e0b;
+}
+
+.jayrita-modal .small,
+.jayrita-modal .text-white-50 {
+    color: rgba(226, 232, 240, 0.7) !important;
+}
+
+:root[data-theme="light"] .jayrita-modal .small,
+:root[data-theme="light"] .jayrita-modal .text-white-50 {
+    color: #6b7280 !important;
+}
+
+/* Caja de descripción */
+.modal-desc-box {
+    background: rgba(15, 23, 42, 0.95);
+    border-radius: 1.25rem;
+    border: 1px solid rgba(148, 163, 184, 0.45);
+}
+
+:root[data-theme="light"] .modal-desc-box {
+    background: #f9fafb;
+}
+
+.modal-text-body {
+    color: #e5e7eb;
+    font-size: 0.96rem;
+}
+
+:root[data-theme="light"] .modal-text-body {
+    color: #111827;
+}
+
+/* Badge oferta especial */
+.jayrita-modal .badge.bg-danger {
+    border-radius: 999px;
+    letter-spacing: 0.06em;
+}
+
+/* Botón cerrar redondeado */
+.jayrita-modal .btn-outline-secondary {
+    border-radius: 999px;
+    padding-inline: 2.2rem;
+}
+
+/* Fondo oscuro del overlay */
+.jayrita-modal-backdrop {
+    background: rgba(0, 0, 0, 0.92);
+}
+
+/* Título del sidebar de filtros */
+.filtros-title {
+    color: #000000;
+    /* negro */
+}
+
+/* Si quieres que en dark siga siendo claro y solo negro en light: */
+:root[data-theme="light"] .filtros-title {
+    color: #000000;
+}
+
+:root[data-theme="dark"] .filtros-title {
+    color: #ffffff;
+}
+
+/* ===== Modal de producto ===== */
+
+.jayrita-modal .modal-dialog {
+    max-width: 1100px;
+}
+
+.jayrita-modal .modal-content {
+    border-radius: 2rem;
+    border: 1px solid rgba(148, 163, 184, 0.4);
+    background:
+        radial-gradient(circle at top left, rgba(251, 191, 36, 0.20), transparent 55%),
+        #ffffff;
+    box-shadow: 0 30px 80px rgba(15, 23, 42, 0.30);
+    overflow: hidden;
+}
+
+/* Dark mode */
+:root[data-theme="dark"] .jayrita-modal .modal-content {
+    background:
+        radial-gradient(circle at top left, rgba(251, 191, 36, 0.20), transparent 55%),
+        #020617;
+    color: #e5e7eb;
+    box-shadow: 0 32px 90px rgba(0, 0, 0, 0.9);
+}
+
+.jayrita-modal .modal-header {
+    border: 0;
+    padding: 1.25rem 1.75rem 0 1.75rem;
+}
+
+.jayrita-modal .btn-close {
+    background-color: rgba(148, 163, 184, 0.3);
+    border-radius: 999px;
+    padding: 0.6rem;
+}
+
+.jayrita-modal .btn-close:hover {
+    background-color: rgba(148, 163, 184, 0.6);
+}
+
+/* Cuerpo */
+.modal-product-body {
+    padding-top: 0;
+}
+
+.modal-product-body .col-lg-5 {
+    border-right: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+@media (max-width: 992px) {
+    .modal-product-body .col-lg-5 {
+        border-right: 0;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.5rem;
+    }
+}
+
+/* Tarjeta de imagen */
+.jayrita-modal .col-lg-5 .position-relative {
+    background: radial-gradient(circle at top, rgba(15, 23, 42, 0.04), transparent 70%);
+    border-radius: 1.6rem;
+    padding: 1.2rem;
+}
+
+/* Título grande */
+.jayrita-modal h1.display-6 {
+    font-weight: 800;
+    letter-spacing: 0.02em;
+}
+
+/* Datos (marca, categoría, etc.) */
+.jayrita-modal .small {
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+:root[data-theme="dark"] .jayrita-modal .small {
+    color: rgba(226, 232, 240, 0.80);
+}
+
+/* Caja de descripción */
+.modal-desc-box {
+    background: #f9fafb;
+    border-radius: 1.25rem;
+    border: 1px solid rgba(148, 163, 184, 0.4);
+}
+
+:root[data-theme="dark"] .modal-desc-box {
+    background: rgba(15, 23, 42, 0.95);
+}
+
+.modal-text-body {
+    font-size: 0.95rem;
+    color: #111827;
+}
+
+:root[data-theme="dark"] .modal-text-body {
+    color: #e5e7eb;
+}
+
+/* Precio + badge oferta */
+.jayrita-modal .text-warning {
+    font-size: 2.1rem;
+}
+
+.jayrita-modal .badge.bg-danger {
+    border-radius: 999px;
+    letter-spacing: 0.06em;
+}
+
+/* Botón cerrar más soft */
+.jayrita-modal .btn-outline-secondary {
+    border-radius: 999px;
+    border-width: 2px;
+    font-weight: 600;
+}
+
+/* Cinta de stock (ya la tienes, solo suavizamos) */
+.agotado-badge {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+}
+
+/* Línea de Marca / textos fuertes en el modal */
+.jayrita-modal .row.small strong,
+.jayrita-modal .row.small span.fw-semibold,
+.jayrita-modal .row.small span.fw-semibold.text-white {
+    color: #000000 !important;
+    /* negro en ambos temas */
 }

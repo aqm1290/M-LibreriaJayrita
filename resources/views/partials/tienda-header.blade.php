@@ -12,16 +12,30 @@
             <!-- MENÚ DESKTOP -->
             <nav class="jayrita-nav d-none d-lg-flex align-items-center gap-4">
                 <a href="{{ route('tienda.home') }}"
-                    class="{{ request()->is('tienda') || request()->routeIs('tienda.home') ? 'active' : '' }}">Inicio</a>
-                <a href="{{ url('/catalogo') }}" class="{{ request()->is('catalogo') ? 'active' : '' }}">Catálogo</a>
+                    class="{{ request()->is('tienda') || request()->routeIs('tienda.home') ? 'active' : '' }}">
+                    Inicio
+                </a>
+
+                <a href="{{ url('/catalogo') }}" class="{{ request()->is('catalogo') ? 'active' : '' }}">
+                    Catálogo
+                </a>
+
                 <a href="{{ route('tienda.marcas') }}"
                     class="{{ request()->routeIs('tienda.marcas') ? 'active' : '' }}">
                     Marcas
-                </a> <a href="{{ url('/ofertas') }}" class="{{ request()->is('ofertas') ? 'active' : '' }}">Ofertas</a>
-                <a href="{{ url('/contacto') }}" class="{{ request()->is('contacto') ? 'active' : '' }}">Contacto</a>
+                </a>
+
+                <a href="{{ route('tienda.ofertas') }}"
+                    class="{{ request()->routeIs('tienda.ofertas') ? 'active' : '' }}">
+                    Ofertas
+                </a>
+
+                <a href="{{ url('/contacto') }}" class="{{ request()->is('contacto') ? 'active' : '' }}">
+                    Contacto
+                </a>
             </nav>
 
-            <!-- ACCIONES DERECHA - Todo visible en móvil y escritorio -->
+            <!-- ACCIONES DERECHA -->
             <div class="jayrita-actions d-flex align-items-center gap-2 gap-lg-3">
 
                 <!-- Switch de tema -->
@@ -30,7 +44,7 @@
                     <span class="moon">🌙</span>
                 </button>
 
-                <!-- MINI CARRITO → Siempre visible (móvil + escritorio) -->
+                <!-- MINI CARRITO -->
                 <div class="position-relative">
                     @livewire('tienda.mini-carrito')
                 </div>
@@ -48,10 +62,11 @@
                                 <small class="text-muted">Hola,</small><br>
                                 <strong>{{ auth('cliente')->user()->nombre }}</strong>
                             </li>
-                            <li><a class="dropdown-item py-2" href="{{ route('cliente.perfil') }}"><i
-                                        class="bi bi-person me-2"></i> Mi Perfil</a></li>
-                            {{-- <li><a class="dropdown-item py-2" href="{{ route('pedido.cliente') }}"><i
-                                        class="bi bi-bag-check me-2"></i> Mis Pedidos</a></li> --}}
+                            <li>
+                                <a class="dropdown-item py-2" href="{{ route('cliente.perfil') }}">
+                                    <i class="bi bi-person me-2"></i> Mi Perfil
+                                </a>
+                            </li>
                             <li>
                                 <hr class="dropdown-divider my-2">
                             </li>
@@ -66,7 +81,6 @@
                         </ul>
                     </div>
                 @else
-                    <!-- Botón Ingresar (se esconde en móvil muy pequeño) -->
                     <a href="{{ route('cliente.login') }}"
                         class="btn jayrita-btn--login d-none d-sm-inline-flex align-items-center gap-1">
                         <i class="bi bi-box-arrow-in-right"></i>
@@ -74,7 +88,7 @@
                     </a>
                 @endauth
 
-                <!-- HAMBURGUESA (solo móvil y tablet) -->
+                <!-- HAMBURGUESA -->
                 <button class="jayrita-mobile-toggle d-lg-none" id="mobileToggle" aria-label="Menú">
                     <i class="bi bi-list fs-3"></i>
                 </button>
@@ -83,25 +97,3 @@
         </div>
     </div>
 </header>
-
-<!-- MENÚ MÓVIL (overlay) -->
-<nav class="jayrita-mobile-menu d-lg-none" id="mobileMenu">
-    <div class="jayrita-mobile-menu__inner p-4">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h5 class="mb-0 fw-bold">Menú</h5>
-            <button id="mobileClose" class="btn-close btn-close-white"></button>
-        </div>
-
-        <a href="{{ route('tienda.home') }}" class="d-block py-3 border-bottom">Inicio</a>
-        <a href="{{ url('/catalogo') }}" class="d-block py-3 border-bottom">Catálogo</a>
-        <a href="{{ url('/marcas') }}" class="d-block py-3 border-bottom">Marcas</a>
-        <a href="{{ url('/ofertas') }}" class="d-block py-3 border-bottom">Ofertas</a>
-        <a href="{{ url('/contacto') }}" class="d-block py-3 border-bottom">Contacto</a>
-
-        @guest('cliente')
-            <a href="{{ route('cliente.login') }}" class="btn jayrita-btn--login w-100 mt-4">
-                Ingresar
-            </a>
-        @endguest
-    </div>
-</nav>

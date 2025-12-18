@@ -54,13 +54,29 @@ class PedidoActual extends Component
         // 3. Buscar si ya existe item de ese producto en el pedido
         $item = $this->pedido->items()->where('producto_id', $producto->id)->first();
 
+        $stockDisponible = $producto->stock ?? 0;
+        $cantidadActual  = $item?->cantidad ?? 0;
+
+        // 3.1 Si no hay stock o ya se alcanzó el máximo, NO agregar más
+        if ($stockDisponible <= 0) {
+            $this->dispatch('mostrar-toast', mensaje: 'Producto agotado, no hay unidades disponibles.');
+            return;
+        }
+
+        if ($cantidadActual >= $stockDisponible) {
+            $this->dispatch(
+                'mostrar-toast',
+                mensaje: "Solo hay {$stockDisponible} unidades disponibles de este producto."
+            );
+            return;
+        }
+
+        // 4. Agregar una unidad más sin pasar el stock
         if ($item) {
-            // Ya existe: incrementar cantidad y recalcular subtotal
             $item->increment('cantidad');
             $item->subtotal = $item->cantidad * $item->precio_unitario;
             $item->save();
         } else {
-            // No existe: crear nuevo item
             $this->pedido->items()->create([
                 'producto_id'     => $producto->id,
                 'nombre_producto' => $producto->nombre,
@@ -70,16 +86,17 @@ class PedidoActual extends Component
             ]);
         }
 
-        // 4. Recalcular total del pedido
+        // 5. Recalcular total del pedido
         $this->pedido->total = $this->pedido->items()->sum('subtotal');
         $this->pedido->save();
 
-        // 5. Actualizar mini-carrito
+        // 6. Actualizar mini‑carrito
         $this->dispatch('carrito-actualizado');
 
-        // 6. Mostrar toast en la vista (evento para JS/Alpine)
+        // 7. Toast OK
         $this->dispatch('mostrar-toast', mensaje: 'Producto agregado al carrito');
     }
+
 
 
 

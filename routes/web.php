@@ -61,6 +61,11 @@ Route::get('/catalogo', CatalogoProductos::class)->name('tienda.catalogo');
 Route::get('/tienda/marcas', ListaMarcas::class)->name('tienda.marcas');
 Route::get('/tienda/marca/{marca}', CatalogoMarca::class)->name('tienda.marca');
 
+use App\Livewire\Tienda\Ofertas;
+
+Route::get('/tienda/ofertas', Ofertas::class)->name('tienda.ofertas');
+
+
 // Perfil cliente (tienda)
 Route::get('/mi-perfil', \App\Livewire\Cliente\Perfil::class)
     ->name('cliente.perfil')

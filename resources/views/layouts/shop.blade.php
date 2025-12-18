@@ -14,7 +14,7 @@
     <link href="https://fonts.googleapis.com" rel="preconnect">
     <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700,1,900&family=Raleway:wght@400;500;600;700;800;900&family=Nunito+Sans:wght@400;600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&family=Raleway:wght@400;500;600;700;800;900&family=Nunito+Sans:wght@400;600;700&display=swap"
         rel="stylesheet">
 
     {{-- Vendor CSS --}}
@@ -24,11 +24,10 @@
     <link rel="stylesheet" href="{{ asset('shop/assets/vendor/swiper/swiper-bundle.min.css') }}">
     <link rel="stylesheet" href="{{ asset('shop/assets/vendor/glightbox/css/glightbox.min.css') }}">
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     {{-- Main CSS --}}
-    {{--     <link rel="stylesheet" href="{{ asset('shop/assets/css/main.css') }}">
- --}}
     <link rel="stylesheet" href="{{ asset('css/tienda-theme.css') }}">
-
 
     {{-- Livewire --}}
     @livewireStyles
@@ -69,30 +68,31 @@
     <main class="main min-vh-100 d-flex flex-column">
         <div class="flex-grow-1 py-5">
             @yield('content')
-            {{-- Para componentes Livewire que usen ->layout('layouts.shop') --}}
             {{ $slot ?? '' }}
         </div>
     </main>
 
+    @php
+        use App\Models\Categoria;
+
+        $footerCategorias = Categoria::where('activo', 1)->orderBy('nombre')->limit(5)->get();
+    @endphp
+
     @include('partials.tienda-footer')
-
-
-
-
 
     @livewire('tienda.pedido-actual')
 
-
-    {{-- Zona flotante: mini carrito + scroll top --}}
+    {{-- Zona flotante: WhatsApp + scroll top --}}
     <div class="jayrita-floating-right">
+        <a href="https://wa.me/59163414986" target="_blank" rel="noopener" class="jayrita-whatsapp-btn">
+            <i class="bi bi-whatsapp"></i>
+        </a>
 
-        {{-- Botón scroll top junto al carrito --}}
         <button id="scroll-top" type="button"
             class="jayrita-scroll-top d-flex align-items-center justify-content-center">
             <i class="bi bi-arrow-up-short"></i>
         </button>
     </div>
-
 
     {{-- Vendor JS --}}
     <script src="{{ asset('shop/assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
@@ -103,7 +103,6 @@
     <script src="{{ asset('shop/assets/vendor/imagesloaded/imagesloaded.pkgd.min.js') }}"></script>
     <script src="{{ asset('shop/assets/vendor/isotope-layout/isotope.pkgd.min.js') }}"></script>
 
-
     <script src="{{ asset('js/tienda-theme.js') }}"></script>
 
     @stack('scripts')
@@ -111,8 +110,6 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
     @livewireScripts
-
-
 </body>
 
 </html>

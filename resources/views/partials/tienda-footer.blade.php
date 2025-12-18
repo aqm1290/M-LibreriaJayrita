@@ -27,8 +27,8 @@
                     <ul class="jayrita-footer-list">
                         <li><a href="{{ url('/') }}">Inicio</a></li>
                         <li><a href="{{ url('/catalogo') }}">Catálogo</a></li>
-                        <li><a href="{{ url('/marcas') }}">Marcas</a></li>
-                        <li><a href="{{ url('/ofertas') }}">Ofertas</a></li>
+                        <li><a href="{{ route('tienda.marcas') }}">Marcas</a></li>
+                        <li><a href="{{ route('tienda.ofertas') }}">Ofertas</a></li>
                         <li><a href="{{ url('/contacto') }}">Contacto</a></li>
                     </ul>
                 </div>
@@ -37,13 +37,16 @@
                 <div class="col-lg-3 col-6">
                     <h5 class="jayrita-footer-title">Categorías</h5>
                     <ul class="jayrita-footer-list">
-                        <li><a href="#">Útiles escolares</a></li>
-                        <li><a href="#">Libros y novelas</a></li>
-                        <li><a href="#">Oficina y escritorio</a></li>
-                        <li><a href="#">Arte y dibujo</a></li>
-                        <li><a href="#">Regalos</a></li>
+                        @foreach ($footerCategorias as $cat)
+                            <li>
+                                <a href="{{ route('tienda.home', ['categoriaActiva' => $cat->id]) }}">
+                                    {{ $cat->nombre }}
+                                </a>
+                            </li>
+                        @endforeach
                     </ul>
                 </div>
+
 
                 {{-- Columna 4: contacto --}}
                 <div class="col-lg-2 col-md-12">

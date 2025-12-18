@@ -65,12 +65,7 @@ class Producto extends Model
         return $this->belongsTo(Promocion::class, 'promo_id');
     }
 
-    // NUEVA relación Many-to-Many con promociones (tabla promo_producto)
-    public function promociones()
-    {
-        return $this->belongsToMany(Promocion::class, 'promo_producto', 'producto_id', 'promo_id')->activas();;
-    }
-
+   
     public function carritoDetalles()
     {
         return $this->hasMany(CarritoDetalle::class);

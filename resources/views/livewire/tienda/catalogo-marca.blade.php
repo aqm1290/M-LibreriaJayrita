@@ -1,260 +1,524 @@
 <div>
     @section('title', 'Marcas - ' . ($marca->nombre ?? 'Catálogo'))
 
-    <div class="container pt-5 mt-5"><!-- Evita que se corte con el header fijo -->
+    <div class="container pt-5 mt-5">
 
-        {{-- FILTRO DE MARCAS --}}
-        <div class="mb-4">
-            <h2 class="fw-black text-warning mb-3">Marcas</h2>
-            <div class="d-flex flex-wrap gap-2">
-                @foreach ($marcas as $m)
-                    <button type="button" wire:click="setMarca({{ $m->id }})"
-                        class="btn btn-sm text-black rounded-pill 
-                            {{ $m->id === $marca->id ? 'btn-warning fw-bold text-dark' : 'btn-outline-secondary text-light' }}">
-                        {{ $m->nombre }}
-                    </button>
-                @endforeach
-            </div>
-        </div>
-
-        {{-- TÍTULO --}}
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        {{-- TÍTULO + VOLVER --}}
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
             <div>
                 <h1 class="display-6 fw-black text-warning mb-1">
                     Productos de {{ $marca->nombre }}
                 </h1>
-                <p class="mb-0" style="color: color-mix(in srgb, var(--default-color), transparent 40%);">
-                    Explora todos los productos disponibles de esta marca.
+                <p class="mb-0 subtitulo-modelos">
+                    Filtra por modelo, busca por nombre o código y explora los productos de esta marca.
                 </p>
             </div>
-            <div class="d-none d-md-block">
+            <div>
                 <a href="{{ route('tienda.marcas') }}" class="btn btn-outline-warning rounded-pill">
                     ← Ver todas las marcas
                 </a>
             </div>
         </div>
 
-        {{-- GRID DE PRODUCTOS --}}
+        {{-- FILTRO DE MODELOS + BUSCADOR + ORDEN --}}
+        <div class="mb-4">
+            <div class="d-flex flex-column flex-lg-row gap-3 align-items-lg-center justify-content-between">
+                <div>
+                    <h2 class="fw-black titulo-filtro-modelos mb-2">Modelos</h2>
+                    <div class="d-flex flex-wrap gap-2">
+                        <button type="button" wire:click="setModelo(null)"
+                            class="btn btn-sm rounded-pill chip-modelo {{ $modeloId === null ? 'chip-modelo--active' : '' }}">
+                            Todos
+                        </button>
+
+                        @foreach ($modelos as $mod)
+                            <button type="button" wire:click="setModelo({{ $mod->id }})"
+                                class="btn btn-sm rounded-pill chip-modelo
+                                        {{ $modeloId === $mod->id ? 'chip-modelo--active' : '' }}">
+                                {{ $mod->nombre }}
+                            </button>
+                        @endforeach
+                    </div>
+                </div>
+
+                <div class="d-flex flex-column flex-sm-row gap-2 align-items-stretch ms-lg-auto">
+                    {{-- Buscador --}}
+                    <div class="input-group buscador-marca">
+                        <span class="input-group-text">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" class="form-control" placeholder="Buscar por nombre o código..."
+                            wire:model.debounce.400ms="busqueda">
+                    </div>
+
+                    {{-- Orden --}}
+                    <select class="form-select select-orden" wire:model.live="orden">
+                        <option value="relevancia">Ordenar por: Relevancia</option>
+                        <option value="precio_asc">Precio: menor a mayor</option>
+                        <option value="precio_desc">Precio: mayor a menor</option>
+                        <option value="nombre_asc">Nombre A–Z</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        {{-- LAYOUT: GALERÍA + DETALLE --}}
         <div class="row g-4">
-            @forelse ($productos as $producto)
-                <div class="col-6 col-sm-6 col-md-4 col-lg-3 col-xl-3">
-                    <div class="card bg-dark border-0 rounded-4 overflow-hidden shadow-lg h-100 product-card">
-                        {{-- IMAGEN --}}
-                        <div class="position-relative overflow-hidden bg-black">
-                            @if ($producto->imagen_url)
-                                <img src="{{ $producto->imagen_url }}" class="card-img-top"
-                                    alt="{{ $producto->nombre }}"
-                                    style="height: 200px; object-fit: cover; transition: transform 0.5s ease;">
-                            @else
-                                <div class="d-flex align-items-center justify-content-center bg-secondary"
-                                    style="height: 200px;">
-                                    <i class="bi bi-image display-4 text-white-50"></i>
-                                </div>
-                            @endif
-
-                            @if ($producto->promociones->isNotEmpty())
-                                <div class="position-absolute top-0 start-0 m-3">
-                                    <span class="badge bg-danger fs-6 px-3 py-2 rounded-pill shadow">OFERTA</span>
-                                </div>
-                            @endif
-
-                            <div class="zoom-overlay">
-                                <button type="button" class="btn btn-warning btn-lg rounded-circle shadow-lg"
-                                    wire:click="abrirModal({{ $producto->id }})">
-                                    <i class="bi bi-zoom-in fs-4"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        {{-- CUERPO --}}
-                        <div class="card-body p-3 d-flex flex-column">
-                            <h3 class="h6 fw-bold text-white mb-1 line-clamp-2">
-                                {{ $producto->nombre }}
-                            </h3>
-                            <p class="small text-white-50 mb-2">
-                                {{ $producto->categoria?->nombre ?? 'Sin categoría' }}
-                                @if ($producto->modelo?->nombre)
-                                    · {{ $producto->modelo->nombre }}
-                                @endif
-                            </p>
-
-                            <div class="mt-auto">
-                                <div class="d-flex justify-content-between align-items-end mb-3">
-                                    <span class="fs-5 fw-black text-warning">
-                                        Bs {{ number_format($producto->precio, 2) }}
-                                    </span>
-                                </div>
-
-                                <div class="d-grid gap-2">
-                                    <button type="button" class="btn btn-warning btn-md fw-bold rounded-pill py-2"
-                                        wire:click="agregarAlPedido({{ $producto->id }})">
-                                        <i class="bi bi-cart-plus me-2"></i>
-                                        Agregar
-                                    </button>
-
-                                    <button type="button" class="btn btn-outline-warning btn-sm rounded-pill"
-                                        wire:click="abrirModal({{ $producto->id }})">
-                                        <i class="bi bi-eye me-2"></i> Ver detalle
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            @empty
-                <div class="col-12 text-center py-5">
-                    <i class="bi bi-emoji-frown display-1 text-warning mb-4"></i>
-                    <h3 class="text-white fw-bold">No hay productos para esta marca.</h3>
-                    <p class="lead" style="color: color-mix(in srgb, var(--default-color), transparent 45%);">
-                        Prueba seleccionando otra marca en la parte superior.
-                    </p>
-                </div>
-            @endforelse
-        </div>
-
-        {{-- PAGINACIÓN --}}
-        <div class="mt-5 d-flex justify-content-center">
-            {{ $productos->links('vendor.pagination.bootstrap-5') }}
-        </div>
-    </div>
-
-    {{-- MODAL DETALLE --}}
-    @if (!is_null($productoSeleccionado))
-        <div class="modal fade show d-block jayrita-modal" id="productoModal" tabindex="-1"
-            wire:keydown.escape="cerrarModal" style="background: rgba(0,0,0,0.95); z-index: 9999;">
-            <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
-                <div class="modal-content border-0 rounded-4 shadow-lg">
-                    <div class="modal-header border-0">
-                        <button wire:click="cerrarModal" class="btn-close"></button>
-                    </div>
-
-                    <div class="modal-body p-4 p-lg-5">
-                        <div class="row g-5">
-                            <div class="col-lg-5">
-                                <img src="{{ $productoSeleccionado->imagen_url ?? asset('images/no-image.png') }}"
-                                    class="img-fluid rounded-4 shadow-lg" alt="{{ $productoSeleccionado->nombre }}"
-                                    style="max-height: 500px; object-fit: contain;">
-                            </div>
-
-                            <div class="col-lg-7">
-                                <h1 class="display-5 fw-black text-warning mb-3">
-                                    {{ $productoSeleccionado->nombre }}
-                                </h1>
-
-                                <div class="row g-3 mb-4">
-                                    <div class="col-sm-6 modal-text-muted">
-                                        <strong>Marca:</strong>
-                                        <span class="fw-bold">
-                                            {{ $productoSeleccionado->marca?->nombre ?? 'Sin marca' }}
-                                        </span>
-                                    </div>
-                                    <div class="col-sm-6 modal-text-muted">
-                                        <strong>Categoría:</strong>
-                                        {{ $productoSeleccionado->categoria?->nombre ?? 'Sin categoría' }}
-                                    </div>
-                                    @if ($productoSeleccionado->modelo)
-                                        <div class="col-sm-6 modal-text-muted">
-                                            <strong>Modelo:</strong>
-                                            {{ $productoSeleccionado->modelo->nombre }}
+            {{-- GALERÍA --}}
+            <div class="col-12 col-lg-6">
+                <div class="row g-3">
+                    @forelse ($productos as $producto)
+                        @php
+                            $stock = $producto->stock ?? 0;
+                            $agotado = $stock <= 0;
+                            $stockBajo = $stock > 0 && $stock <= 5;
+                        @endphp
+                        <div class="col-6 col-md-4">
+                            <button type="button" wire:click="seleccionarProducto({{ $producto->id }})"
+                                class="galeria-card w-100 {{ $productoSeleccionado && $producto->id === $productoSeleccionado->id ? 'galeria-card--active' : '' }}">
+                                <div class="galeria-thumb tooltip-producto">
+                                    @if ($producto->imagen_url)
+                                        <img src="{{ $producto->imagen_url }}" alt="{{ $producto->nombre }}">
+                                    @else
+                                        <div
+                                            class="galeria-thumb-empty d-flex align-items-center justify-content-center">
+                                            <i class="bi bi-image"></i>
                                         </div>
                                     @endif
-                                    <div class="col-sm-6 modal-text-muted">
-                                        <strong>Código:</strong>
-                                        {{ $productoSeleccionado->codigo ?? 'N/A' }}
+
+                                    {{-- Tooltip (nombre + precio) --}}
+                                    <div class="tooltip-producto-content">
+                                        <div class="fw-bold">{{ $producto->nombre }}</div>
+                                        <div class="small">
+                                            Bs {{ number_format($producto->precio, 2) }}
+                                        </div>
+                                    </div>
+
+                                    {{-- Badge stock --}}
+                                    @if ($agotado)
+                                        <span class="badge-stock badge-stock--agotado">Agotado</span>
+                                    @elseif ($stockBajo)
+                                        <span class="badge-stock badge-stock--bajo">
+                                            Quedan {{ $stock }} uds.
+                                        </span>
+                                    @endif
+                                </div>
+                            </button>
+                        </div>
+                    @empty
+                        <div class="col-12 text-center py-5">
+                            <i class="bi bi-emoji-frown display-1 text-warning mb-3"></i>
+                            <h3 class="empty-title-text">No se encontraron productos.</h3>
+                            <p class="empty-sub-text">Prueba con otra búsqueda o modelo.</p>
+                        </div>
+                    @endforelse
+                </div>
+
+                <div class="mt-4 d-flex justify-content-center">
+                    {{ $productos->links('vendor.pagination.bootstrap-5') }}
+                </div>
+            </div>
+
+            {{-- DETALLE --}}
+            <div class="col-12 col-lg-6">
+                @if ($productoSeleccionado)
+                    @php
+                        $stockSel = $productoSeleccionado->stock ?? 0;
+                        $agotadoSel = $stockSel <= 0;
+                        $stockBajoSel = $stockSel > 0 && $stockSel <= 5;
+                    @endphp
+
+                    <div class="detalle-card p-4 p-lg-5 rounded-4 shadow-lg">
+                        <div class="row g-4 align-items-center">
+                            <div class="col-md-6">
+                                <div class="detalle-img-wrapper mb-3 mb-md-0 position-relative">
+                                    <img src="{{ $productoSeleccionado->imagen_url ?? asset('images/no-image.png') }}"
+                                        alt="{{ $productoSeleccionado->nombre }}">
+
+                                    @if ($agotadoSel)
+                                        <span class="badge-stock badge-stock--agotado detalle-badge-top">Agotado</span>
+                                    @elseif ($stockBajoSel)
+                                        <span class="badge-stock badge-stock--bajo detalle-badge-top">
+                                            ¡Últimas {{ $stockSel }} uds.!
+                                        </span>
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h2 class="detalle-title mb-3">
+                                    {{ $productoSeleccionado->nombre }}
+                                </h2>
+
+                                <div class="small detalle-meta mb-3">
+                                    <div><strong>Marca:</strong>
+                                        {{ $productoSeleccionado->marca?->nombre ?? 'Sin marca' }}</div>
+                                    <div><strong>Modelo:</strong>
+                                        {{ $productoSeleccionado->modelo?->nombre ?? 'Sin modelo' }}</div>
+                                    <div><strong>Categoría:</strong>
+                                        {{ $productoSeleccionado->categoria?->nombre ?? 'Sin categoría' }}</div>
+                                    <div><strong>Código:</strong> {{ $productoSeleccionado->codigo ?? 'N/A' }}</div>
+                                    <div>
+                                        <strong>Stock:</strong>
+                                        <span class="{{ $agotadoSel ? 'text-danger fw-bold' : '' }}">
+                                            {{ $stockSel }} uds.
+                                        </span>
                                     </div>
                                 </div>
 
                                 @if ($productoSeleccionado->descripcion)
-                                    <div class="modal-desc-box rounded-4 p-4 mb-4">
-                                        <p class="lead modal-text-body lh-lg mb-0">
-                                            {{ $productoSeleccionado->descripcion }}
-                                        </p>
-                                    </div>
+                                    <p class="detalle-desc mb-3">
+                                        {{ $productoSeleccionado->descripcion }}
+                                    </p>
                                 @endif
 
-                                <div class="d-flex align-items-center gap-4 mb-4">
-                                    <h1 class="text-warning fw-black mb-0">
+                                <div class="d-flex align-items-center gap-3 mb-4">
+                                    <h3 class="detalle-price mb-0">
                                         Bs {{ number_format($productoSeleccionado->precio, 2) }}
-                                    </h1>
-                                    @if ($productoSeleccionado->promociones->isNotEmpty())
-                                        <span class="badge bg-danger fs-4 px-4 py-2">
+                                    </h3>
+                                    @if ($productoSeleccionado->promo)
+                                        <span class="badge modal-badge-oferta">
                                             OFERTA ESPECIAL
                                         </span>
                                     @endif
                                 </div>
 
-                                <div class="d-flex flex-wrap gap-3">
-                                    <button type="button" class="btn btn-warning btn-lg px-5 rounded-pill fw-bold"
-                                        wire:click="agregarAlPedido({{ $productoSeleccionado->id }})">
-                                        <i class="bi bi-cart-plus fs-4 me-3"></i>
-                                        Agregar al carrito
-                                    </button>
-                                    <button type="button" class="btn btn-outline-secondary btn-lg px-5 rounded-pill"
-                                        wire:click="cerrarModal">
-                                        Cerrar
-                                    </button>
-                                </div>
+                                <button type="button"
+                                    class="btn btn-add-cart-modern btn-lg px-4 {{ $agotadoSel ? 'btn-add-cart-disabled' : '' }}"
+                                    wire:click="agregarAlPedido({{ $productoSeleccionado->id }})"
+                                    @if ($agotadoSel) disabled @endif>
+                                    <i class="bi bi-cart-plus fs-4 me-2"></i>
+                                    {{ $agotadoSel ? 'Agotado' : 'Añadir al carrito' }}
+                                </button>
                             </div>
                         </div>
                     </div>
-
-                </div>
+                @else
+                    <div class="detalle-placeholder rounded-4 p-4 p-lg-5 text-center">
+                        <i class="bi bi-mouse display-3 mb-3"></i>
+                        <h4 class="mb-1">Selecciona un producto</h4>
+                        <p class="mb-0">Haz clic en cualquiera de las imágenes de la izquierda para ver los detalles.
+                        </p>
+                    </div>
+                @endif
             </div>
-        </div>
-    @endif
-
-    {{-- TOAST "PRODUCTO AGREGADO" --}}
-    <div x-data="{ showToast: false, mensaje: '' }" x-init="document.addEventListener('mostrar-toast', (e) => {
-        mensaje = e.detail.mensaje || '¡Producto agregado!';
-        showToast = true;
-        setTimeout(() => showToast = false, 3000);
-    });" x-show="showToast" x-transition
-        class="position-fixed bottom-0 end-0 m-4 z-50">
-        <div class="bg-success text-white px-4 py-3 rounded-3 shadow-lg d-flex align-items-center gap-3">
-            <i class="bi bi-check-circle-fill fs-4"></i>
-            <strong x-text="mensaje"></strong>
         </div>
     </div>
 
-    {{-- ESTILOS REUTILIZADOS --}}
+    {{-- TOAST --}}
+    <div x-data="{ showToast: false, mensaje: '' }" x-init="document.addEventListener('mostrar-toast', (e) => {
+        mensaje = e.detail.mensaje || '¡Producto agregado al carrito!';
+        showToast = true;
+        setTimeout(() => showToast = false, 3500);
+    });" x-show="showToast" x-transition
+        class="position-fixed bottom-0 end-0 m-4 z-50">
+        <div class="bg-success text-white px-5 py-4 rounded-4 shadow-2xl d-flex align-items-center gap-4">
+            <i class="bi bi-check-circle-fill fs-3"></i>
+            <strong x-text="mensaje" class="fs-5"></strong>
+        </div>
+    </div>
+
+    {{-- ESTILOS --}}
     <style>
-        .product-card {
-            transition: all 0.4s ease;
+        .subtitulo-modelos {
+            color: color-mix(in srgb, var(--default-color), transparent 40%);
         }
 
-        .product-card:hover {
-            transform: translateY(-12px);
-            box-shadow: 0 20px 40px rgba(255, 193, 7, 0.25) !important;
+        .titulo-filtro-modelos {
+            color: #facc15;
         }
 
-        .product-card:hover img {
-            transform: scale(1.1);
+        :root[data-theme="light"] .titulo-filtro-modelos {
+            color: #f59e0b;
         }
 
-        .zoom-overlay {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            opacity: 0;
-            transition: opacity 0.4s ease;
-            z-index: 10;
+        /* Chips modelos */
+        .chip-modelo {
+            border-radius: 999px;
+            padding-inline: 1.1rem;
+            border: 1px solid rgba(148, 163, 184, 0.6);
+            background: transparent;
+            color: #e5e7eb;
+            font-weight: 600;
+            font-size: 0.8rem;
         }
 
-        .product-card:hover .zoom-overlay {
-            opacity: 1;
+        :root[data-theme="light"] .chip-modelo {
+            color: #374151;
+            background: rgba(255, 255, 255, 0.8);
         }
 
-        .line-clamp-2 {
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
+        .chip-modelo--active {
+            background: #facc15;
+            border-color: #facc15;
+            color: #111827;
+        }
+
+        /* Buscador + orden */
+        .buscador-marca .input-group-text {
+            background: rgba(15, 23, 42, 0.9);
+            border-color: rgba(148, 163, 184, 0.5);
+            color: #9ca3af;
+        }
+
+        .buscador-marca .form-control {
+            background: rgba(15, 23, 42, 0.9);
+            border-color: rgba(148, 163, 184, 0.5);
+            color: #e5e7eb;
+        }
+
+        .buscador-marca .form-control::placeholder {
+            color: #9ca3af;
+        }
+
+        .buscador-marca .form-control:focus {
+            border-color: #fbbf24;
+            box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.6);
+        }
+
+        :root[data-theme="light"] .buscador-marca .input-group-text {
+            background: #ffffff;
+            color: #6b7280;
+        }
+
+        :root[data-theme="light"] .buscador-marca .form-control {
+            background: #ffffff;
+            color: #111827;
+        }
+
+        .select-orden {
+            min-width: 220px;
+            background: rgba(15, 23, 42, 0.9);
+            border-color: rgba(148, 163, 184, 0.5);
+            color: #e5e7eb;
+        }
+
+        :root[data-theme="light"] .select-orden {
+            background: #ffffff;
+            color: #111827;
+        }
+
+        .select-orden:focus {
+            border-color: #fbbf24;
+            box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.6);
+        }
+
+        /* Galería */
+        .galeria-card {
+            border-radius: 1rem;
+            padding: 0;
+            border: 2px solid transparent;
             overflow: hidden;
-            text-overflow: ellipsis;
+            background: transparent;
+            transition: all 0.2s ease;
         }
 
-        .jayrita-modal .modal-content {
+        .galeria-thumb {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            background: #020617;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .galeria-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+
+        .galeria-thumb-empty {
+            width: 100%;
+            height: 100%;
+            background: #111827;
+            color: #6b7280;
+            font-size: 2rem;
+        }
+
+        :root[data-theme="light"] .galeria-thumb,
+        :root[data-theme="light"] .galeria-thumb-empty {
+            background: #f3f4f6;
+            color: #9ca3af;
+        }
+
+        .galeria-card:hover .galeria-thumb img {
+            transform: scale(1.05);
+        }
+
+        .galeria-card:hover {
+            border-color: rgba(148, 163, 184, 0.8);
+        }
+
+        .galeria-card--active {
+            border-color: #facc15;
+            box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.6);
+        }
+
+        /* Tooltip */
+        .tooltip-producto {
+            position: relative;
+        }
+
+        .tooltip-producto-content {
+            position: absolute;
+            left: 50%;
+            bottom: 8px;
+            transform: translateX(-50%);
+            padding: 0.35rem 0.7rem;
+            border-radius: 999px;
+            background: rgba(15, 23, 42, 0.9);
+            color: #e5e7eb;
+            font-size: 0.7rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            white-space: nowrap;
+        }
+
+        :root[data-theme="light"] .tooltip-producto-content {
+            background: rgba(17, 24, 39, 0.95);
+            color: #f9fafb;
+        }
+
+        .tooltip-producto:hover .tooltip-producto-content {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-4px);
+        }
+
+        /* Badges de stock */
+        .badge-stock {
+            position: absolute;
+            left: 8px;
+            top: 8px;
+            border-radius: 999px;
+            padding: 0.15rem 0.6rem;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+        }
+
+        .badge-stock--agotado {
+            background: #ef4444;
+            color: #ffffff;
+        }
+
+        .badge-stock--bajo {
+            background: #f97316;
+            color: #ffffff;
+        }
+
+        .detalle-badge-top {
+            top: 10px;
+            left: 10px;
+        }
+
+        /* Detalle */
+        .detalle-card {
+            background:
+                radial-gradient(circle at top left, rgba(251, 191, 36, 0.16), transparent 55%),
+                #020617;
+            border: 1px solid rgba(148, 163, 184, 0.4);
+            color: #e5e7eb;
+        }
+
+        :root[data-theme="light"] .detalle-card {
+            background:
+                radial-gradient(circle at top left, rgba(251, 191, 36, 0.10), transparent 55%),
+                #ffffff;
+            color: #111827;
+        }
+
+        .detalle-img-wrapper {
+            background: #020617;
+            border-radius: 1.25rem;
+            padding: 1rem;
+        }
+
+        .detalle-img-wrapper img {
+            width: 100%;
+            height: 260px;
+            object-fit: contain;
+        }
+
+        :root[data-theme="light"] .detalle-img-wrapper {
+            background: #f9fafb;
+        }
+
+        .detalle-title {
+            color: #facc15;
+            font-weight: 800;
+        }
+
+        :root[data-theme="light"] .detalle-title {
+            color: #f59e0b;
+        }
+
+        .detalle-meta {
+            color: rgba(226, 232, 240, 0.85);
+        }
+
+        :root[data-theme="light"] .detalle-meta {
+            color: #6b7280;
+        }
+
+        .detalle-desc {
+            font-size: 0.95rem;
+            color: #e5e7eb;
+        }
+
+        :root[data-theme="light"] .detalle-desc {
+            color: #111827;
+        }
+
+        .detalle-price {
+            color: #facc15;
+            font-weight: 800;
+        }
+
+        :root[data-theme="light"] .detalle-price {
+            color: #eab308;
+        }
+
+        .modal-badge-oferta {
+            background: linear-gradient(135deg, #f97316, #ef4444);
+            color: #ffffff;
+            border-radius: 999px;
+            letter-spacing: 0.06em;
+        }
+
+        .detalle-placeholder {
             border-radius: 1.5rem;
+            border: 1px dashed rgba(148, 163, 184, 0.5);
+            color: rgba(148, 163, 184, 0.9);
+            background: rgba(15, 23, 42, 0.35);
+        }
+
+        :root[data-theme="light"] .detalle-placeholder {
+            background: #f9fafb;
+            color: #6b7280;
+            border-color: rgba(148, 163, 184, 0.7);
+        }
+
+        .empty-title-text {
+            color: #f9fafb;
+        }
+
+        .empty-sub-text {
+            color: color-mix(in srgb, var(--default-color), transparent 45%);
+        }
+
+        :root[data-theme="light"] .empty-title-text {
+            color: #111827;
+        }
+
+        @media (max-width: 992px) {
+            .detalle-img-wrapper img {
+                height: 220px;
+            }
         }
     </style>
 </div>
