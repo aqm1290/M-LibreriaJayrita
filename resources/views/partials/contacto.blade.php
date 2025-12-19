@@ -3,9 +3,7 @@
     {{-- Título --}}
     <div class="container section-title">
         <h2>Contacto</h2>
-        <div>
-
-        </div>
+        <div></div>
     </div>
 
     <div class="container">
@@ -61,64 +59,11 @@
             referrerpolicy="no-referrer-when-downgrade"></iframe>
     </div>
 
-    {{-- Formulario superpuesto --}}
+    {{-- Formulario superpuesto (Livewire) --}}
     <div class="container form-container-overlap">
         <div class="row justify-content-center">
             <div class="col-lg-10">
-                <div class="contact-form-wrapper">
-                    <h2 class="text-center mb-4">Envíanos un mensaje</h2>
-
-                    <form action="" method="post">
-                        @csrf
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <div class="input-with-icon">
-                                        <i class="bi bi-person"></i>
-                                        <input type="text" class="form-control" name="name"
-                                            placeholder="Nombre completo" required>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <div class="input-with-icon">
-                                        <i class="bi bi-envelope"></i>
-                                        <input type="email" class="form-control" name="email"
-                                            placeholder="Correo electrónico" required>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <div class="input-with-icon">
-                                        <i class="bi bi-text-left"></i>
-                                        <input type="text" class="form-control" name="subject" placeholder="Asunto"
-                                            required>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-12">
-                                <div class="form-group">
-                                    <div class="input-with-icon">
-                                        <i class="bi bi-chat-dots message-icon"></i>
-                                        <textarea class="form-control" name="message" placeholder="Escribe tu mensaje..." required></textarea>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-12 text-center">
-                                <button type="submit" class="btn btn-submit">
-                                    ENVIAR MENSAJE
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-
-                </div>
+                @livewire('tienda.contacto-form')
             </div>
         </div>
     </div>

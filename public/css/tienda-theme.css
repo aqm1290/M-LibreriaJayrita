@@ -1372,6 +1372,121 @@ body {
 
 
 
+/* ====================== LOGIN / REGISTER CLIENTE ====================== */
+
+.jayrita-auth-card {
+    background: var(--surface-color);
+    border-radius: 20px;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    box-shadow: 0 20px 45px rgba(15, 23, 42, 0.25);
+    transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+:root[data-theme="dark"] .jayrita-auth-card {
+    box-shadow: 0 22px 50px rgba(0, 0, 0, 0.7);
+}
+
+/* badge superior */
+.jayrita-auth-badge {
+    background: color-mix(in srgb, var(--accent-color), transparent 75%);
+    color: var(--accent-color);
+    font-size: 0.78rem;
+    letter-spacing: 0.03em;
+}
+
+/* título y subtítulo */
+.jayrita-auth-title {
+    color: var(--default-color);
+}
+
+.jayrita-auth-subtitle {
+    color: color-mix(in srgb, var(--default-color), transparent 35%);
+    font-size: 0.95rem;
+}
+
+/* labels */
+.jayrita-auth-label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: color-mix(in srgb, var(--default-color), transparent 15%);
+}
+
+/* inputs principales (login + register) */
+.jayrita-auth-input,
+.jayrita-auth-input-secondary {
+    border-radius: 10px;
+    padding: 0.75rem 0.9rem;
+    border: 1px solid color-mix(in srgb, var(--default-color), transparent 78%);
+    background-color: color-mix(in srgb, var(--surface-color), #000 3%);
+    color: var(--default-color);
+    font-size: 0.95rem;
+}
+
+.jayrita-auth-input::placeholder,
+.jayrita-auth-input-secondary::placeholder {
+    color: color-mix(in srgb, var(--default-color), transparent 45%);
+}
+
+.jayrita-auth-input:focus,
+.jayrita-auth-input-secondary:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 0.18rem color-mix(in srgb, var(--accent-color), transparent 82%);
+}
+
+/* para diferenciar ligeramente el campo opcional de teléfono */
+.jayrita-auth-input-secondary {
+    background-color: color-mix(in srgb, var(--surface-color), #000 5%);
+}
+
+/* botón principal */
+.jayrita-auth-btn {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    border: none;
+    border-radius: 999px;
+    color: #111827;
+    box-shadow: 0 12px 30px rgba(251, 191, 36, 0.35);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+}
+
+.jayrita-auth-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 40px rgba(251, 191, 36, 0.45);
+    filter: brightness(1.03);
+}
+
+:root[data-theme="dark"] .jayrita-auth-btn {
+    box-shadow: 0 16px 36px rgba(251, 191, 36, 0.55);
+}
+
+/* divider y links */
+.jayrita-auth-divider {
+    border-color: color-mix(in srgb, var(--default-color), transparent 80%);
+}
+
+.jayrita-auth-link {
+    color: #2563eb;
+    text-decoration: none;
+}
+
+.jayrita-auth-link:hover {
+    text-decoration: underline;
+}
+
+/* mensajes de error */
+.jayrita-auth-card .invalid-feedback strong {
+    font-size: 0.82rem;
+}
+
+/* responsive */
+@media (max-width: 576px) {
+    .jayrita-auth-card {
+        border-radius: 16px;
+        box-shadow: 0 14px 32px rgba(15, 23, 42, 0.28);
+    }
+}
+
+
+
 /* Línea "Stock: X uds." también más legible en light */
 :root[data-theme="light"] .product-card-modern .text-white-50 {
     color: #6b7280 !important;

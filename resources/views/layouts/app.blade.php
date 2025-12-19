@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Librería Jayrita</title>
 
-    <link rel="icon" type="image/png" href="{{ asset('images/burbuja.png') }}">
+    <link rel="icon" href="{{ asset('images/burbuja.png') }}">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles

@@ -38,6 +38,7 @@ use App\Livewire\Auth\ClienteRegister;
 use App\Livewire\Tienda\CatalogoMarca;
 use App\Livewire\Tienda\ListaMarcas;
 use App\Livewire\Tienda\CatalogoProductos;
+use App\Livewire\Tienda\Ofertas;
 
 // === OTROS COMPONENTES LIVEWIRE ===
 use App\Livewire\CategoriaManager;
@@ -61,7 +62,6 @@ Route::get('/catalogo', CatalogoProductos::class)->name('tienda.catalogo');
 Route::get('/tienda/marcas', ListaMarcas::class)->name('tienda.marcas');
 Route::get('/tienda/marca/{marca}', CatalogoMarca::class)->name('tienda.marca');
 
-use App\Livewire\Tienda\Ofertas;
 
 Route::get('/tienda/ofertas', Ofertas::class)->name('tienda.ofertas');
 
@@ -70,6 +70,10 @@ Route::get('/tienda/ofertas', Ofertas::class)->name('tienda.ofertas');
 Route::get('/mi-perfil', \App\Livewire\Cliente\Perfil::class)
     ->name('cliente.perfil')
     ->middleware('auth:cliente');
+
+Route::get('/contacto', function () {
+    return view('tienda.contacto');
+})->name('tienda.contacto');
 
 Route::post('/cliente/logout', function () {
     Auth::guard('cliente')->logout();

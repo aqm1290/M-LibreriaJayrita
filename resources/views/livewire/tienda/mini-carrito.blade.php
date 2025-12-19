@@ -46,10 +46,17 @@
 
                             {{-- Imagen / ícono --}}
                             <div class="flex-shrink-0">
-                                <div class="mini-cart-thumb d-flex align-items-center justify-content-center">
-                                    <i class="bi bi-box-seam"></i>
+                                <div
+                                    class="mini-cart-thumb d-flex align-items-center justify-content-center overflow-hidden">
+                                    @if ($item->producto && $item->producto->imagen_url)
+                                        <img src="{{ $item->producto->imagen_url }}" alt="{{ $item->nombre_producto }}"
+                                            class="img-fluid w-100 h-100 object-fit-cover">
+                                    @else
+                                        <i class="bi bi-box-seam"></i>
+                                    @endif
                                 </div>
                             </div>
+
 
                             {{-- Info producto --}}
                             <div class="flex-grow-1 min-width-0">
